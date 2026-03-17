@@ -1,6 +1,5 @@
 nul
 .claude
-node_modules
 .env
 .idea
 */__pycache__
