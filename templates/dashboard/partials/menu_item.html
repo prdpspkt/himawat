@@ -1,0 +1,47 @@
+{% load static %}
+<div class="menu-item" data-id="{{ item.id }}" data-type="{{ item.type }}">
+    <div class="menu-item-bar">
+        <div class="menu-item-handle">
+            <span class="item-type">{% if item.type == 'page' %}Page{% elif item.type == 'custom_link' %}Custom{% elif item.type == 'category' %}Category{% else %}{{ item.type|title }}{% endif %}</span>
+            <span class="item-title">{{ item.title }}</span>
+        </div>
+        <div class="item-controls">
+            <button type="button" class="edit-btn" onclick="toggleItemSettings(this)">Edit</button>
+            <button type="button" class="delete-btn" onclick="deleteMenuItem(this)">Remove</button>
+        </div>
+    </div>
+    <div class="menu-item-settings">
+        <div class="field">
+            <label>Navigation Label</label>
+            <input type="text" class="item-title-input" value="{{ item.title }}" onchange="updateItemTitle(this)">
+        </div>
+        <div class="field">
+            <label>URL</label>
+            <input type="text" class="item-url-input" value="{{ item.url|default:item.get_url }}" onchange="updateItemUrl(this)">
+        </div>
+        <div class="field">
+            <label>Title Attribute (optional)</label>
+            <input type="text" class="item-attr-input" placeholder="On hover text" value="{{ item.css_class|default:'' }}">
+        </div>
+        <div class="field">
+            <label>CSS Classes (optional)</label>
+            <input type="text" class="item-class-input" placeholder="e.g., highlight-button" value="{{ item.css_class|default:'' }}">
+        </div>
+        <div class="field">
+            <label>Link Target</label>
+            <select class="item-target-input">
+                <option value="_self" {% if item.target == '_self' %}selected{% endif %}>Same window/tab</option>
+                <option value="_blank" {% if item.target == '_blank' %}selected{% endif %}>New window/tab</option>
+            </select>
+        </div>
+        <div class="menu-item-actions">
+            <button type="button" onclick="cancelItemEdit(this)">Cancel</button>
+            <button type="button" class="btn-save-menu" onclick="saveItemChanges(this)">Save</button>
+        </div>
+    </div>
+    <div class="menu-item-children">
+        {% for child in item.children.all %}
+        {% include 'dashboard/partials/menu_item.html' with item=child %}
+        {% endfor %}
+    </div>
+</div>

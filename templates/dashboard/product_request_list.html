@@ -1,0 +1,123 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Product Requests{% endblock %}
+{% block page_title %}Product Requests{% endblock %}
+
+{% block dashboard_content %}
+<div class="bg-white rounded-lg shadow">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 p-6 border-b border-gray-200">
+        <div class="bg-yellow-50 rounded-lg p-4">
+            <p class="text-sm text-yellow-600 font-medium">Pending</p>
+            <p class="text-2xl font-bold text-yellow-800">{{ pending_count|default:0 }}</p>
+        </div>
+        <div class="bg-blue-50 rounded-lg p-4">
+            <p class="text-sm text-blue-600 font-medium">Processing</p>
+            <p class="text-2xl font-bold text-blue-800">{{ processing_count|default:0 }}</p>
+        </div>
+        <div class="bg-green-50 rounded-lg p-4">
+            <p class="text-sm text-green-600 font-medium">Completed</p>
+            <p class="text-2xl font-bold text-green-800">{{ completed_count|default:0 }}</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4">
+            <p class="text-sm text-gray-600 font-medium">Total</p>
+            <p class="text-2xl font-bold text-gray-800">{{ requests|length }}</p>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex flex-wrap items-center gap-4">
+            <span class="text-sm font-medium text-gray-700">Filter by status:</span>
+            <div class="flex space-x-2">
+                <a href="?" class="px-3 py-1 rounded-full text-sm {% if not request.GET.status %}bg-primary text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">All</a>
+                <a href="?status=pending" class="px-3 py-1 rounded-full text-sm {% if request.GET.status == 'pending' %}bg-yellow-500 text-white{% else %}bg-yellow-100 text-yellow-700 hover:bg-yellow-200{% endif %}">Pending</a>
+                <a href="?status=processing" class="px-3 py-1 rounded-full text-sm {% if request.GET.status == 'processing' %}bg-blue-500 text-white{% else %}bg-blue-100 text-blue-700 hover:bg-blue-200{% endif %}">Processing</a>
+                <a href="?status=completed" class="px-3 py-1 rounded-full text-sm {% if request.GET.status == 'completed' %}bg-green-500 text-white{% else %}bg-green-100 text-green-700 hover:bg-green-200{% endif %}">Completed</a>
+                <a href="?status=cancelled" class="px-3 py-1 rounded-full text-sm {% if request.GET.status == 'cancelled' %}bg-gray-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">Cancelled</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Requests Table -->
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Requester</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for request in requests %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            {% with first_item=request.items.first %}
+                            {% if first_item %}
+                                {% if first_item.product.image %}
+                                <img class="h-10 w-10 rounded object-cover mr-3" src="{{ first_item.product.image.url }}" alt="">
+                                {% endif %}
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">{{ first_item.product.name }}</div>
+                                    {% if request.total_items > 1 %}
+                                    <div class="text-xs text-gray-500">+{{ request.total_items|add:"-1" }} more items</div>
+                                    {% else %}
+                                    <div class="text-xs text-gray-500">{{ first_item.product.category }}</div>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">General Inquiry</div>
+                                    <div class="text-xs text-gray-500">No specific products</div>
+                                </div>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-900">{{ request.name }}</div>
+                        <div class="text-xs text-gray-500">{{ request.email }}</div>
+                        {% if request.phone %}
+                        <div class="text-xs text-gray-400">{{ request.phone }}</div>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="text-sm text-gray-600 max-w-xs truncate">{{ request.message|truncatechars:60 }}</p>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ request.created_at|date:"M d, Y" }}
+                        <div class="text-xs text-gray-400">{{ request.created_at|time:"g:i A" }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if request.status == 'pending' %}bg-yellow-100 text-yellow-800
+                            {% elif request.status == 'processing' %}bg-blue-100 text-blue-800
+                            {% elif request.status == 'completed' %}bg-green-100 text-green-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ request.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="{% url 'dashboard:product_request_detail' request.pk %}" class="text-primary hover:text-red-700">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                        <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        <p>No product requests found.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

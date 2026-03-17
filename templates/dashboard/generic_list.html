@@ -1,0 +1,22 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{{ title|default:'List' }}{% endblock %}
+{% block page_title %}{{ title|default:'List' }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">{{ title|default:'All Items' }}</h3>
+        {% if create_url %}
+        <a href="{{ create_url }}" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors">
+            Add New
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="p-6 text-center">
+        <p class="text-gray-500">Please create specific templates for this view.</p>
+        <p class="text-sm text-gray-400 mt-2">Template: {{ request.resolver_match.url_name }}</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Testimonials{% endblock %}
+{% block page_title %}Testimonials{% endblock %}
+
+{% block dashboard_content %}
+<div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">All Testimonials</h3>
+        <a href="{% url 'dashboard:testimonial_create' %}" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors">
+            Add New
+        </a>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Featured</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for testimonial in testimonials %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            {% if testimonial.avatar %}
+                            <img class="h-10 w-10 rounded-full object-cover mr-3" src="{{ testimonial.avatar.url }}" alt="">
+                            {% else %}
+                            <div class="h-10 w-10 rounded-full bg-primary flex items-center justify-center mr-3">
+                                <span class="text-white font-bold">{{ testimonial.name|first }}</span>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">{{ testimonial.name }}</div>
+                                {% if testimonial.position %}
+                                <div class="text-xs text-gray-500">{{ testimonial.position }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ testimonial.company|default:"—" }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-500">{{ testimonial.rating }} ★</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {% if testimonial.featured %}
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Yes</span>
+                        {% else %}
+                        <span class="text-gray-400">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if testimonial.status == 'published' %}bg-green-100 text-green-800
+                            {% elif testimonial.status == 'draft' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ testimonial.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <a href="{% url 'dashboard:testimonial_edit' testimonial.pk %}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                        <a href="{% url 'dashboard:testimonial_delete' testimonial.pk %}" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">No testimonials found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

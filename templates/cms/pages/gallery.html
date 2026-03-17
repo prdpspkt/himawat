@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page.meta_title|default:page.title }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block meta_description %}{{ page.meta_description|default:page.excerpt|truncatewords:30 }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="bg-gradient-to-r from-primary/90 to-red-800 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ page.title }}</h1>
+        {% if page.excerpt %}
+        <p class="text-xl text-red-100 max-w-2xl mx-auto">{{ page.excerpt }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Page Content -->
+{% if page.content %}
+<div class="max-w-7xl mx-auto px-4 py-12">
+    <div class="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700">
+        {{ page.content|safe }}
+    </div>
+</div>
+{% endif %}
+
+<!-- Galleries Grid -->
+<div class="max-w-7xl mx-auto px-4 pb-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for gallery in galleries %}
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden group hover:shadow-xl transition-shadow">
+            <!-- Gallery Cover Image -->
+            <div class="relative h-64 overflow-hidden">
+                {% if gallery.cover_image %}
+                <img src="{{ gallery.cover_image.url }}" alt="{{ gallery.name }}" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                {% elif gallery.images.first %}
+                <img src="{{ gallery.images.first.image.url }}" alt="{{ gallery.name }}" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                {% else %}
+                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                {% endif %}
+                <!-- Image Count Badge -->
+                <div class="absolute top-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
+                    {{ gallery.images.count }} photos
+                </div>
+            </div>
+            
+            <!-- Gallery Info -->
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">{{ gallery.name }}</h3>
+                {% if gallery.description %}
+                <p class="text-gray-600 mb-4 line-clamp-2">{{ gallery.description }}</p>
+                {% endif %}
+                <a href="{% url 'pages:gallery_detail' gallery.slug %}" 
+                   class="inline-flex items-center text-primary font-semibold hover:text-red-700 transition-colors">
+                    View Gallery
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-16">
+            <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <p class="text-gray-500 text-lg">No galleries available yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

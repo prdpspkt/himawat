@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog - {% if company_info %}{{ company_info.company_name }}{% else %}Thelix{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">Blog</h1>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">Latest news, insights, and updates from our team</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Posts Grid -->
+        <div class="md:col-span-2">
+            {% if posts %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for post in posts %}
+                <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    {% if post.featured_image %}
+                    <a href="{{ post.get_absolute_url }}">
+                        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-48 object-cover">
+                    </a>
+                    {% endif %}
+                    <div class="p-6">
+                        {% if post.category %}
+                        <a href="{% url 'pages:post_category' post.category.slug %}" class="text-sm text-primary font-medium">{{ post.category.name }}</a>
+                        {% endif %}
+                        <h2 class="text-xl font-bold text-gray-900 mt-2 mb-2">
+                            <a href="{{ post.get_absolute_url }}" class="hover:text-primary">{{ post.title }}</a>
+                        </h2>
+                        <p class="text-gray-600 text-sm mb-4">{{ post.excerpt|truncatewords:20 }}</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <span>{{ post.author.name }}</span>
+                            <span class="mx-2">•</span>
+                            <span>{{ post.published_at|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <div class="mt-8 flex justify-center space-x-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Previous</a>
+                {% endif %}
+                <span class="px-4 py-2 bg-primary text-white rounded-lg">{{ page_obj.number }}</span>
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Next</a>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="text-center py-12">
+                <p class="text-gray-500">No posts found.</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="space-y-8">
+            <!-- Search -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="font-bold text-gray-900 mb-4">Search</h3>
+                <form method="get" action="{% url 'pages:post_list' %}">
+                    <input type="text" name="search" placeholder="Search posts..." 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                </form>
+            </div>
+            
+            <!-- Categories -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="font-bold text-gray-900 mb-4">Categories</h3>
+                <ul class="space-y-2">
+                    {% for category in categories %}
+                    <li>
+                        <a href="{% url 'pages:post_category' category.slug %}" class="text-gray-600 hover:text-primary flex justify-between">
+                            <span>{{ category.name }}</span>
+                            <span class="text-gray-400">({{ category.posts.count }})</span>
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li class="text-gray-500">No categories</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <!-- Tags -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="font-bold text-gray-900 mb-4">Tags</h3>
+                <div class="flex flex-wrap gap-2">
+                    {% for tag in tags %}
+                    <a href="{% url 'pages:post_tag' tag.slug %}" class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-primary hover:text-white transition-colors">{{ tag.name }}</a>
+                    {% empty %}
+                    <span class="text-gray-500">No tags</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,411 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page.meta_title|default:page.title }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block meta_description %}{{ page.meta_description|default:page.excerpt|truncatewords:30 }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="relative bg-gradient-to-br from-yellow-500 via-orange-500 to-red-600 overflow-hidden">
+    <!-- Decorative Pattern -->
+    <div class="absolute inset-0 opacity-10">
+        <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs>
+                <pattern id="courses-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                    <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100" height="100" fill="url(#courses-grid)"/>
+        </svg>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 py-24 md:py-32 text-center">
+        {% if page.featured_image %}
+        <div class="mb-8">
+            <img src="{{ page.featured_image.url }}" alt="{{ page.title }}" class="w-32 h-32 object-contain mx-auto rounded-full bg-white/10 p-4 backdrop-blur-sm">
+        </div>
+        {% endif %}
+
+        <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+            {{ page.title }}
+        </h1>
+
+        {% if page.excerpt %}
+        <p class="text-xl md:text-2xl text-yellow-100 max-w-3xl mx-auto mb-8">
+            {{ page.excerpt }}
+        </p>
+        {% endif %}
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="#vastu-training" class="inline-flex items-center justify-center px-8 py-4 bg-white text-orange-600 rounded-lg hover:bg-gray-100 transition-all font-semibold shadow-lg">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                Vastu Training
+            </a>
+            <a href="#engineering-training" class="inline-flex items-center justify-center px-8 py-4 bg-white/20 text-white border-2 border-white rounded-lg hover:bg-white/30 transition-all font-semibold">
+                Engineering Training
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+{% if page.content %}
+<div class="max-w-7xl mx-auto px-4 py-16">
+    <div class="prose prose-lg max-w-none mx-auto prose-headings:text-gray-900 prose-p:text-gray-700">
+        {{ page.content|safe }}
+    </div>
+</div>
+{% endif %}
+
+<!-- Vastu Training Section -->
+<div id="vastu-training" class="bg-gray-50 py-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-12">
+            <span class="inline-block bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold mb-4">POPULAR</span>
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Vastu Training Programs</h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Master the ancient science of Vastu with our comprehensive training courses</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Orientation Program -->
+            <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
+                <div class="relative h-48 bg-gradient-to-br from-primary to-red-700 p-6 flex flex-col justify-between">
+                    <div>
+                        <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">BEGINNER</span>
+                    </div>
+                    <div class="w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Orientation Program for Owners</h3>
+                    <p class="text-gray-600 mb-4">Perfect for property owners who want to understand Vastu basics for their homes and offices.</p>
+                    <ul class="space-y-2 mb-6 text-sm">
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            2-day intensive program
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Site visits & practical training
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Certificate of completion
+                        </li>
+                    </ul>
+                    <a href="{% url 'pages:consultation' %}" class="inline-flex items-center text-primary font-semibold group-hover:translate-x-2 transition-transform">
+                        Enroll Now
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Advanced Vastu -->
+            <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
+                <div class="relative h-48 bg-gradient-to-br from-secondary to-green-700 p-6 flex flex-col justify-between">
+                    <div>
+                        <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">INTERMEDIATE</span>
+                    </div>
+                    <div class="w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Advanced Vastu Training</h3>
+                    <p class="text-gray-600 mb-4">Deep dive into Vastu principles for professionals and serious practitioners.</p>
+                    <ul class="space-y-2 mb-6 text-sm">
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-secondary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            7-day comprehensive course
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-secondary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Advanced case studies
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-secondary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Professional certification
+                        </li>
+                    </ul>
+                    <a href="{% url 'pages:consultation' %}" class="inline-flex items-center text-secondary font-semibold group-hover:translate-x-2 transition-transform">
+                        Enroll Now
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Yantra Designing -->
+            <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
+                <div class="relative h-48 bg-gradient-to-br from-accent to-purple-700 p-6 flex flex-col justify-between">
+                    <div>
+                        <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">SPECIALIZED</span>
+                    </div>
+                    <div class="w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Yantra Designing</h3>
+                    <p class="text-gray-600 mb-4">Learn sacred geometry and create powerful Vastu yantras for energy correction.</p>
+                    <ul class="space-y-2 mb-6 text-sm">
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-accent mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            5-day specialized training
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-accent mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Practical yantra creation
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-accent mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Take-home kit included
+                        </li>
+                    </ul>
+                    <a href="{% url 'pages:consultation' %}" class="inline-flex items-center text-accent font-semibold group-hover:translate-x-2 transition-transform">
+                        Enroll Now
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Vastu CAD -->
+            <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
+                <div class="relative h-48 bg-gradient-to-br from-blue-600 to-blue-800 p-6 flex flex-col justify-between">
+                    <div>
+                        <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">TECHNICAL</span>
+                    </div>
+                    <div class="w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Vastu CAD</h3>
+                    <p class="text-gray-600 mb-4">Combine traditional Vastu knowledge with modern CAD software for precise planning.</p>
+                    <ul class="space-y-2 mb-6 text-sm">
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            10-day intensive program
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-blue-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Hands-on CAD training
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Software license included
+                        </li>
+                    </ul>
+                    <a href="{% url 'pages:consultation' %}" class="inline-flex items-center text-blue-600 font-semibold group-hover:translate-x-2 transition-transform">
+                        Enroll Now
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Vedic Mantra -->
+            <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
+                <div class="relative h-48 bg-gradient-to-br from-yellow-500 to-orange-600 p-6 flex flex-col justify-between">
+                    <div>
+                        <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">SPIRITUAL</span>
+                    </div>
+                    <div class="w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Vedic Mantra (Diksha)</h3>
+                    <p class="text-gray-600 mb-4">Sacred initiation into Vedic mantras for spiritual growth and Vastu rituals.</p>
+                    <ul class="space-y-2 mb-6 text-sm">
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            3-day spiritual program
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Traditional initiation
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Mantra notebook provided
+                        </li>
+                    </ul>
+                    <a href="{% url 'pages:consultation' %}" class="inline-flex items-center text-yellow-600 font-semibold group-hover:translate-x-2 transition-transform">
+                        Enroll Now
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Engineering Training Section -->
+<div id="engineering-training" class="py-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-12">
+            <span class="inline-block bg-secondary/10 text-secondary px-4 py-2 rounded-full text-sm font-semibold mb-4">TECHNICAL</span>
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Engineering Training</h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Practical training in civil engineering and construction management</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Engineering Training -->
+            <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                <div class="p-8">
+                    <div class="flex items-start mb-6">
+                        <div class="w-16 h-16 bg-secondary/10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                            <svg class="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Engineering Training</h3>
+                            <p class="text-gray-600">Comprehensive civil engineering and construction training</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-6">Master structural engineering, project management, and construction techniques with hands-on training from industry experts.</p>
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-secondary mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-gray-700">30-day intensive program</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-secondary mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-gray-700">Site visits & practical training</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-secondary mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-gray-700">Job placement assistance</span>
+                        </li>
+                    </ul>
+                    <a href="{% url 'pages:consultation' %}" class="inline-flex items-center text-secondary font-semibold">
+                        Learn More
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mason Training -->
+            <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                <div class="p-8">
+                    <div class="flex items-start mb-6">
+                        <div class="w-16 h-16 bg-accent/10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                            <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Mason Training</h3>
+                            <p class="text-gray-600">Skill development for masons and construction workers</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-6">Learn professional masonry techniques, quality construction methods, and Vastu-compliant building practices.</p>
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-accent mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-gray-700">15-day practical training</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-accent mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-gray-700">Hands-on construction practice</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-accent mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-gray-700">Tool kit and certification</span>
+                        </li>
+                    </ul>
+                    <a href="{% url 'pages:consultation' %}" class="inline-flex items-center text-accent font-semibold">
+                        Learn More
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="bg-gradient-to-r from-yellow-500 to-orange-600 py-16">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Start Your Learning Journey Today</h2>
+        <p class="text-xl text-yellow-100 mb-8">Join thousands of students who have transformed their careers with our training programs.</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'pages:consultation' %}" class="inline-flex items-center justify-center px-8 py-4 bg-white text-orange-600 rounded-lg hover:bg-gray-100 transition-all font-semibold shadow-lg">
+                Enroll Now
+            </a>
+            <a href="tel:{% if company_info %}{{ company_info.phone }}{% endif %}" class="inline-flex items-center justify-center px-8 py-4 bg-white/20 text-white border-2 border-white rounded-lg hover:bg-white/30 transition-all font-semibold">
+                Call for Details
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

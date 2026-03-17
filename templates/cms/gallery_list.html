@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Galleries - {% if company_info %}{{ company_info.company_name }}{% else %}Thelix{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-12">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">Photo Galleries</h1>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">Explore our collection of images</p>
+    </div>
+    
+    {% if galleries %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for gallery in galleries %}
+        <a href="{{ gallery.get_absolute_url }}" class="group">
+            <div class="relative overflow-hidden rounded-lg shadow-md">
+                {% if gallery.cover_image %}
+                <img src="{{ gallery.cover_image.url }}" alt="{{ gallery.name }}" class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300">
+                {% else %}
+                <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                    <span class="text-gray-400">No image</span>
+                </div>
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-6">
+                    <h2 class="text-xl font-bold text-white">{{ gallery.name }}</h2>
+                    <p class="text-white/80 text-sm">{{ gallery.image_count }} images</p>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    
+    {% if is_paginated %}
+    <div class="mt-12 flex justify-center space-x-2">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Previous</a>
+        {% endif %}
+        <span class="px-4 py-2 bg-primary text-white rounded-lg">{{ page_obj.number }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="text-center py-12">
+        <p class="text-gray-500">No galleries found.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

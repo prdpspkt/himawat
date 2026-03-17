@@ -1,0 +1,1026 @@
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import (
+    View, TemplateView, ListView, CreateView, UpdateView, DeleteView, DetailView
+)
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from django.urls import reverse_lazy
+from django.db.models import Count, Q
+from django.utils import timezone
+from django.http import JsonResponse
+
+from dashboard.models import (
+    Post, Page, Category, Tag, Download, Gallery,
+    Testimonial, Carousel, FAQ, Product, ProductRequest, ProductRequestItem, Consultation,
+    Menu, CompanyInfo, CEOInfo, Video, PageRevision, PostRevision, AIConfiguration
+)
+from dashboard.forms import PageForm, PostForm, FAQForm, ProductForm
+from accounts.models import User
+
+
+class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    """Mixin to check if user is admin"""
+    def test_func(self):
+        return self.request.user.is_admin
+
+
+class DashboardView(AdminRequiredMixin, TemplateView):
+    """Main dashboard view"""
+    template_name = 'dashboard/index.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Statistics
+        context['total_posts'] = Post.objects.count()
+        context['published_posts'] = Post.objects.filter(status='published').count()
+        context['total_pages'] = Page.objects.count()
+        context['total_products'] = Product.objects.count()
+        context['total_galleries'] = Gallery.objects.count()
+        
+        # Recent items
+        context['recent_posts'] = Post.objects.select_related('author').order_by('-created_at')[:5]
+        context['pending_consultations'] = Consultation.objects.filter(status='pending').count()
+        context['pending_product_requests'] = ProductRequest.objects.filter(status='pending').count()
+        
+        # Popular content
+        context['popular_posts'] = Post.objects.order_by('-view_count')[:5]
+        
+        return context
+
+
+# Base CRUD Views
+class BaseListView(AdminRequiredMixin, ListView):
+    """Base list view for dashboard"""
+    paginate_by = 20
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) |
+                Q(name__icontains=search)
+            )
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('search', '')
+        return context
+
+
+class BaseCreateView(AdminRequiredMixin, CreateView):
+    """Base create view"""
+    def form_valid(self, form):
+        messages.success(self.request, f'{self.model.__name__} created successfully!')
+        return super().form_valid(form)
+
+
+class BaseUpdateView(AdminRequiredMixin, UpdateView):
+    """Base update view"""
+    def form_valid(self, form):
+        messages.success(self.request, f'{self.model.__name__} updated successfully!')
+        return super().form_valid(form)
+
+
+class BaseDeleteView(AdminRequiredMixin, DeleteView):
+    """Base delete view"""
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, f'{self.model.__name__} deleted successfully!')
+        return super().delete(request, *args, **kwargs)
+
+
+# Post Views
+class PostListView(BaseListView):
+    model = Post
+    template_name = 'dashboard/post_list.html'
+    context_object_name = 'posts'
+    
+    def get_queryset(self):
+        return Post.objects.select_related('category', 'author').order_by('-created_at')
+
+
+class PostCreateView(BaseCreateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'dashboard/post_form.html'
+    success_url = reverse_lazy('dashboard:post_list')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['all_categories'] = Category.objects.filter(status='active').prefetch_related('children')
+        context['all_tags'] = Tag.objects.filter(status='active').order_by('name')
+        return context
+    
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        response = super().form_valid(form)
+        
+        # Handle tags from the hidden input
+        tags_input = self.request.POST.get('tags', '')
+        if tags_input:
+            tag_ids = [int(tid) for tid in tags_input.split(',') if tid.isdigit()]
+            self.object.tags.set(tag_ids)
+        else:
+            self.object.tags.clear()
+        
+        return response
+
+
+class PostUpdateView(BaseUpdateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'dashboard/post_form.html'
+    success_url = reverse_lazy('dashboard:post_list')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['all_categories'] = Category.objects.filter(status='active').prefetch_related('children')
+        context['all_tags'] = Tag.objects.filter(status='active').order_by('name')
+        return context
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        
+        # Handle tags from the hidden input
+        tags_input = self.request.POST.get('tags', '')
+        if tags_input:
+            tag_ids = [int(tid) for tid in tags_input.split(',') if tid.isdigit()]
+            self.object.tags.set(tag_ids)
+        else:
+            self.object.tags.clear()
+        
+        return response
+
+
+class PostDeleteView(BaseDeleteView):
+    model = Post
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:post_list')
+
+
+# Page Views
+class PageListView(BaseListView):
+    model = Page
+    template_name = 'dashboard/page_list.html'
+    context_object_name = 'pages'
+    
+    def get_queryset(self):
+        return Page.objects.order_by('order', 'title')
+
+
+class PageCreateView(BaseCreateView):
+    model = Page
+    form_class = PageForm
+    template_name = 'dashboard/page_form.html'
+    success_url = reverse_lazy('dashboard:page_list')
+
+
+class PageUpdateView(BaseUpdateView):
+    model = Page
+    form_class = PageForm
+    template_name = 'dashboard/page_form.html'
+    success_url = reverse_lazy('dashboard:page_list')
+
+
+class PageDeleteView(BaseDeleteView):
+    model = Page
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:page_list')
+
+
+# Category Views
+class CategoryListView(BaseListView):
+    model = Category
+    template_name = 'dashboard/category_list.html'
+    context_object_name = 'categories'
+    
+    def get_queryset(self):
+        return Category.objects.annotate(post_count=Count('posts')).order_by('sort_order')
+
+
+class CategoryCreateView(BaseCreateView):
+    model = Category
+    template_name = 'dashboard/category_form.html'
+    fields = ['name', 'slug', 'description', 'parent', 'image', 'sort_order', 'status']
+    success_url = reverse_lazy('dashboard:category_list')
+
+
+class CategoryUpdateView(BaseUpdateView):
+    model = Category
+    template_name = 'dashboard/category_form.html'
+    fields = ['name', 'slug', 'description', 'parent', 'image', 'sort_order', 'status']
+    success_url = reverse_lazy('dashboard:category_list')
+
+
+class CategoryDeleteView(BaseDeleteView):
+    model = Category
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:category_list')
+
+
+# Download Views
+class DownloadListView(BaseListView):
+    model = Download
+    template_name = 'dashboard/download_list.html'
+    context_object_name = 'downloads'
+    
+    def get_queryset(self):
+        return Download.objects.order_by('-created_at')
+
+
+class DownloadCreateView(BaseCreateView):
+    model = Download
+    template_name = 'dashboard/download_form.html'
+    fields = ['title', 'slug', 'description', 'file', 'version', 'featured_image', 'status', 'published_at']
+    success_url = reverse_lazy('dashboard:download_list')
+    
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class DownloadUpdateView(BaseUpdateView):
+    model = Download
+    template_name = 'dashboard/download_form.html'
+    fields = ['title', 'slug', 'description', 'file', 'version', 'featured_image', 'status', 'published_at']
+    success_url = reverse_lazy('dashboard:download_list')
+
+
+class DownloadDeleteView(BaseDeleteView):
+    model = Download
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:download_list')
+
+
+# Gallery Views
+class GalleryListView(BaseListView):
+    model = Gallery
+    template_name = 'dashboard/gallery_list.html'
+    context_object_name = 'galleries'
+    
+    def get_queryset(self):
+        return Gallery.objects.annotate(image_count=Count('images')).order_by('sort_order')
+
+
+class GalleryCreateView(BaseCreateView):
+    model = Gallery
+    template_name = 'dashboard/gallery_form.html'
+    fields = ['name', 'slug', 'description', 'cover_image', 'sort_order', 'status']
+    success_url = reverse_lazy('dashboard:gallery_list')
+    
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class GalleryUpdateView(BaseUpdateView):
+    model = Gallery
+    template_name = 'dashboard/gallery_form.html'
+    fields = ['name', 'slug', 'description', 'cover_image', 'sort_order', 'status']
+    success_url = reverse_lazy('dashboard:gallery_list')
+
+
+class GalleryDeleteView(BaseDeleteView):
+    model = Gallery
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:gallery_list')
+
+
+# Gallery Image API Views
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
+from dashboard.models import GalleryImage
+
+
+@staff_member_required
+def gallery_image_upload(request):
+    """Upload multiple images to a gallery"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Invalid method'})
+    
+    try:
+        gallery_id = request.POST.get('gallery_id')
+        gallery = get_object_or_404(Gallery, pk=gallery_id)
+        images = request.FILES.getlist('images')
+        
+        if not images:
+            return JsonResponse({'success': False, 'error': 'No images provided'})
+        
+        current_count = gallery.images.count()
+        created_images = []
+        
+        for i, image_file in enumerate(images):
+            image = GalleryImage.objects.create(
+                gallery=gallery,
+                image=image_file,
+                sort_order=current_count + i
+            )
+            created_images.append({
+                'id': image.id,
+                'url': image.image.url
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'images': created_images,
+            'count': len(created_images)
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@staff_member_required
+@require_POST
+def gallery_image_reorder(request):
+    """Reorder gallery images"""
+    try:
+        data = json.loads(request.body)
+        images = data.get('images', [])
+        
+        for img_data in images:
+            GalleryImage.objects.filter(pk=img_data['id']).update(
+                sort_order=img_data['order']
+            )
+        
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@staff_member_required
+@require_POST
+def gallery_image_delete(request, pk):
+    """Delete a gallery image"""
+    try:
+        image = get_object_or_404(GalleryImage, pk=pk)
+        image.delete()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@staff_member_required
+def gallery_image_detail(request, pk):
+    """Get gallery image details"""
+    try:
+        image = get_object_or_404(GalleryImage, pk=pk)
+        return JsonResponse({
+            'success': True,
+            'image': {
+                'id': image.id,
+                'title': image.title,
+                'description': image.description,
+                'alt_text': image.alt_text,
+                'url': image.image.url
+            }
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@staff_member_required
+@require_POST
+def gallery_image_update(request, pk):
+    """Update gallery image metadata"""
+    try:
+        image = get_object_or_404(GalleryImage, pk=pk)
+        data = json.loads(request.body)
+        
+        image.title = data.get('title', image.title)
+        image.description = data.get('description', image.description)
+        image.alt_text = data.get('alt_text', image.alt_text)
+        image.save()
+        
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+# Testimonial Views
+class TestimonialListView(BaseListView):
+    model = Testimonial
+    template_name = 'dashboard/testimonial_list.html'
+    context_object_name = 'testimonials'
+    
+    def get_queryset(self):
+        return Testimonial.objects.order_by('order')
+
+
+class TestimonialCreateView(BaseCreateView):
+    model = Testimonial
+    template_name = 'dashboard/testimonial_form.html'
+    fields = ['name', 'slug', 'position', 'company', 'avatar', 'testimonial', 'rating', 'featured', 'order', 'status']
+    success_url = reverse_lazy('dashboard:testimonial_list')
+
+
+class TestimonialUpdateView(BaseUpdateView):
+    model = Testimonial
+    template_name = 'dashboard/testimonial_form.html'
+    fields = ['name', 'slug', 'position', 'company', 'avatar', 'testimonial', 'rating', 'featured', 'order', 'status']
+    success_url = reverse_lazy('dashboard:testimonial_list')
+
+
+class TestimonialDeleteView(BaseDeleteView):
+    model = Testimonial
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:testimonial_list')
+
+
+# Product Views
+class ProductListView(BaseListView):
+    model = Product
+    template_name = 'dashboard/product_list.html'
+    context_object_name = 'products'
+    
+    def get_queryset(self):
+        return Product.objects.order_by('-featured', 'sort_order')
+
+
+class ProductCreateView(BaseCreateView):
+    model = Product
+    template_name = 'dashboard/product_form.html'
+    fields = ['name', 'slug', 'description', 'image', 'category', 'featured', 'sort_order', 'status']
+    success_url = reverse_lazy('dashboard:product_list')
+    
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class ProductUpdateView(BaseUpdateView):
+    model = Product
+    template_name = 'dashboard/product_form.html'
+    fields = ['name', 'slug', 'description', 'image', 'category', 'featured', 'sort_order', 'status']
+    success_url = reverse_lazy('dashboard:product_list')
+
+
+class ProductDeleteView(BaseDeleteView):
+    model = Product
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:product_list')
+
+
+# Carousel Views
+class CarouselListView(BaseListView):
+    model = Carousel
+    template_name = 'dashboard/carousel_list.html'
+    context_object_name = 'carousels'
+    
+    def get_queryset(self):
+        return Carousel.objects.order_by('sort_order')
+
+
+class CarouselCreateView(BaseCreateView):
+    model = Carousel
+    template_name = 'dashboard/carousel_form.html'
+    fields = ['title', 'caption', 'image', 'link_url', 'sort_order', 'status']
+    success_url = reverse_lazy('dashboard:carousel_list')
+
+
+class CarouselUpdateView(BaseUpdateView):
+    model = Carousel
+    template_name = 'dashboard/carousel_form.html'
+    fields = ['title', 'caption', 'image', 'link_url', 'sort_order', 'status']
+    success_url = reverse_lazy('dashboard:carousel_list')
+
+
+class CarouselDeleteView(BaseDeleteView):
+    model = Carousel
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:carousel_list')
+
+
+# FAQ Views
+class FAQListView(BaseListView):
+    model = FAQ
+    template_name = 'dashboard/faq_list.html'
+    context_object_name = 'faqs'
+    
+    def get_queryset(self):
+        return FAQ.objects.order_by('category', 'sort_order')
+
+
+class FAQCreateView(BaseCreateView):
+    model = FAQ
+    template_name = 'dashboard/faq_form.html'
+    fields = ['question', 'answer', 'category', 'sort_order', 'status']
+    success_url = reverse_lazy('dashboard:faq_list')
+
+
+class FAQUpdateView(BaseUpdateView):
+    model = FAQ
+    template_name = 'dashboard/faq_form.html'
+    fields = ['question', 'answer', 'category', 'sort_order', 'status']
+    success_url = reverse_lazy('dashboard:faq_list')
+
+
+class FAQDeleteView(BaseDeleteView):
+    model = FAQ
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:faq_list')
+
+
+# Menu Views
+class MenuListView(BaseListView):
+    model = Menu
+    template_name = 'dashboard/menu_list.html'
+    context_object_name = 'menus'
+    
+    def get_queryset(self):
+        return Menu.objects.annotate(item_count=Count('items'))
+
+
+class MenuCreateView(BaseCreateView):
+    model = Menu
+    template_name = 'dashboard/menu_form.html'
+    fields = ['name', 'slug', 'location', 'description']
+    success_url = reverse_lazy('dashboard:menu_list')
+
+
+class MenuUpdateView(BaseUpdateView):
+    model = Menu
+    template_name = 'dashboard/menu_form.html'
+    fields = ['name', 'slug', 'location', 'description']
+    success_url = reverse_lazy('dashboard:menu_list')
+
+
+class MenuDeleteView(BaseDeleteView):
+    model = Menu
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:menu_list')
+
+
+# Product Request Views
+class ProductRequestListView(BaseListView):
+    model = ProductRequest
+    template_name = 'dashboard/product_request_list.html'
+    context_object_name = 'requests'
+    
+    def get_queryset(self):
+        return ProductRequest.objects.prefetch_related('items', 'items__product').order_by('-created_at')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['pending_count'] = ProductRequest.objects.filter(status='pending').count()
+        context['processing_count'] = ProductRequest.objects.filter(status='processing').count()
+        context['completed_count'] = ProductRequest.objects.filter(status='completed').count()
+        return context
+
+
+class ProductRequestDetailView(AdminRequiredMixin, UpdateView):
+    model = ProductRequest
+    template_name = 'dashboard/product_request_detail.html'
+    fields = ['status', 'notes']
+    
+    def get_success_url(self):
+        return reverse_lazy('dashboard:product_request_detail', kwargs={'pk': self.object.pk})
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Request updated successfully!')
+        return super().form_valid(form)
+
+
+# Consultation Views
+class ConsultationListView(BaseListView):
+    model = Consultation
+    template_name = 'dashboard/consultation_list.html'
+    context_object_name = 'consultations'
+    
+    def get_queryset(self):
+        return Consultation.objects.order_by('-created_at')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['pending_count'] = Consultation.objects.filter(status='pending').count()
+        context['confirmed_count'] = Consultation.objects.filter(status='confirmed').count()
+        context['completed_count'] = Consultation.objects.filter(status='completed').count()
+        return context
+
+
+class ConsultationDetailView(AdminRequiredMixin, UpdateView):
+    model = Consultation
+    template_name = 'dashboard/consultation_detail.html'
+    fields = ['status', 'notes']
+    
+    def get_success_url(self):
+        return reverse_lazy('dashboard:consultation_detail', kwargs={'pk': self.object.pk})
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Consultation updated successfully!')
+        return super().form_valid(form)
+
+
+# Company Info View
+class CompanyInfoUpdateView(AdminRequiredMixin, UpdateView):
+    model = CompanyInfo
+    template_name = 'dashboard/company_info_form.html'
+    fields = [
+        'company_name', 'description', 'logo', 'favicon', 'email', 'phone', 
+        'address', 'city', 'state', 'postal_code', 'country', 
+        'latitude', 'longitude',
+        'facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'whatsapp'
+    ]
+    success_url = reverse_lazy('dashboard:company_info')
+    
+    def get_object(self):
+        return CompanyInfo.get_instance()
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Company information updated successfully!')
+        return super().form_valid(form)
+
+
+# CEO Info View
+class CEOInfoUpdateView(AdminRequiredMixin, UpdateView):
+    model = CEOInfo
+    template_name = 'dashboard/ceo_info_form.html'
+    fields = [
+        'name', 'title', 'bio', 'message', 'photo', 'email', 'phone',
+        'social_linkedin', 'social_twitter', 'social_facebook', 'is_active'
+    ]
+    success_url = reverse_lazy('dashboard:ceo_info')
+    
+    def get_object(self):
+        return CEOInfo.get_instance()
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'CEO information updated successfully!')
+        return super().form_valid(form)
+
+
+# User Profile View
+class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
+    """User profile update view - users can only edit their own profile"""
+    model = User
+    template_name = 'dashboard/profile_form.html'
+    fields = ['first_name', 'last_name', 'email', 'phone', 'avatar', 'bio']
+    
+    def get_object(self):
+        return self.request.user
+    
+    def get_success_url(self):
+        return reverse_lazy('dashboard:user_profile')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Profile updated successfully!')
+        return super().form_valid(form)
+
+
+# User Profile View
+class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
+    """User profile update view - users can only edit their own profile"""
+    model = User
+    template_name = 'dashboard/profile_form.html'
+    fields = ['first_name', 'last_name', 'email', 'phone', 'avatar', 'bio']
+    
+    def get_object(self):
+        return self.request.user
+    
+    def get_success_url(self):
+        return reverse_lazy('dashboard:user_profile')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Profile updated successfully!')
+        return super().form_valid(form)
+
+
+# User Management Views
+class UserListView(BaseListView):
+    model = User
+    template_name = 'dashboard/user_list.html'
+    context_object_name = 'users'
+    
+    def get_queryset(self):
+        return User.objects.order_by('-created_at')
+
+
+# AJAX Views for Categories and Tags
+from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.http import require_POST
+
+
+@staff_member_required
+@require_POST
+def category_create_ajax(request):
+    """Create a new category via AJAX"""
+    try:
+        name = request.POST.get('name', '').strip()
+        parent_id = request.POST.get('parent', '').strip()
+        
+        if not name:
+            return JsonResponse({'success': False, 'error': 'Category name is required'})
+        
+        # Check if category with this name already exists
+        if Category.objects.filter(name__iexact=name).exists():
+            return JsonResponse({'success': False, 'error': 'A category with this name already exists'})
+        
+        # Create the category
+        category_data = {'name': name}
+        if parent_id:
+            try:
+                parent = Category.objects.get(pk=parent_id)
+                category_data['parent'] = parent
+            except Category.DoesNotExist:
+                pass
+        
+        category = Category.objects.create(**category_data)
+        
+        return JsonResponse({
+            'success': True,
+            'category': {
+                'id': category.id,
+                'name': category.name,
+                'slug': category.slug,
+                'parent_id': category.parent_id
+            }
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+# Video Views
+class VideoListView(BaseListView):
+    model = Video
+    template_name = 'dashboard/video_list.html'
+    context_object_name = 'videos'
+    
+    def get_queryset(self):
+        return Video.objects.order_by('sort_order', '-created_at')
+
+
+class VideoCreateView(BaseCreateView):
+    model = Video
+    template_name = 'dashboard/video_form.html'
+    fields = ['title', 'slug', 'description', 'embed_code', 'thumbnail', 'sort_order', 'status', 'published_at']
+    success_url = reverse_lazy('dashboard:video_list')
+    
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class VideoUpdateView(BaseUpdateView):
+    model = Video
+    template_name = 'dashboard/video_form.html'
+    fields = ['title', 'slug', 'description', 'embed_code', 'thumbnail', 'sort_order', 'status', 'published_at']
+    success_url = reverse_lazy('dashboard:video_list')
+
+
+class VideoDeleteView(BaseDeleteView):
+    model = Video
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:video_list')
+
+
+@staff_member_required
+@require_POST
+def tag_create_ajax(request):
+    """Create a new tag via AJAX"""
+    try:
+        name = request.POST.get('name', '').strip()
+
+        if not name:
+            return JsonResponse({'success': False, 'error': 'Tag name is required'})
+
+        # Check if tag with this name already exists (case-insensitive)
+        existing_tag = Tag.objects.filter(name__iexact=name).first()
+        if existing_tag:
+            return JsonResponse({
+                'success': True,
+                'tag': {
+                    'id': existing_tag.id,
+                    'name': existing_tag.name,
+                    'slug': existing_tag.slug
+                }
+            })
+
+        # Create the tag
+        tag = Tag.objects.create(name=name)
+
+        return JsonResponse({
+            'success': True,
+            'tag': {
+                'id': tag.id,
+                'name': tag.name,
+                'slug': tag.slug
+            }
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+# Revision Management Views
+class PageRevisionListView(AdminRequiredMixin, ListView):
+    """List all revisions for a page"""
+    model = PageRevision
+    template_name = 'dashboard/page_revision_list.html'
+    context_object_name = 'revisions'
+
+    def get_queryset(self):
+        self.page = get_object_or_404(Page, pk=self.kwargs['page_id'])
+        return PageRevision.objects.filter(page=self.page).order_by('-revision_number')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page'] = self.page
+        return context
+
+
+class PostRevisionListView(AdminRequiredMixin, ListView):
+    """List all revisions for a post"""
+    model = PostRevision
+    template_name = 'dashboard/post_revision_list.html'
+    context_object_name = 'revisions'
+
+    def get_queryset(self):
+        self.post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        return PostRevision.objects.filter(post=self.post).order_by('-revision_number')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['post'] = self.post
+        return context
+
+
+@staff_member_required
+@require_POST
+def restore_page_revision(request, revision_id):
+    """Restore a page to a specific revision"""
+    try:
+        revision = get_object_or_404(PageRevision, pk=revision_id)
+        revision.restore()
+        messages.success(request, f'Page restored to revision {revision.revision_number} successfully!')
+        return JsonResponse({'success': True, 'redirect_url': reverse_lazy('dashboard:page_list')})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@staff_member_required
+@require_POST
+def restore_post_revision(request, revision_id):
+    """Restore a post to a specific revision"""
+    try:
+        revision = get_object_or_404(PostRevision, pk=revision_id)
+        revision.restore()
+        messages.success(request, f'Post restored to revision {revision.revision_number} successfully!')
+        return JsonResponse({'success': True, 'redirect_url': reverse_lazy('dashboard:post_list')})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+# AI Configuration Views
+class AIConfigurationListView(AdminRequiredMixin, ListView):
+    """List all AI configurations"""
+    model = AIConfiguration
+    template_name = 'dashboard/ai_config_list.html'
+    context_object_name = 'configs'
+
+    def get_queryset(self):
+        return AIConfiguration.objects.order_by('-is_default', '-created_at')
+
+
+class AIConfigurationCreateView(AdminRequiredMixin, CreateView):
+    """Create a new AI configuration"""
+    model = AIConfiguration
+    template_name = 'dashboard/ai_config_form.html'
+    fields = ['name', 'api_key', 'model', 'system_prompt',
+              'max_tokens', 'temperature', 'status', 'is_default']
+    success_url = reverse_lazy('dashboard:ai_config_list')
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        messages.success(self.request, 'AI configuration created successfully!')
+        return super().form_valid(form)
+
+
+class AIConfigurationUpdateView(AdminRequiredMixin, UpdateView):
+    """Update an AI configuration"""
+    model = AIConfiguration
+    template_name = 'dashboard/ai_config_form.html'
+    fields = ['name', 'api_key', 'model', 'system_prompt',
+              'max_tokens', 'temperature', 'status', 'is_default']
+    success_url = reverse_lazy('dashboard:ai_config_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'AI configuration updated successfully!')
+        return super().form_valid(form)
+
+
+class AIConfigurationDeleteView(AdminRequiredMixin, DeleteView):
+    """Delete an AI configuration"""
+    model = AIConfiguration
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:ai_config_list')
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, 'AI configuration deleted successfully!')
+        return super().delete(request, *args, **kwargs)
+
+
+@staff_member_required
+@require_POST
+def activate_ai_config(request, config_id):
+    """Activate an AI configuration"""
+    try:
+        config = get_object_or_404(AIConfiguration, pk=config_id)
+        config.status = 'active'
+        config.save()
+
+        # Deactivate all other configs
+        AIConfiguration.objects.filter(status='active').exclude(pk=config_id).update(status='inactive')
+
+        messages.success(request, f'AI configuration "{config.name}" activated successfully!')
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+# AI Content Generation API
+@staff_member_required
+def generate_content_with_ai(request):
+    """Generate content using DeepSeek AI with streaming support"""
+    import json
+    from django.http import StreamingHttpResponse
+    from openai import OpenAI
+
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Only POST method is allowed'})
+
+    try:
+        # Get active AI configuration
+        ai_config = AIConfiguration.get_active()
+        if not ai_config:
+            return JsonResponse({
+                'success': False,
+                'error': 'No active AI configuration found. Please activate an AI configuration first.'
+            })
+
+        # Get request data
+        data = json.loads(request.body)
+        prompt = data.get('prompt', '').strip()
+        action = data.get('action', 'generate')  # generate, replace, edit
+        current_content = data.get('current_content', '')
+
+        if not prompt:
+            return JsonResponse({'success': False, 'error': 'Prompt is required'})
+
+        # Prepare messages based on action
+        messages = []
+
+        # Add system prompt if configured
+        if ai_config.system_prompt:
+            messages.append({
+                'role': 'system',
+                'content': ai_config.system_prompt
+            })
+
+        # Prepare user prompt based on action
+        user_prompt = prompt
+        if action == 'edit' and current_content:
+            user_prompt = f"{prompt}\n\nCurrent content:\n{current_content}\n\nPlease improve the above content based on my instructions."
+
+        messages.append({
+            'role': 'user',
+            'content': user_prompt
+        })
+
+        # Create OpenAI client for DeepSeek
+        client = OpenAI(
+            api_key=ai_config.api_key,
+            base_url='https://api.z.ai/api/paas/v4/'
+        )
+
+        def generate():
+            """Generator function for streaming response"""
+            try:
+                # Create streaming completion
+                stream = client.chat.completions.create(
+                    model="glm-4.5",
+                    messages=messages,
+                    max_tokens=ai_config.max_tokens,
+                    temperature=ai_config.temperature,
+                    stream=True
+                )
+
+                # Stream the response
+                for chunk in stream:
+                    if chunk.choices[0].delta.content is not None:
+                        content = chunk.choices[0].delta.content
+                        # Send as SSE format
+                        yield f"data: {json.dumps({'content': content})}\n\n"
+
+                # Send completion signal
+                yield f"data: {json.dumps({'done': True})}\n\n"
+
+            except Exception as e:
+                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+
+        return StreamingHttpResponse(generate(), content_type='text/event-stream')
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': f'Server error: {str(e)}'})

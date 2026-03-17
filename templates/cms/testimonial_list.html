@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Testimonials - {% if company_info %}{{ company_info.company_name }}{% else %}Thelix{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-12">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">Client Testimonials</h1>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">What our clients say about our services</p>
+        {% if average_rating %}
+        <div class="mt-4 flex items-center justify-center space-x-2">
+            <div class="flex text-yellow-400">
+                {% for i in "12345" %}
+                <svg class="w-6 h-6 {% if forloop.counter <= average_rating %}fill-current{% else %}text-gray-300{% endif %}" viewBox="0 0 20 20">
+                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                </svg>
+                {% endfor %}
+            </div>
+            <span class="text-2xl font-bold text-gray-900">{{ average_rating }}</span>
+            <span class="text-gray-500">({{ total_count }} reviews)</span>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if testimonials %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for testimonial in testimonials %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center mb-4">
+                {% if testimonial.avatar %}
+                <img src="{{ testimonial.avatar.url }}" alt="{{ testimonial.name }}" class="w-14 h-14 rounded-full object-cover mr-4">
+                {% else %}
+                <div class="w-14 h-14 bg-primary rounded-full flex items-center justify-center mr-4">
+                    <span class="text-2xl font-bold text-white">{{ testimonial.name|first }}</span>
+                </div>
+                {% endif %}
+                <div>
+                    <h3 class="font-bold text-gray-900">{{ testimonial.name }}</h3>
+                    {% if testimonial.position %}
+                    <p class="text-sm text-gray-500">{{ testimonial.position }}</p>
+                    {% endif %}
+                    {% if testimonial.company %}
+                    <p class="text-sm text-primary">{{ testimonial.company }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="flex text-yellow-400 mb-3">
+                {% for i in "12345" %}
+                <svg class="w-5 h-5 {% if forloop.counter <= testimonial.rating %}fill-current{% else %}text-gray-300{% endif %}" viewBox="0 0 20 20">
+                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                </svg>
+                {% endfor %}
+            </div>
+            <p class="text-gray-700 italic">"{{ testimonial.testimonial }}"</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if is_paginated %}
+    <div class="mt-12 flex justify-center space-x-2">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Previous</a>
+        {% endif %}
+        <span class="px-4 py-2 bg-primary text-white rounded-lg">{{ page_obj.number }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="text-center py-12">
+        <p class="text-gray-500">No testimonials yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

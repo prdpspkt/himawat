@@ -1,0 +1,148 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit AI Configuration{% else %}Add AI Configuration{% endif %}{% endblock %}
+{% block page_title %}{% if form.instance.pk %}Edit AI Configuration{% else %}Add AI Configuration{% endif %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="max-w-4xl mx-auto">
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">DeepSeek AI Configuration</h3>
+                <p class="text-sm text-gray-500 mt-1">Configure your DeepSeek AI API settings for content generation</p>
+            </div>
+            <div class="px-6 py-4 space-y-4">
+                <div>
+                    <label for="id_name" class="block text-sm font-medium text-gray-700">Configuration Name</label>
+                    <input type="text" name="name" id="id_name" value="{{ form.name.value|default:'' }}" required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                    {% if form.name.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.name.errors }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-gray-500">A friendly name to identify this configuration (e.g., "Main DeepSeek Chat")</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="id_model" class="block text-sm font-medium text-gray-700">DeepSeek Model</label>
+                        <select name="model" id="id_model" required
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                            {% for value, label in form.fields.model.choices %}
+                            <option value="{{ value }}" {% if form.model.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.model.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.model.errors }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-xs text-gray-500">Choose the DeepSeek model to use</p>
+                    </div>
+
+                    <div>
+                        <label for="id_status" class="block text-sm font-medium text-gray-700">Status</label>
+                        <select name="status" id="id_status"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                            {% for value, label in form.fields.status.choices %}
+                            <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.status.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.status.errors }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-xs text-gray-500">Only active configurations can be used</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center">
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input type="checkbox" name="is_default" id="id_is_default" {% if form.is_default.value %}checked{% endif %}
+                                   class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded">
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="id_is_default" class="font-medium text-gray-700">Set as Default</label>
+                            <p class="text-gray-500">Mark this as the default AI configuration</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">API Configuration</h3>
+            </div>
+            <div class="px-6 py-4 space-y-4">
+                <div>
+                    <label for="id_api_key" class="block text-sm font-medium text-gray-700">DeepSeek API Key</label>
+                    <input type="password" name="api_key" id="id_api_key" value="{{ form.api_key.value|default:'' }}" required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                    {% if form.api_key.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.api_key.errors }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-gray-500">
+                        Get your API key from <a href="https://platform.deepseek.com/" target="_blank" class="text-indigo-600 hover:text-indigo-900">platform.deepseek.com</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">AI Behavior Settings</h3>
+            </div>
+            <div class="px-6 py-4 space-y-4">
+                <div>
+                    <label for="id_system_prompt" class="block text-sm font-medium text-gray-700">System Prompt</label>
+                    <textarea name="system_prompt" id="id_system_prompt" rows="6"
+                              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">{{ form.system_prompt.value|default:'' }}</textarea>
+                    {% if form.system_prompt.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.system_prompt.errors }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-gray-500">Define the AI's persona, behavior, and guidelines. This will be prepended to all user prompts.</p>
+                    <div class="mt-2 p-3 bg-gray-50 rounded-md">
+                        <p class="text-xs text-gray-600 mb-2"><strong>Example:</strong></p>
+                        <pre class="text-xs text-gray-700 whitespace-pre-wrap">You are a professional content writer specializing in web content. Your writing should be:
+- Clear, concise, and engaging
+- SEO-friendly with proper keyword usage
+- Formatted with HTML headings, paragraphs, and lists
+- Professional but accessible tone</pre>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="id_max_tokens" class="block text-sm font-medium text-gray-700">Max Tokens</label>
+                        <input type="number" name="max_tokens" id="id_max_tokens" value="{{ form.max_tokens.value|default:2000 }}" min="1" max="8000" required
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                        {% if form.max_tokens.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.max_tokens.errors }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-xs text-gray-500">Maximum length of generated content (2000 = ~1500 words)</p>
+                    </div>
+
+                    <div>
+                        <label for="id_temperature" class="block text-sm font-medium text-gray-700">Temperature</label>
+                        <input type="number" name="temperature" id="id_temperature" value="{{ form.temperature.value|default:0.7 }}" min="0" max="2" step="0.1" required
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                        {% if form.temperature.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.temperature.errors }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-xs text-gray-500">0.0 = focused, 1.0 = creative, 1.5+ = very creative</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3">
+            <a href="{% url 'dashboard:ai_config_list' %}" class="px-6 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Cancel
+            </a>
+            <button type="submit" class="px-6 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                {% if form.instance.pk %}Update Configuration{% else %}Create Configuration{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

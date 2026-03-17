@@ -1,0 +1,614 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page.meta_title|default:page.title }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block meta_description %}{{ page.meta_description|default:page.excerpt|truncatewords:30 }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="relative bg-gradient-to-br from-primary via-red-700 to-red-900 overflow-hidden">
+    <!-- Decorative Pattern -->
+    <div class="absolute inset-0 opacity-10">
+        <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs>
+                <pattern id="vastu-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                    <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100" height="100" fill="url(#vastu-grid)"/>
+        </svg>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 py-24 md:py-32 text-center">
+        {% if page.featured_image %}
+        <div class="mb-8">
+            <img src="{{ page.featured_image.url }}" alt="{{ page.title }}" class="w-32 h-32 object-contain mx-auto rounded-full bg-white/10 p-4 backdrop-blur-sm">
+        </div>
+        {% endif %}
+
+        <div class="inline-flex items-center bg-white/20 text-white text-sm font-semibold px-4 py-2 rounded-full mb-6">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+            Professional Vastu Training Programs
+        </div>
+
+        <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+            {{ page.title }}
+        </h1>
+
+        {% if page.excerpt %}
+        <p class="text-xl md:text-2xl text-red-100 max-w-3xl mx-auto mb-8">
+            {{ page.excerpt }}
+        </p>
+        {% endif %}
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'pages:consultation' %}" class="inline-flex items-center justify-center px-8 py-4 bg-white text-primary rounded-lg hover:bg-gray-100 transition-all font-semibold shadow-lg">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Enroll Now
+            </a>
+            <a href="tel:{% if company_info %}{{ company_info.phone }}{% endif %}" class="inline-flex items-center justify-center px-8 py-4 bg-primary/20 text-white border-2 border-white rounded-lg hover:bg-primary/30 transition-all font-semibold">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                </svg>
+                Call: {% if company_info %}{{ company_info.phone }}{% endif %}
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+{% if page.content %}
+<div class="max-w-7xl mx-auto px-4 py-16">
+    <div class="prose prose-lg max-w-none mx-auto prose-headings:text-gray-900 prose-p:text-gray-700">
+        {{ page.content|safe }}
+    </div>
+</div>
+{% endif %}
+
+<!-- Training Programs -->
+<div class="bg-gray-50 py-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Vastu Training Programs</h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Choose the program that suits your needs and become a certified Vastu expert</p>
+        </div>
+
+        <div class="space-y-8">
+            <!-- Orientation Program -->
+            <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3">
+                    <div class="bg-gradient-to-br from-primary to-red-700 p-8 text-white flex flex-col justify-center">
+                        <span class="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full w-fit mb-4">BEGINNER</span>
+                        <h3 class="text-2xl font-bold mb-2">Orientation Program for Owners</h3>
+                        <p class="text-red-100 mb-4">Perfect for property owners who want to understand Vastu basics</p>
+                        <div class="text-4xl font-bold">2 Days</div>
+                        <div class="text-sm text-red-100">Intensive Program</div>
+                    </div>
+                    <div class="lg:col-span-2 p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">What You'll Learn:</h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Introduction to Vastu Shastra
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Five elements and their significance
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Directions and their importance
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Basic Vastu assessment of property
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Simple remedies for common defects
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">Program Highlights:</h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Hands-on site visit training
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Study material included
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Certificate of completion
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Q&A sessions with experts
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                            <div>
+                                <span class="text-sm text-gray-500">Starting from</span>
+                                <div class="text-2xl font-bold text-primary">NPR 15,000</div>
+                            </div>
+                            <a href="{% url 'pages:consultation' %}" class="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-semibold">
+                                Enroll Now
+                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Vastu Training -->
+            <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3">
+                    <div class="bg-gradient-to-br from-secondary to-green-700 p-8 text-white flex flex-col justify-center">
+                        <span class="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full w-fit mb-4">INTERMEDIATE</span>
+                        <h3 class="text-2xl font-bold mb-2">Advanced Vastu Training</h3>
+                        <p class="text-green-100 mb-4">For professionals and serious practitioners</p>
+                        <div class="text-4xl font-bold">7 Days</div>
+                        <div class="text-sm text-green-100">Comprehensive Course</div>
+                    </div>
+                    <div class="lg:col-span-2 p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">What You'll Learn:</h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-secondary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Advanced Vastu principles
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-secondary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Scientific basis of Vastu
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-secondary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Plot analysis and selection
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-secondary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Building design & layout
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-secondary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Remedy implementation
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">Program Highlights:</h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-secondary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Multiple case studies
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-secondary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Practical field training
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-secondary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Professional certification
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-secondary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Business setup guidance
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                            <div>
+                                <span class="text-sm text-gray-500">Starting from</span>
+                                <div class="text-2xl font-bold text-secondary">NPR 35,000</div>
+                            </div>
+                            <a href="{% url 'pages:consultation' %}" class="inline-flex items-center px-6 py-3 bg-secondary text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                                Enroll Now
+                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yantra Designing -->
+            <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3">
+                    <div class="bg-gradient-to-br from-accent to-purple-700 p-8 text-white flex flex-col justify-center">
+                        <span class="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full w-fit mb-4">SPECIALIZED</span>
+                        <h3 class="text-2xl font-bold mb-2">Yantra Designing</h3>
+                        <p class="text-purple-100 mb-4">Sacred geometry and Vastu yantras</p>
+                        <div class="text-4xl font-bold">5 Days</div>
+                        <div class="text-sm text-purple-100">Specialized Training</div>
+                    </div>
+                    <div class="lg:col-span-2 p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">What You'll Learn:</h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-accent mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Sacred geometry principles
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-accent mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Vastu purush mandala
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-accent mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Yantra design & creation
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-accent mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Energy correction techniques
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-accent mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Mantras and rituals
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">Program Highlights:</h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-accent mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Hands-on yantra creation
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-accent mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Take-home kit included
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-accent mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Personalized yantra for you
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-accent mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Certification in Yantra therapy
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                            <div>
+                                <span class="text-sm text-gray-500">Starting from</span>
+                                <div class="text-2xl font-bold text-accent">NPR 25,000</div>
+                            </div>
+                            <a href="{% url 'pages:consultation' %}" class="inline-flex items-center px-6 py-3 bg-accent text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold">
+                                Enroll Now
+                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vastu CAD -->
+            <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3">
+                    <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-8 text-white flex flex-col justify-center">
+                        <span class="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full w-fit mb-4">TECHNICAL</span>
+                        <h3 class="text-2xl font-bold mb-2">Vastu CAD</h3>
+                        <p class="text-blue-100 mb-4">Modern CAD with traditional Vastu</p>
+                        <div class="text-4xl font-bold">10 Days</div>
+                        <div class="text-sm text-blue-100">Technical Program</div>
+                    </div>
+                    <div class="lg:col-span-2 p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">What You'll Learn:</h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        AutoCAD fundamentals
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Vastu-compliant drafting
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        3D modeling basics
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Plot and building design
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Printing and presentation
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">Program Highlights:</h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Computer lab training
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Software license included
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Project portfolio creation
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Job placement assistance
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                            <div>
+                                <span class="text-sm text-gray-500">Starting from</span>
+                                <div class="text-2xl font-bold text-blue-600">NPR 45,000</div>
+                            </div>
+                            <a href="{% url 'pages:consultation' %}" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                                Enroll Now
+                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vedic Mantra -->
+            <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3">
+                    <div class="bg-gradient-to-br from-yellow-500 to-orange-600 p-8 text-white flex flex-col justify-center">
+                        <span class="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full w-fit mb-4">SPIRITUAL</span>
+                        <h3 class="text-2xl font-bold mb-2">Vedic Mantra (Diksha)</h3>
+                        <p class="text-yellow-100 mb-4">Sacred initiation and mantra training</p>
+                        <div class="text-4xl font-bold">3 Days</div>
+                        <div class="text-sm text-yellow-100">Spiritual Program</div>
+                    </div>
+                    <div class="lg:col-span-2 p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">What You'll Learn:</h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Vedic mantra introduction
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Correct pronunciation
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Mantra for Vastu rituals
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Meditation techniques
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Spiritual practices
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">Program Highlights:</h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Traditional initiation ceremony
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Personal mantra assigned
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Mantra notebook provided
+                                    </li>
+                                    <li class="flex items-start text-gray-700">
+                                        <svg class="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Ongoing support included
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                            <div>
+                                <span class="text-sm text-gray-500">Starting from</span>
+                                <div class="text-2xl font-bold text-yellow-600">NPR 20,000</div>
+                            </div>
+                            <a href="{% url 'pages:consultation' %}" class="inline-flex items-center px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors font-semibold">
+                                Enroll Now
+                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Why Choose Us -->
+<div class="max-w-7xl mx-auto px-4 py-16">
+    <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose Our Vastu Training?</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">Learn from the experts with 25+ years of experience</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="text-center">
+            <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Certified Experts</h3>
+            <p class="text-gray-600">Learn from highly qualified Vastu consultants</p>
+        </div>
+
+        <div class="text-center">
+            <div class="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-10 h-10 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Practical Training</h3>
+            <p class="text-gray-600">Hands-on experience with real site visits</p>
+        </div>
+
+        <div class="text-center">
+            <div class="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-10 h-10 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Recognized Certification</h3>
+            <p class="text-gray-600">Industry-recognized course completion certificates</p>
+        </div>
+
+        <div class="text-center">
+            <div class="w-20 h-20 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-10 h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">500+ Alumni</h3>
+            <p class="text-gray-600">Join our growing community of Vastu experts</p>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="bg-gradient-to-r from-primary to-red-800 py-16">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Begin Your Vastu Journey Today</h2>
+        <p class="text-xl text-red-100 mb-8">Transform your life and career with authentic Vastu knowledge</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'pages:consultation' %}" class="inline-flex items-center justify-center px-8 py-4 bg-white text-primary rounded-lg hover:bg-gray-100 transition-all font-semibold shadow-lg">
+                Enroll in a Course
+            </a>
+            <a href="tel:{% if company_info %}{{ company_info.phone }}{% endif %}" class="inline-flex items-center justify-center px-8 py-4 bg-primary/20 text-white border-2 border-white rounded-lg hover:bg-primary/30 transition-all font-semibold">
+                Talk to an Expert
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page.meta_title|default:page.title }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block meta_description %}{{ page.meta_description|default:page.excerpt|truncatewords:30 }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="relative bg-gray-900 overflow-hidden">
+    {% if page.featured_image %}
+    <div class="absolute inset-0">
+        <img src="{{ page.featured_image.url }}" alt="{{ page.title }}" class="w-full h-full object-cover opacity-40">
+    </div>
+    {% endif %}
+    <div class="relative max-w-7xl mx-auto px-4 py-24 md:py-32 text-center">
+        <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">{{ page.title }}</h1>
+        {% if page.excerpt %}
+        <p class="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto mb-8">{{ page.excerpt }}</p>
+        {% endif %}
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'pages:consultation' %}" class="px-8 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-semibold">
+                Get Consultation
+            </a>
+            <a href="{% url 'pages:page_detail' 'vastu-services' %}" class="px-8 py-3 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-colors font-semibold">
+                Our Services
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="max-w-7xl mx-auto px-4 py-16">
+    <div class="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700">
+        {{ page.content|safe }}
+    </div>
+</div>
+
+<!-- Features/Blocks Section -->
+{% if page.blocks %}
+<div class="bg-gray-50 py-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <!-- Dynamic blocks can be rendered here -->
+    </div>
+</div>
+{% endif %}
+
+<!-- CTA Section -->
+<div class="bg-primary py-16">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold text-white mb-4">Ready to Transform Your Space?</h2>
+        <p class="text-red-100 mb-8">Contact us today for expert Vastu consultation and engineering design services.</p>
+        <a href="{% url 'pages:page_detail' 'contact-page' %}" class="inline-block px-8 py-3 bg-white text-primary rounded-lg hover:bg-gray-100 transition-colors font-semibold">
+            Contact Us
+        </a>
+    </div>
+</div>
+{% endblock %}

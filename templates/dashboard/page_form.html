@@ -1,0 +1,265 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}{% if object %}Edit Page{% else %}New Page{% endif %}{% endblock %}
+{% block page_title %}{% if object %}Edit Page{% else %}New Page{% endif %}{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .meta-box {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .meta-box-header {
+        border-bottom: 1px solid #e5e7eb;
+        padding: 12px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        background: #f9fafb;
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
+
+    .meta-box-content {
+        padding: 16px;
+    }
+
+    .permalink-preview {
+        font-size: 13px;
+        color: #6b7280;
+        background: #f3f4f6;
+        padding: 4px 8px;
+        border-radius: 4px;
+        border: 1px solid #e5e7eb;
+    }
+
+    /* Textarea styling */
+    textarea[name="content"] {
+        min-height: 400px;
+        font-family: monospace;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="max-w-7xl mx-auto">
+    <form method="post" enctype="multipart/form-data" id="page-form">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main Content - Left Side -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Title -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                    <input type="text" name="title" value="{{ form.title.value|default:'' }}" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-lg"
+                           placeholder="Enter page title">
+                </div>
+                
+                <!-- Permalink -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Permalink</label>
+                    <div class="flex items-center space-x-2">
+                        <span class="permalink-preview">{{ request.scheme }}://{{ request.get_host }}/page/</span>
+                        <input type="text" name="slug" value="{{ form.slug.value|default:'' }}"
+                               class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm"
+                               placeholder="auto-generated-from-title">
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">URL-friendly version of the title (auto-generated if left blank)</p>
+                </div>
+                
+                <!-- Content Editor -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                    {{ form.content }}
+                    <p class="text-xs text-gray-500 mt-2">Enter content (HTML allowed).</p>
+                </div>
+                
+                <!-- Excerpt -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Excerpt</label>
+                    <textarea name="excerpt" rows="3"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                              placeholder="Brief description of the page (optional)">{{ form.excerpt.value|default:'' }}</textarea>
+                    <p class="text-xs text-gray-500 mt-1">Used in page listings and SEO descriptions</p>
+                </div>
+            </div>
+            
+            <!-- Sidebar - Right Side -->
+            <div class="space-y-4">
+                <!-- Publish Meta Box -->
+                <div class="meta-box">
+                    <div class="meta-box-header">Publish</div>
+                    <div class="meta-box-content">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                                {% for value, label in form.fields.status.choices %}
+                                <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Template</label>
+                            <select name="template" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                                {% for value, label in form.fields.template.choices %}
+                                <option value="{{ value }}" {% if form.template.value == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Select a layout template for this page</p>
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <button type="submit" class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+                                {% if object %}Update{% else %}Publish{% endif %}
+                            </button>
+                            <a href="{% url 'dashboard:page_list' %}" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                                Cancel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hierarchy Meta Box -->
+                <div class="meta-box">
+                    <div class="meta-box-header">Page Attributes</div>
+                    <div class="meta-box-content">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Parent Page</label>
+                            <select name="parent" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                                <option value="">— No Parent (Top Level) —</option>
+                                {% for page in form.fields.parent.queryset %}
+                                {% if not object or page.pk != object.pk %}
+                                <option value="{{ page.pk }}" {% if form.parent.value == page.pk %}selected{% endif %}>{{ page.title }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Order</label>
+                            <input type="number" name="order" value="{{ form.order.value|default:0 }}" min="0"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:border-primary text-sm">
+                            <p class="text-xs text-gray-500 mt-1">Display order (0 = first)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- SEO Meta Box -->
+                <div class="meta-box">
+                    <div class="meta-box-header">SEO Settings</div>
+                    <div class="meta-box-content space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
+                            <input type="text" name="meta_title" value="{{ form.meta_title.value|default:'' }}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:border-primary text-sm"
+                                   placeholder="SEO title (optional)">
+                            <p class="text-xs text-gray-500 mt-1">Recommended: 50-60 characters</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
+                            <textarea name="meta_description" rows="2"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:border-primary text-sm resize-none"
+                                      placeholder="SEO description (optional)">{{ form.meta_description.value|default:'' }}</textarea>
+                            <p class="text-xs text-gray-500 mt-1">Recommended: 150-160 characters</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label>
+                            <input type="text" name="meta_keywords" value="{{ form.meta_keywords.value|default:'' }}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:border-primary text-sm"
+                                   placeholder="keyword1, keyword2, keyword3">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Featured Image Meta Box -->
+                <div class="meta-box">
+                    <div class="meta-box-header">Featured Image</div>
+                    <div class="meta-box-content">
+                        <div id="featured-image-preview" class="mb-3">
+                            {% if object and object.featured_image %}
+                            <img src="{{ object.featured_image.url }}" class="w-full h-40 object-cover rounded-lg">
+                            {% else %}
+                            <div class="w-full h-32 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+                                <span class="text-gray-400 text-sm">No featured image</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <input type="file" name="featured_image" id="featured_image" accept="image/*"
+                               class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-red-700">
+                        <p class="text-xs text-gray-500 mt-2">Recommended size: 1200x630px</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Featured Image Preview
+    document.getElementById('featured_image')?.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('featured-image-preview').innerHTML =
+                    `<img src="${e.target.result}" class="w-full h-40 object-cover rounded-lg">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Auto-generate slug from title
+    document.querySelector('input[name="title"]')?.addEventListener('blur', function() {
+        const slugField = document.querySelector('input[name="slug"]');
+        if (slugField && !slugField.value) {
+            const title = this.value;
+            const slug = title.toLowerCase()
+                .replace(/[^\w\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .substring(0, 50);
+            slugField.value = slug;
+        }
+    });
+
+    // Meta title character counter
+    const metaTitleInput = document.querySelector('input[name="meta_title"]');
+    if (metaTitleInput) {
+        metaTitleInput.addEventListener('input', function() {
+            const count = this.value.length;
+            if (count > 60) {
+                this.classList.add('border-yellow-500');
+            } else {
+                this.classList.remove('border-yellow-500');
+            }
+        });
+    }
+
+    // Meta description character counter
+    const metaDescInput = document.querySelector('textarea[name="meta_description"]');
+    if (metaDescInput) {
+        metaDescInput.addEventListener('input', function() {
+            const count = this.value.length;
+            if (count > 160) {
+                this.classList.add('border-yellow-500');
+            } else {
+                this.classList.remove('border-yellow-500');
+            }
+        });
+    }
+</script>
+{% endblock %}

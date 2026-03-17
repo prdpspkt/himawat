@@ -1,0 +1,1352 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Edit Menu Items: {{ menu.name }}{% endblock %}
+{% block page_title %}Edit Menu Items: {{ menu.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Dynamic Menu Management System */
+    .menu-management-wrap {
+        display: flex;
+        gap: 20px;
+    }
+    
+    .menu-edit-area {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .menu-settings-column {
+        width: 300px;
+        flex-shrink: 0;
+    }
+    
+    /* Menu Structure (Left side) */
+    .menu-structure {
+        background: #fff;
+        border: 1px solid #c3c4c7;
+        padding: 15px;
+        min-height: 400px;
+    }
+    
+    .menu-structure-header {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f0f0f1;
+    }
+    
+    .menu-structure-header h3 {
+        font-size: 14px;
+        margin: 0;
+        color: #1d2327;
+    }
+    
+    .menu-structure-header p {
+        font-size: 12px;
+        color: #646970;
+        margin: 5px 0 0;
+    }
+    
+    /* Menu Items List */
+    .menu-items-wrapper {
+        margin-top: 15px;
+    }
+    
+    .menu-item {
+        background: #fff;
+        border: 1px solid #c3c4c7;
+        margin-bottom: 3px;
+        cursor: move;
+        position: relative;
+    }
+    
+    .menu-item.dragging {
+        opacity: 0.5;
+    }
+    
+    .menu-item.ui-sortable-helper {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+    
+    /* Visual indicator for submenu levels using left border */
+    .menu-item.level-1 > .menu-item-bar {
+        border-left: 4px solid #2271b1;
+    }
+    
+    .menu-item.level-2 > .menu-item-bar {
+        border-left: 4px solid #00a32a;
+    }
+    
+    .menu-item.level-3 > .menu-item-bar {
+        border-left: 4px solid #d63638;
+    }
+    
+    .menu-item.level-4 > .menu-item-bar {
+        border-left: 4px solid #9966ff;
+    }
+    
+    /* Depth indicator dots on menu item bar */
+    .menu-item-bar {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        background: #f6f7f7;
+        border-bottom: 1px solid #c3c4c7;
+        cursor: move;
+        position: relative;
+    }
+    
+    .depth-indicator {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 8px;
+        font-size: 11px;
+        color: #646970;
+        font-weight: 600;
+    }
+    
+    .depth-indicator::before {
+        content: '';
+        width: 4px;
+        height: 4px;
+        background: #c3c4c7;
+        border-radius: 50%;
+        margin-right: 3px;
+    }
+    
+    .level-1 .depth-indicator::before {
+        background: #2271b1;
+        box-shadow: -6px 0 0 #2271b1;
+    }
+    
+    .level-2 .depth-indicator::before {
+        background: #00a32a;
+        box-shadow: -6px 0 0 #00a32a, -12px 0 0 #00a32a;
+    }
+    
+    .level-3 .depth-indicator::before {
+        background: #d63638;
+        box-shadow: -6px 0 0 #d63638, -12px 0 0 #d63638, -18px 0 0 #d63638;
+    }
+    
+    .level-4 .depth-indicator::before {
+        background: #9966ff;
+        box-shadow: -6px 0 0 #9966ff, -12px 0 0 #9966ff, -18px 0 0 #9966ff, -24px 0 0 #9966ff;
+    }
+    
+    .menu-item-handle {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        gap: 10px;
+    }
+    
+    .item-type {
+        font-size: 11px;
+        color: #646970;
+        text-transform: uppercase;
+        background: #f0f0f1;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+    
+    .item-title {
+        font-weight: 600;
+        color: #1d2327;
+        font-size: 13px;
+    }
+    
+    .item-controls {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .item-controls button {
+        background: none;
+        border: none;
+        color: #2271b1;
+        cursor: pointer;
+        font-size: 12px;
+        padding: 3px 8px;
+    }
+    
+    .item-controls button:hover {
+        color: #135e96;
+    }
+    
+    .item-controls .delete-btn {
+        color: #b32d2e;
+    }
+    
+    .item-controls .delete-btn:hover {
+        color: #8a2424;
+    }
+    
+    /* Menu Item Settings (Expanded) */
+    .menu-item-settings {
+        padding: 15px;
+        background: #fff;
+        display: none;
+    }
+    
+    .menu-item-settings.open {
+        display: block;
+    }
+    
+    .menu-item-settings .field {
+        margin-bottom: 12px;
+    }
+    
+    .menu-item-settings label {
+        display: block;
+        font-size: 12px;
+        color: #1d2327;
+        margin-bottom: 4px;
+    }
+    
+    .menu-item-settings input,
+    .menu-item-settings select {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid #8c8f94;
+        border-radius: 4px;
+        font-size: 13px;
+    }
+    
+    .menu-item-settings .description {
+        font-size: 11px;
+        color: #646970;
+        margin-top: 4px;
+    }
+    
+    .menu-item-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #f0f0f1;
+        margin-top: 15px;
+    }
+    
+    /* Submenu items */
+    .menu-item-children {
+        margin-left: 30px;
+        margin-top: 3px;
+        padding-left: 15px;
+        border-left: 2px dashed #c3c4c7;
+        min-height: 20px;
+    }
+    
+    .menu-item-children:empty::before {
+        content: 'Drop items here';
+        display: block;
+        padding: 20px;
+        text-align: center;
+        color: #a7aaad;
+        font-size: 12px;
+        font-style: italic;
+    }
+    
+    /* Add Menu Items Panel (Right side) */
+    .accordion-section {
+        background: #fff;
+        border: 1px solid #c3c4c7;
+        margin-bottom: 10px;
+    }
+    
+    .accordion-heading {
+        background: #f6f7f7;
+        padding: 12px 15px;
+        cursor: pointer;
+        border-bottom: 1px solid #c3c4c7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .accordion-heading h4 {
+        margin: 0;
+        font-size: 13px;
+        color: #1d2327;
+    }
+    
+    .accordion-heading .toggle-icon::after {
+        content: '▼';
+        font-size: 10px;
+        color: #646970;
+    }
+    
+    .accordion-heading.collapsed .toggle-icon::after {
+        content: '▶';
+    }
+    
+    .accordion-content {
+        padding: 15px;
+        display: block;
+    }
+    
+    .accordion-content.collapsed {
+        display: none;
+    }
+    
+    .accordion-content label {
+        display: block;
+        font-size: 12px;
+        margin-bottom: 5px;
+        color: #1d2327;
+    }
+    
+    .accordion-content select,
+    .accordion-content input {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid #8c8f94;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        font-size: 13px;
+    }
+    
+    .add-to-menu {
+        background: #f6f7f7;
+        border: 1px solid #2271b1;
+        color: #2271b1;
+        padding: 6px 12px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+        float: right;
+    }
+    
+    .add-to-menu:hover {
+        background: #f0f6fc;
+    }
+    
+    /* Save Menu Button */
+    .menu-actions {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #c3c4c7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .btn-save-menu {
+        background: #2271b1;
+        border: 1px solid #2271b1;
+        color: #fff;
+        padding: 8px 20px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+    
+    .btn-save-menu:hover {
+        background: #135e96;
+    }
+    
+    .btn-delete-menu {
+        background: #b32d2e;
+        border: 1px solid #b32d2e;
+        color: #fff;
+        padding: 8px 20px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 13px;
+        text-decoration: none;
+    }
+    
+    .btn-delete-menu:hover {
+        background: #8a2424;
+    }
+    
+    /* Loading state */
+    .saving .btn-save-menu {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    
+    /* Placeholder for drag */
+    .sortable-placeholder {
+        background: #f0f6fc;
+        border: 2px dashed #2271b1;
+        height: 50px;
+        margin-bottom: 3px;
+    }
+    
+    /* Empty menu message */
+    .menu-items-wrapper:empty::before {
+        content: 'Add menu items from the column on the left.';
+        display: block;
+        padding: 40px;
+        text-align: center;
+        color: #646970;
+        font-size: 13px;
+        background: #f6f7f7;
+        border: 2px dashed #c3c4c7;
+    }
+    
+    /* Drag indentation guide lines */
+    .drag-indent-guide {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: repeating-linear-gradient(
+            to bottom,
+            #2271b1 0px,
+            #2271b1 4px,
+            transparent 4px,
+            transparent 8px
+        );
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+    }
+    
+    .drag-indent-guide.active {
+        opacity: 0.6;
+    }
+    
+    /* Visual feedback for nesting levels during drag */
+    .ui-sortable-helper {
+        transition: transform 0.1s ease;
+    }
+    
+    .ui-sortable-helper.nest-level-1 {
+        transform: translateX(30px);
+    }
+    
+    .ui-sortable-helper.nest-level-2 {
+        transform: translateX(60px);
+    }
+    
+    .ui-sortable-helper.nest-level-3 {
+        transform: translateX(90px);
+    }
+    
+    /* Nesting indicator badge */
+    .nesting-indicator {
+        position: absolute;
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #2271b1;
+        color: #fff;
+        padding: 3px 10px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        pointer-events: none;
+        white-space: nowrap;
+        z-index: 1000;
+    }
+    
+    .nesting-indicator.visible {
+        opacity: 1;
+    }
+    
+    .nesting-indicator.nest {
+        background: #00a32a;
+    }
+    
+    .nesting-indicator.unnest {
+        background: #d63638;
+    }
+    
+    /* Placeholder indentation levels */
+    .sortable-placeholder.indent-level-1 {
+        margin-left: 30px;
+    }
+    
+    .sortable-placeholder.indent-level-2 {
+        margin-left: 60px;
+    }
+    
+    .sortable-placeholder.indent-level-3 {
+        margin-left: 90px;
+    }
+    
+    /* Drag hint text */
+    .drag-hint {
+        font-size: 11px;
+        color: #646970;
+        margin-top: 10px;
+        padding: 8px 12px;
+        background: #f6f7f7;
+        border-left: 3px solid #2271b1;
+    }
+    
+    .drag-hint strong {
+        color: #1d2327;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="menu-management-wrap">
+    <!-- Left: Menu Structure -->
+    <div class="menu-edit-area">
+        <div class="menu-structure">
+            <div class="menu-structure-header">
+                <h3>Menu Structure</h3>
+                <div class="drag-hint">
+                    <strong>💡 Tip:</strong> Drag items <strong>up/down</strong> to reorder. 
+                    Drag <strong>right</strong> over another item to make it a submenu. 
+                    Drag <strong>left</strong> to make it a top-level item.
+                </div>
+            </div>
+            
+            <div class="drag-hint">
+                <strong>💡 Drag Tips:</strong> Drag right to make an item a submenu (nest), drag left to make it a top-level item (unnest).
+            </div>
+            
+            <div class="menu-items-wrapper" id="menu-items-list">
+                {% for item in menu_items %}
+                {% include 'dashboard/partials/menu_item.html' with item=item %}
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="menu-actions">
+            <a href="{% url 'dashboard:menu_delete' menu.pk %}" class="btn-delete-menu" onclick="return confirm('Are you sure you want to delete this menu?')">Delete Menu</a>
+            <button type="button" class="btn-save-menu" id="save-menu-btn" onclick="saveMenuOrder()">
+                <span class="btn-text">Save Menu</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Right: Add Menu Items -->
+    <div class="menu-settings-column">
+        <!-- Pages -->
+        <div class="accordion-section">
+            <div class="accordion-heading" onclick="toggleAccordion(this)">
+                <h4>Pages</h4>
+                <span class="toggle-icon"></span>
+            </div>
+            <div class="accordion-content">
+                <label for="page-select">Select a page:</label>
+                <select id="page-select">
+                    <option value="">— Select —</option>
+                    {% for page in pages %}
+                    <option value="{{ page.id }}" data-title="{{ page.title }}" data-url="{{ page.get_absolute_url }}">{{ page.title }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="add-to-menu" onclick="addPageToMenu()">Add to Menu</button>
+                <div style="clear: both;"></div>
+            </div>
+        </div>
+        
+        <!-- Custom Links -->
+        <div class="accordion-section">
+            <div class="accordion-heading collapsed" onclick="toggleAccordion(this)">
+                <h4>Custom Links</h4>
+                <span class="toggle-icon"></span>
+            </div>
+            <div class="accordion-content collapsed">
+                <label for="custom-url">URL</label>
+                <input type="url" id="custom-url" placeholder="https://">
+                
+                <label for="custom-link-text">Link Text</label>
+                <input type="text" id="custom-link-text" placeholder="Menu Item">
+                
+                <button type="button" class="add-to-menu" onclick="addCustomLinkToMenu()">Add to Menu</button>
+                <div style="clear: both;"></div>
+            </div>
+        </div>
+        
+        <!-- Categories -->
+        <div class="accordion-section">
+            <div class="accordion-heading collapsed" onclick="toggleAccordion(this)">
+                <h4>Categories</h4>
+                <span class="toggle-icon"></span>
+            </div>
+            <div class="accordion-content collapsed">
+                <label for="category-select">Select a category:</label>
+                <select id="category-select">
+                    <option value="">— Select —</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" data-title="{{ category.name }}" data-url="{{ category.get_absolute_url }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="add-to-menu" onclick="addCategoryToMenu()">Add to Menu</button>
+                <div style="clear: both;"></div>
+            </div>
+        </div>
+        
+        <!-- Menu Settings -->
+        <div class="accordion-section">
+            <div class="accordion-heading collapsed" onclick="toggleAccordion(this)">
+                <h4>Menu Settings</h4>
+                <span class="toggle-icon"></span>
+            </div>
+            <div class="accordion-content collapsed">
+                <form method="post" action="{% url 'dashboard:menu_edit' menu.pk %}">
+                    {% csrf_token %}
+                    <label for="id_name">Menu Name</label>
+                    <input type="text" name="name" id="id_name" value="{{ menu.name }}" required>
+                    
+                    <label for="id_slug">Slug</label>
+                    <input type="text" name="slug" id="id_slug" value="{{ menu.slug }}" required>
+                    
+                    <label for="id_location">Display Location</label>
+                    <input type="text" name="location" id="id_location" value="{{ menu.location|default:'' }}" placeholder="e.g., main, footer">
+                    
+                    <button type="submit" class="add-to-menu">Update Menu</button>
+                    <div style="clear: both;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nesting indicator for drag feedback -->
+<div class="nesting-indicator" id="nesting-indicator"></div>
+
+<!-- Nesting Indicator -->
+<div id="nesting-indicator" class="nesting-indicator"></div>
+
+<!-- Menu Item Template (for JavaScript) -->
+<template id="menu-item-template">
+    <div class="menu-item" data-id="" data-type="">
+        <div class="menu-item-bar">
+            <div class="menu-item-handle">
+                <span class="depth-indicator"></span>
+                <span class="dashicons dashicons-menu"></span>
+                <span class="item-type"></span>
+                <span class="item-title"></span>
+            </div>
+            <div class="item-controls">
+                <button type="button" class="edit-btn" onclick="toggleItemSettings(this)">Edit</button>
+                <button type="button" class="delete-btn" onclick="deleteMenuItem(this)">Remove</button>
+            </div>
+        </div>
+        <div class="menu-item-settings">
+            <div class="field">
+                <label>Navigation Label</label>
+                <input type="text" class="item-title-input" value="" onchange="updateItemTitle(this)">
+            </div>
+            <div class="field">
+                <label>URL</label>
+                <input type="text" class="item-url-input" value="" onchange="updateItemUrl(this)">
+            </div>
+            <div class="field">
+                <label>Title Attribute (optional)</label>
+                <input type="text" class="item-attr-input" placeholder="On hover text">
+            </div>
+            <div class="field">
+                <label>CSS Classes (optional)</label>
+                <input type="text" class="item-class-input" placeholder="e.g., highlight-button">
+            </div>
+            <div class="field">
+                <label>Link Target</label>
+                <select class="item-target-input">
+                    <option value="_self">Same window/tab</option>
+                    <option value="_blank">New window/tab</option>
+                </select>
+            </div>
+            <div class="menu-item-actions">
+                <button type="button" onclick="cancelItemEdit(this)">Cancel</button>
+                <button type="button" class="btn-save-menu" onclick="saveItemChanges(this)">Save</button>
+            </div>
+        </div>
+        <div class="menu-item-children"></div>
+    </div>
+</template>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script>
+    // CSRF Token for AJAX
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    
+    // Global variables for drag tracking
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let dragCurrentX = 0;
+    let dragCurrentItem = null;
+    let dragStartParent = null;
+    let dragStartIndex = 0;
+    let currentNestingLevel = 0;
+    let maxNestingDepth = 4; // Maximum allowed nesting depth
+    let placeholderElement = null;
+    let previousSibling = null;
+    let isDragging = false;
+    
+    // Constants for drag behavior
+    const NEST_THRESHOLD = 30; // Pixels to drag right to nest
+    const UNNEST_THRESHOLD = 20; // Pixels to drag left to unnest
+    const INDENT_SIZE = 30; // Size of each indent level in pixels
+    
+    // Initialize Sortable
+    $(document).ready(function() {
+        makeSortable($('#menu-items-list'));
+        updateLevelClasses();
+    });
+    
+    function makeSortable(element) {
+        element.sortable({
+            handle: '.menu-item-bar',
+            placeholder: 'sortable-placeholder',
+            connectWith: '.menu-item-children',
+            tolerance: 'pointer',
+            distance: 5,
+            start: function(event, ui) {
+                isDragging = true;
+                dragStartX = event.pageX;
+                dragStartY = event.pageY;
+                dragCurrentX = dragStartX;
+                dragCurrentItem = ui.item;
+                dragStartParent = ui.item.parent();
+                dragStartIndex = ui.item.index();
+                currentNestingLevel = getItemLevel(ui.item);
+                placeholderElement = ui.placeholder;
+                previousSibling = ui.item.prev('.menu-item');
+                
+                // Add visual feedback
+                ui.item.addClass('dragging');
+                ui.placeholder.height(ui.item.outerHeight());
+                
+                // Store initial data
+                ui.item.data('start-parent', dragStartParent);
+                ui.item.data('start-level', currentNestingLevel);
+                ui.item.data('current-level', currentNestingLevel);
+            },
+            sort: function(event, ui) {
+                if (!isDragging || !dragCurrentItem) return;
+                
+                dragCurrentX = event.pageX;
+                const deltaX = dragCurrentX - dragStartX;
+                
+                // Calculate potential nesting level based on drag distance
+                let targetLevel = ui.item.data('start-level') || 0;
+                
+                // Calculate how many indent levels we've moved
+                const indentLevels = Math.round(deltaX / INDENT_SIZE);
+                targetLevel = (ui.item.data('start-level') || 0) + indentLevels;
+                
+                // Clamp to valid range
+                targetLevel = Math.max(0, Math.min(targetLevel, maxNestingDepth));
+                
+                // Check if we have a previous sibling to nest under
+                const prevItem = ui.placeholder.prev('.menu-item, .sortable-placeholder');
+                const nextItem = ui.placeholder.next('.menu-item');
+                
+                // Only allow nesting if there's a previous item
+                if (targetLevel > 0 && prevItem.length === 0) {
+                    targetLevel = 0;
+                }
+                
+                // Don't allow nesting deeper than previous item + 1
+                if (prevItem.length > 0 && targetLevel > 0) {
+                    const prevLevel = getItemLevel(prevItem);
+                    const maxNewLevel = prevLevel + 1;
+                    targetLevel = Math.min(targetLevel, maxNewLevel);
+                }
+                
+                // Store current target level
+                if (targetLevel !== ui.item.data('current-level')) {
+                    ui.item.data('current-level', targetLevel);
+                    currentNestingLevel = targetLevel;
+                    
+                    // Update visual feedback
+                    updateDragVisuals(ui.item, targetLevel, deltaX);
+                }
+                
+                // Show nesting indicator
+                updateNestingIndicator(deltaX, targetLevel);
+            },
+            stop: function(event, ui) {
+                isDragging = false;
+                
+                // Remove visual feedback classes
+                ui.item.removeClass('dragging nest-level-1 nest-level-2 nest-level-3');
+                hideNestingIndicator();
+                
+                // Get the target nesting level
+                const targetLevel = ui.item.data('current-level') || 0;
+                const startLevel = ui.item.data('start-level') || 0;
+                
+                // Only process if level changed
+                if (targetLevel !== startLevel) {
+                    // Move the item to the appropriate container
+                    moveItemToLevel(ui.item, targetLevel);
+                }
+                
+                // Refresh sortable on all containers
+                refreshAllSortables();
+                
+                // Update level classes
+                updateLevelClasses();
+                
+                // Reset tracking variables
+                dragCurrentItem = null;
+                placeholderElement = null;
+                previousSibling = null;
+                currentNestingLevel = 0;
+            },
+            change: function(event, ui) {
+                // Update placeholder position tracking
+                placeholderElement = ui.placeholder;
+                previousSibling = ui.placeholder.prev('.menu-item');
+            },
+            over: function(event, ui) {
+                // When dragging over a new container
+                placeholderElement = ui.placeholder;
+            },
+            out: function(event, ui) {
+                // When dragging out of a container
+            },
+            receive: function(event, ui) {
+                // Item received from another container
+            }
+        });
+        
+        // Make child containers sortable
+        element.find('.menu-item-children').each(function() {
+            if (!$(this).hasClass('ui-sortable')) {
+                makeSortable($(this));
+            }
+        });
+    }
+    
+    // Get the nesting level of an item
+    function getItemLevel(item) {
+        let level = 0;
+        let parent = item.parent();
+        
+        while (parent.length && !parent.hasClass('menu-items-wrapper')) {
+            if (parent.hasClass('menu-item-children')) {
+                level++;
+            }
+            parent = parent.parent();
+        }
+        
+        return level;
+    }
+    
+    // Move item to target nesting level
+    function moveItemToLevel(item, targetLevel) {
+        const $item = $(item);
+        let currentLevel = getItemLevel($item);
+        
+        // Find the target container
+        let targetContainer;
+        
+        if (targetLevel === 0) {
+            // Move to top level
+            targetContainer = $('#menu-items-list');
+        } else {
+            // Find the appropriate parent at target level - 1
+            let current = $item.prev('.menu-item');
+            
+            // If no previous sibling, can't nest
+            if (!current.length && targetLevel > 0) {
+                // Try to find any preceding item at the right level
+                const allItems = $('#menu-items-list').find('.menu-item');
+                const itemIndex = allItems.index($item);
+                
+                for (let i = itemIndex - 1; i >= 0; i--) {
+                    const prevItem = $(allItems[i]);
+                    const prevLevel = getItemLevel(prevItem);
+                    
+                    if (prevLevel <= targetLevel - 1) {
+                        current = prevItem;
+                        break;
+                    }
+                }
+            }
+            
+            if (current.length) {
+                // Find the correct parent by traversing up from the previous item
+                let parentItem = current;
+                const parentLevel = getItemLevel(parentItem);
+                
+                // If previous item is at a higher level, use it directly
+                if (parentLevel === targetLevel - 1) {
+                    targetContainer = parentItem.children('.menu-item-children');
+                } else if (parentLevel < targetLevel - 1) {
+                    // Can't nest this deep, use the previous item's level
+                    targetContainer = parentItem.children('.menu-item-children');
+                } else {
+                    // Previous item is deeper, find ancestor at correct level
+                    while (parentLevel > targetLevel - 1 && parentItem.length) {
+                        parentItem = parentItem.parent().closest('.menu-item');
+                    }
+                    targetContainer = parentItem.children('.menu-item-children');
+                }
+            }
+            
+            // If still no container, default to top level
+            if (!targetContainer || !targetContainer.length) {
+                targetContainer = $('#menu-items-list');
+            }
+        }
+        
+        // Move the item
+        if (targetContainer && targetContainer.length) {
+            // Ensure the container is initialized as sortable
+            if (!targetContainer.hasClass('ui-sortable')) {
+                makeSortable(targetContainer);
+            }
+            
+            // Move the item to the target container at the end
+            targetContainer.append($item);
+            
+            // Refresh the sortable
+            if (targetContainer.data('ui-sortable')) {
+                targetContainer.sortable('refresh');
+            }
+        }
+        
+        // Refresh all containers
+        refreshAllSortables();
+    }
+    
+    // Refresh all sortable containers
+    function refreshAllSortables() {
+        $('.menu-items-wrapper, .menu-item-children').each(function() {
+            if ($(this).hasClass('ui-sortable')) {
+                $(this).sortable('refresh');
+            } else {
+                makeSortable($(this));
+            }
+        });
+    }
+    
+    // Update visual feedback during drag
+    function updateDragVisuals(item, level, deltaX) {
+        const $item = $(item);
+        
+        // Remove all nest level classes
+        $item.removeClass('nest-level-1 nest-level-2 nest-level-3');
+        
+        // Add appropriate class based on level
+        if (level > 0) {
+            $item.addClass('nest-level-' + Math.min(level, 3));
+        }
+        
+        // Update placeholder indentation
+        const placeholder = $('.sortable-placeholder');
+        placeholder.removeClass('indent-level-1 indent-level-2 indent-level-3');
+        if (level > 0) {
+            placeholder.addClass('indent-level-' + Math.min(level, 3));
+        }
+    }
+    
+    // Update nesting indicator
+    function updateNestingIndicator(deltaX, targetLevel) {
+        const indicator = $('#nesting-indicator');
+        const helper = $('.ui-sortable-helper');
+        
+        if (!helper.length) {
+            indicator.removeClass('visible');
+            return;
+        }
+        
+        // Position indicator above the helper
+        const helperOffset = helper.offset();
+        if (helperOffset) {
+            indicator.css({
+                left: helperOffset.left + (helper.outerWidth() / 2),
+                top: helperOffset.top - 30
+            });
+        }
+        
+        // Set indicator text
+        if (targetLevel > 0) {
+            indicator.text('Make submenu (Level ' + targetLevel + ')');
+            indicator.removeClass('unnest').addClass('nest');
+        } else if (deltaX < -UNNEST_THRESHOLD) {
+            indicator.text('Make top-level');
+            indicator.removeClass('nest').addClass('unnest');
+        } else {
+            indicator.text('Move item');
+            indicator.removeClass('nest unnest');
+        }
+        
+        indicator.addClass('visible');
+    }
+    
+    // Hide nesting indicator
+    function hideNestingIndicator() {
+        $('#nesting-indicator').removeClass('visible');
+    }
+    
+    // Update level classes for all items
+    function updateLevelClasses() {
+        $('.menu-item').each(function() {
+            const $item = $(this);
+            const level = getItemLevel($item);
+            
+            // Remove all level classes
+            $item.removeClass('level-0 level-1 level-2 level-3 level-4');
+            
+            // Add current level class
+            $item.addClass('level-' + level);
+            
+            // Update depth indicator text
+            const indicator = $item.find('.depth-indicator');
+            if (level > 0) {
+                indicator.text('L' + level);
+            } else {
+                indicator.text('');
+            }
+        });
+    }
+    
+    // Toggle Accordion
+    function toggleAccordion(heading) {
+        $(heading).toggleClass('collapsed');
+        $(heading).next('.accordion-content').toggleClass('collapsed');
+    }
+    
+    // Toggle Item Settings
+    function toggleItemSettings(btn) {
+        const item = $(btn).closest('.menu-item');
+        item.find('.menu-item-settings').toggleClass('open');
+    }
+    
+    // Cancel Item Edit
+    function cancelItemEdit(btn) {
+        $(btn).closest('.menu-item-settings').removeClass('open');
+    }
+    
+    // Update Item Title
+    function updateItemTitle(input) {
+        const item = $(input).closest('.menu-item');
+        const newTitle = $(input).val();
+        item.find('.item-title').text(newTitle);
+    }
+    
+    // Update Item URL
+    function updateItemUrl(input) {
+        // URL updated in the input, will be saved with the item
+    }
+    
+    // Normalize URL helper function
+    function normalizeUrl(url) {
+        url = url.trim();
+        if (!url.match(/^(https?:\/\/|mailto:|tel:|\/)/i)) {
+            if (url.includes('.')) {
+                return 'https://' + url;
+            }
+        }
+        return url;
+    }
+    
+    // Save Item Changes
+    function saveItemChanges(btn) {
+        const item = $(btn).closest('.menu-item');
+        const itemId = item.data('id');
+        const itemType = item.data('type');
+        
+        let url = item.find('.item-url-input').val();
+        // Normalize URL for custom links
+        if (itemType === 'custom_link') {
+            url = normalizeUrl(url);
+        }
+        
+        const data = {
+            title: item.find('.item-title-input').val(),
+            url: url,
+            css_class: item.find('.item-class-input').val(),
+            target: item.find('.item-target-input').val(),
+        };
+        
+        // Update display
+        item.find('.item-title').text(data.title);
+        item.find('.menu-item-settings').removeClass('open');
+        
+        // Save to server if it's an existing item
+        if (itemId && !itemId.toString().startsWith('new-')) {
+            $.ajax({
+                url: `/dashboard/api/menu-items/${itemId}/update/`,
+                type: 'POST',
+                contentType: 'application/json',
+                headers: { 'X-CSRFToken': csrftoken },
+                data: JSON.stringify(data),
+                success: function(response) {
+                    if (response.success) {
+                        showNotification('Item updated successfully', 'success');
+                    } else {
+                        showNotification(response.error || 'Error updating item', 'error');
+                    }
+                },
+                error: function() {
+                    showNotification('Error updating item', 'error');
+                }
+            });
+        }
+    }
+    
+    // Add Page to Menu
+    let newItemCounter = 0;
+    function addPageToMenu() {
+        const select = $('#page-select');
+        const selected = select.find(':selected');
+        
+        if (!selected.val()) {
+            alert('Please select a page');
+            return;
+        }
+        
+        const title = selected.data('title');
+        const url = selected.data('url');
+        const pageId = selected.val();
+        
+        addMenuItem({
+            type: 'page',
+            title: title,
+            url: url,
+            page_id: pageId
+        });
+        
+        select.val('');
+    }
+    
+    // Add Custom Link to Menu
+    function addCustomLinkToMenu() {
+        let url = $('#custom-url').val().trim();
+        const title = $('#custom-link-text').val().trim();
+        
+        if (!url || !title) {
+            alert('Please enter both URL and Link Text');
+            return;
+        }
+        
+        // Normalize URL - add https:// if no protocol specified
+        if (!url.match(/^(https?:\/\/|mailto:|tel:|\/)/i)) {
+            // If it contains a dot, assume it's a website
+            if (url.includes('.')) {
+                url = 'https://' + url;
+            }
+        }
+        
+        addMenuItem({
+            type: 'custom_link',
+            title: title,
+            url: url
+        });
+        
+        $('#custom-url').val('');
+        $('#custom-link-text').val('');
+    }
+    
+    // Add Category to Menu
+    function addCategoryToMenu() {
+        const select = $('#category-select');
+        const selected = select.find(':selected');
+        
+        if (!selected.val()) {
+            alert('Please select a category');
+            return;
+        }
+        
+        const title = selected.data('title');
+        const url = selected.data('url');
+        const categoryId = selected.val();
+        
+        addMenuItem({
+            type: 'category',
+            title: title,
+            url: url,
+            category_id: categoryId
+        });
+        
+        select.val('');
+    }
+    
+    // Add Menu Item to DOM
+    function addMenuItem(data) {
+        newItemCounter++;
+        const tempId = 'new-' + newItemCounter;
+        
+        const template = document.getElementById('menu-item-template');
+        const clone = template.content.cloneNode(true);
+        const itemDiv = $(clone).find('.menu-item');
+        
+        itemDiv.attr('data-id', tempId);
+        itemDiv.attr('data-type', data.type);
+        const typeLabels = {
+            'page': 'Page',
+            'custom_link': 'Custom Link',
+            'category': 'Category'
+        };
+        itemDiv.find('.item-type').text(typeLabels[data.type] || data.type);
+        itemDiv.find('.item-title').text(data.title);
+        itemDiv.find('.item-title-input').val(data.title);
+        itemDiv.find('.item-url-input').val(data.url);
+        
+        // Create via AJAX
+        $.ajax({
+            url: '/dashboard/api/menu-items/create/',
+            type: 'POST',
+            contentType: 'application/json',
+            headers: { 'X-CSRFToken': csrftoken },
+            data: JSON.stringify({
+                menu_id: {{ menu.id }},
+                title: data.title,
+                type: data.type,
+                url: data.url,
+                page_id: data.page_id || null,
+                category_id: data.category_id || null
+            }),
+            success: function(response) {
+                if (response.success) {
+                    itemDiv.attr('data-id', response.item.id);
+                    showNotification('Item added successfully', 'success');
+                } else {
+                    showNotification(response.error || 'Error adding item', 'error');
+                }
+            },
+            error: function() {
+                showNotification('Error adding item', 'error');
+            }
+        });
+        
+        $('#menu-items-list').append(itemDiv.parent());
+        makeSortable($('#menu-items-list'));
+        updateLevelClasses();
+    }
+    
+    // Delete Menu Item
+    function deleteMenuItem(btn) {
+        if (!confirm('Are you sure you want to remove this item?')) {
+            return;
+        }
+        
+        const item = $(btn).closest('.menu-item');
+        const itemId = item.data('id');
+        
+        // Remove from DOM immediately
+        item.remove();
+        
+        // Delete from server if it's an existing item
+        if (itemId && !itemId.toString().startsWith('new-')) {
+            $.ajax({
+                url: `/dashboard/api/menu-items/${itemId}/delete/`,
+                type: 'POST',
+                headers: { 'X-CSRFToken': csrftoken },
+                success: function(response) {
+                    if (response.success) {
+                        showNotification('Item removed', 'success');
+                    } else {
+                        showNotification(response.error || 'Error removing item', 'error');
+                    }
+                },
+                error: function() {
+                    showNotification('Error removing item', 'error');
+                }
+            });
+        }
+        
+        // Refresh sortables and level classes
+        refreshAllSortables();
+        updateLevelClasses();
+    }
+    
+    // Save Menu Order
+    function saveMenuOrder() {
+        const btn = $('#save-menu-btn');
+        btn.addClass('saving');
+        btn.find('.btn-text').text('Saving...');
+        
+        const items = [];
+        
+        // Collect top-level items
+        $('#menu-items-list > .menu-item').each(function(index) {
+            collectItemData($(this), items, index, null);
+        });
+        
+        $.ajax({
+            url: '/dashboard/api/menu-items/reorder/',
+            type: 'POST',
+            contentType: 'application/json',
+            headers: { 'X-CSRFToken': csrftoken },
+            data: JSON.stringify({ items: items }),
+            success: function(response) {
+                btn.removeClass('saving');
+                btn.find('.btn-text').text('Save Menu');
+                
+                if (response.success) {
+                    showNotification('Menu saved successfully', 'success');
+                } else {
+                    showNotification(response.error || 'Error saving menu', 'error');
+                }
+            },
+            error: function() {
+                btn.removeClass('saving');
+                btn.find('.btn-text').text('Save Menu');
+                showNotification('Error saving menu', 'error');
+            }
+        });
+    }
+    
+    // Collect item data recursively
+    function collectItemData(item, items, order, parentId) {
+        const itemId = item.data('id');
+        const realId = itemId.toString().startsWith('new-') ? null : itemId;
+        
+        if (realId) {
+            items.push({
+                id: realId,
+                parent_id: parentId,
+                order: order
+            });
+        }
+        
+        // Collect children
+        item.find('> .menu-item-children > .menu-item').each(function(childIndex) {
+            collectItemData($(this), items, childIndex, realId);
+        });
+    }
+    
+    // Show Notification
+    function showNotification(message, type) {
+        // Simple alert for now - can be replaced with a toast notification
+        const div = $('<div>')
+            .text(message)
+            .css({
+                position: 'fixed',
+                top: '50px',
+                right: '20px',
+                padding: '15px 20px',
+                background: type === 'success' ? '#00a32a' : '#d63638',
+                color: '#fff',
+                borderRadius: '4px',
+                zIndex: 9999,
+                boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+            })
+            .appendTo('body');
+        
+        setTimeout(() => div.fadeOut(() => div.remove()), 3000);
+    }
+    
+    // Track mouse position globally for better drag experience
+    $(document).on('mousemove', function(e) {
+        if (isDragging && dragCurrentItem) {
+            dragCurrentX = e.pageX;
+        }
+    });
+</script>
+{% endblock %}

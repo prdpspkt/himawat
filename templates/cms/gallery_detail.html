@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ gallery.name }} - Gallery{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-12">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ gallery.name }}</h1>
+        {% if gallery.description %}
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ gallery.description }}</p>
+        {% endif %}
+    </div>
+    
+    {% if gallery.images.all %}
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for image in gallery.images.all %}
+        <div class="group relative aspect-square overflow-hidden rounded-lg cursor-pointer" onclick="openLightbox({{ forloop.counter0 }})">
+            <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:image.title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+            {% if image.title %}
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                <span class="text-white text-sm">{{ image.title }}</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <p class="text-gray-500">No images in this gallery.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox" class="fixed inset-0 bg-black/90 z-50 hidden">
+    <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white hover:text-gray-300">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <button onclick="prevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <button onclick="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <div class="flex items-center justify-center h-full p-8">
+        <img id="lightbox-image" src="" alt="" class="max-w-full max-h-full object-contain">
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const images = [{% for image in gallery.images.all %}"{{ image.image.url }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+let currentIndex = 0;
+
+function openLightbox(index) {
+    currentIndex = index;
+    document.getElementById('lightbox-image').src = images[currentIndex];
+    document.getElementById('lightbox').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+function nextImage() {
+    currentIndex = (currentIndex + 1) % images.length;
+    document.getElementById('lightbox-image').src = images[currentIndex];
+}
+
+function prevImage() {
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    document.getElementById('lightbox-image').src = images[currentIndex];
+}
+
+document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
+});
+
+document.addEventListener('keydown', function(e) {
+    if (document.getElementById('lightbox').classList.contains('hidden')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowRight') nextImage();
+    if (e.key === 'ArrowLeft') prevImage();
+});
+</script>
+{% endblock %}

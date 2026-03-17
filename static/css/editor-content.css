@@ -1,0 +1,515 @@
+/**
+ * TinyMCE Editor Content CSS
+ * This file ensures the WYSIWYG editor matches the frontend styling
+ * Based on the site's prose styling from Tailwind CSS
+ */
+
+/* Fullscreen Mode Styles */
+.mce-fullscreen {
+    z-index: 9999 !important;
+}
+
+.mce-fullscreen .mce-tinymce {
+    height: 100vh !important;
+    width: 100vw !important;
+    top: 0 !important;
+    left: 0 !important;
+    position: fixed !important;
+}
+
+/* Base Editor Styles */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #374151;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    line-height: 1.25;
+    color: #111827;
+    margin-top: 1.6em;
+    margin-bottom: 0.6em;
+}
+
+h1 {
+    font-size: 2.25rem;
+    margin-top: 0;
+    line-height: 1.2;
+}
+
+h2 {
+    font-size: 1.875rem;
+    line-height: 1.3;
+}
+
+h3 {
+    font-size: 1.5rem;
+    line-height: 1.4;
+}
+
+h4 {
+    font-size: 1.25rem;
+}
+
+h5 {
+    font-size: 1.125rem;
+}
+
+h6 {
+    font-size: 1rem;
+    color: #6B7280;
+}
+
+/* Paragraphs */
+p {
+    font-size: 1rem;
+    line-height: 1.75;
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+    color: #374151;
+}
+
+/* Links */
+a {
+    color: #D62828;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #b91c1c;
+    text-decoration: underline;
+}
+
+/* Lists */
+ul, ol {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+    padding-left: 1.625em;
+}
+
+li {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    line-height: 1.75;
+}
+
+ul li {
+    list-style-type: disc;
+}
+
+ul ul li {
+    list-style-type: circle;
+}
+
+ul ul ul li {
+    list-style-type: square;
+}
+
+ol li {
+    list-style-type: decimal;
+}
+
+/* Definition Lists */
+dl {
+    margin-bottom: 1em;
+}
+
+dt {
+    font-weight: 600;
+    color: #111827;
+}
+
+dd {
+    margin-left: 1.5em;
+    margin-bottom: 0.5em;
+    color: #6B7280;
+}
+
+/* Blockquotes */
+blockquote {
+    margin-top: 1.6em;
+    margin-bottom: 1.6em;
+    padding-left: 1em;
+    padding-right: 1em;
+    border-left: 4px solid #D62828;
+    font-style: italic;
+    color: #4B5563;
+    font-weight: 500;
+}
+
+blockquote p {
+    margin-bottom: 0;
+}
+
+/* Code */
+code {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    font-size: 0.875em;
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-weight: 400;
+    background-color: #F3F4F6;
+    border-radius: 0.25rem;
+    color: #D62828;
+}
+
+pre {
+    background-color: #1F2937;
+    color: #F9FAFB;
+    padding: 0.875em;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin-top: 1.714em;
+    margin-bottom: 1.714em;
+    font-size: 0.875em;
+    line-height: 1.714;
+}
+
+pre code {
+    background-color: transparent;
+    color: inherit;
+    padding: 0;
+    font-weight: 400;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+/* Horizontal Rule */
+hr {
+    border: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #D62828, transparent);
+    margin: 2em 0;
+}
+
+/* Images */
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1em 0;
+}
+
+/* Images with captions */
+figure {
+    margin: 2em 0;
+    text-align: center;
+}
+
+figure img {
+    margin: 0;
+}
+
+figcaption {
+    margin-top: 0.5em;
+    font-size: 0.875rem;
+    color: #6B7280;
+    font-style: italic;
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5em 0;
+    font-size: 0.95em;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+    background-color: #D62828;
+    color: white;
+}
+
+th {
+    padding: 0.75em 1em;
+    text-align: left;
+    font-weight: 600;
+}
+
+tbody {
+    background-color: white;
+}
+
+tr {
+    border-bottom: 1px solid #E5E7EB;
+}
+
+tr:last-child {
+    border-bottom: none;
+}
+
+td {
+    padding: 0.75em 1em;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #F9FAFB;
+}
+
+tbody tr:hover {
+    background-color: #FEF2F2;
+}
+
+/* Strong and Bold */
+strong, b {
+    font-weight: 600;
+    color: #111827;
+}
+
+/* Emphasis and Italic */
+em, i {
+    font-style: italic;
+}
+
+/* Mark and Highlight */
+mark {
+    background-color: #FEF3C7;
+    color: #92400E;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+}
+
+/* Small */
+small {
+    font-size: 0.875em;
+    color: #6B7280;
+}
+
+/* Subscript and Superscript */
+sub, sup {
+    font-size: 0.75em;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sup {
+    top: -0.5em;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+/* Abbreviations */
+abbr[title] {
+    text-decoration: underline dotted;
+    cursor: help;
+}
+
+/* Citations */
+cite {
+    font-style: italic;
+    color: #6B7280;
+}
+
+/* Keyboard Input */
+kbd {
+    font-family: monospace;
+    font-size: 0.875em;
+    padding: 0.2em 0.4em;
+    background-color: #F3F4F6;
+    border: 1px solid #D1D5DB;
+    border-radius: 3px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Sample Output */
+samp {
+    font-family: monospace;
+    font-size: 0.875em;
+    color: #059669;
+    background-color: #ECFDF5;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+}
+
+/* Variable */
+var {
+    font-family: monospace;
+    font-size: 0.875em;
+    color: #7C3AED;
+    font-style: italic;
+}
+
+/* Deleted Text */
+del {
+    color: #EF4444;
+    text-decoration: line-through;
+}
+
+/* Inserted Text */
+ins {
+    color: #059669;
+    text-decoration: underline;
+}
+
+/* Address */
+address {
+    font-style: normal;
+    margin-bottom: 1em;
+}
+
+/* Content Divs - for spacing */
+.content-wrapper {
+    padding: 1em;
+}
+
+/* Text Alignment */
+.text-left {
+    text-align: left;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-justify {
+    text-align: justify;
+}
+
+/* Lead Paragraph (large intro text) */
+.lead {
+    font-size: 1.25rem;
+    color: #4B5563;
+    font-weight: 400;
+}
+
+/* Highlight Box */
+.highlight-box {
+    background-color: #EFF6FF;
+    border-left: 4px solid #3B82F6;
+    padding: 1em 1.5em;
+    margin: 1.5em 0;
+    border-radius: 0.25rem;
+}
+
+/* Warning Box */
+.warning-box {
+    background-color: #FEF3C7;
+    border-left: 4px solid #F59E0B;
+    padding: 1em 1.5em;
+    margin: 1.5em 0;
+    border-radius: 0.25rem;
+}
+
+/* Info Box */
+.info-box {
+    background-color: #E0E7FF;
+    border-left: 4px solid #6366F1;
+    padding: 1em 1.5em;
+    margin: 1.5em 0;
+    border-radius: 0.25rem;
+}
+
+/* Success Box */
+.success-box {
+    background-color: #D1FAE5;
+    border-left: 4px solid #10B981;
+    padding: 1em 1.5em;
+    margin: 1.5em 0;
+    border-radius: 0.25rem;
+}
+
+/* Button Styles in Content */
+.btn {
+    display: inline-block;
+    padding: 0.5em 1.5em;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: #D62828;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #b91c1c;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #2E7D32;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #247129;
+    color: white;
+}
+
+/* Callout */
+.callout {
+    background: linear-gradient(135deg, #FEF2F2 0%, #FFFFFF 100%);
+    border: 1px solid #FCA5A5;
+    border-radius: 0.5rem;
+    padding: 1.5em;
+    margin: 1.5em 0;
+    box-shadow: 0 2px 8px rgba(214, 40, 40, 0.1);
+}
+
+.callout h3 {
+    color: #D62828;
+    margin-top: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    body {
+        padding: 15px;
+        font-size: 15px;
+    }
+
+    h1 {
+        font-size: 1.875rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+
+    table {
+        font-size: 0.875em;
+    }
+
+    th, td {
+        padding: 0.5em;
+    }
+}
+
+/* Print styles */
+@media print {
+    body {
+        padding: 0;
+    }
+
+    a {
+        color: #000;
+        text-decoration: underline;
+    }
+
+    .btn, .callout, .highlight-box, .warning-box, .info-box, .success-box {
+        page-break-inside: avoid;
+    }
+}
