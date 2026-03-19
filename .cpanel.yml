@@ -1,18 +1,17 @@
 ---
-# Simple copy deployment for cPanel
-
 deployment:
-  pre_build:
-    - cp -R accounts /home/negeobag/himawat/
-    - cp -R dashboard /home/negeobag/himawat/
-    - cp -R himwat /home/negeobag/himawat/
-    - cp -R pages /home/negeobag/himawat/
-    - cp -R services /home/negeobag/himawat/
-    - cp -R static /home/negeobag/himawat/
-    - cp -R templates /home/negeobag/himawat/
-    - cp -R media /home/negeobag/himawat/
-    - cp manage.py /home/negeobag/himawat/
-    - cp requirements.txt /home/negeobag/himawat/
-    - cp .env.example /home/negeobag/himawat/.env
-    - cp passenger_wsgi.py /home/negeobag/himawat/
-
+  tasks:
+    - export DEPLOYPATH=/home/negeobag/himawat
+    - /bin/cp -R accounts $DEPLOYPATH
+    - /bin/cp -R dashboard $DEPLOYPATH
+    - /bin/cp -R himwat $DEPLOYPATH
+    - /bin/cp -R pages $DEPLOYPATH
+    - /bin/cp -R services $DEPLOYPATH
+    - /bin/cp -R static $DEPLOYPATH
+    - /bin/cp -R templates $DEPLOYPATH
+    - /bin/cp -R media $DEPLOYPATH
+    - /bin/cp -R tmp $DEPLOYPATH
+    - /bin/cp manage.py $DEPLOYPATH
+    - /bin/cp requirements.txt $DEPLOYPATH
+    - /bin/cp .env.example $DEPLOYPATH/.env
+    - /bin/cp passenger_wsgi.py $DEPLOYPATH
