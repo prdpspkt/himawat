@@ -1,8 +1,0 @@
-/home/negeobag/virtualenv/himawat/3.11/lib/python3.11/site-packages/django/views/generic/list.py:91: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'dashboard.models.Menu'> QuerySet.
-  return self.paginator_class(
-/home/negeobag/virtualenv/himawat/3.11/lib/python3.11/site-packages/django/views/generic/list.py:91: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'dashboard.models.Menu'> QuerySet.
-  return self.paginator_class(
-/home/negeobag/virtualenv/himawat/3.11/lib/python3.11/site-packages/django/views/generic/list.py:91: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'dashboard.models.Menu'> QuerySet.
-  return self.paginator_class(
-/home/negeobag/virtualenv/himawat/3.11/lib/python3.11/site-packages/django/views/generic/list.py:91: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'dashboard.models.Menu'> QuerySet.
-  return self.paginator_class(
