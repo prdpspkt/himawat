@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = 'django-insecure-wnx+#tn3lti*sz@3un)lrl-i6d*ilfzkg##z1&ip@gpgmt8f$4'
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'himawatkhandavastu.com', 'www.himawatkhandavastu.com', '*']
 
@@ -29,21 +29,17 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-
-    # Third-party apps
-    'django_cleanup.apps.CleanupConfig',
-
     # Local apps
     'accounts',
     'dashboard',
     'pages',
+    'services',
 ]
 
 MIDDLEWARE = [
@@ -60,11 +56,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'himwat.urls'
 
+# Do this if you aren't sure. It's the standard Django default.
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
+        'APP_DIRS': DEBUG, 
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -72,7 +69,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'pages.context_processors.site_context',
+                'pages.context_processors.home_context',
                 'pages.context_processors.page_context',
+                'services.context_processors.service_categories',
             ],
         },
     },
@@ -93,9 +92,9 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'himawat1_cms',  # The name of the database you created in MySQL
-            'USER': 'himawat1_cms',  # Your MySQL username (e.g., 'root')
-            'PASSWORD': 'd4CXWYzFEESYeYUuXS4w',  # Your MySQL password
+            'NAME': 'negeobag_himawat',  # The name of the database you created in MySQL
+            'USER': 'negeobag_himawat',  # Your MySQL username (e.g., 'root')
+            'PASSWORD': '*HPKO@CrevmO84p7',  # Your MySQL password
             'HOST': '127.0.0.1',  # Use 'localhost' or '127.0.0.1'
             'PORT': '3306',  # Default MySQL port
             'OPTIONS': {
@@ -181,3 +180,60 @@ if not DEBUG:
             'django.template.loaders.app_directories.Loader',
         ))
     ]
+
+# Logging Configuration
+import os
+
+# Ensure logs directory exists
+LOGS_DIR = BASE_DIR / 'logs'
+os.makedirs(LOGS_DIR, exist_ok=True)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': LOGS_DIR / 'django.log',
+            'maxBytes': 1024 * 1024 * 10,  # 10 MB
+            'backupCount': 10,
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['console', 'file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'dashboard': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'INFO',
+    },
+}
+

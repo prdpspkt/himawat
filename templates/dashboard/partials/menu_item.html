@@ -3,6 +3,9 @@
     <div class="menu-item-bar">
         <div class="menu-item-handle">
             <span class="item-type">{% if item.type == 'page' %}Page{% elif item.type == 'custom_link' %}Custom{% elif item.type == 'category' %}Category{% else %}{{ item.type|title }}{% endif %}</span>
+            {% if item.icon %}
+            <span class="item-icon"><i class="{{ item.icon }}"></i></span>
+            {% endif %}
             <span class="item-title">{{ item.title }}</span>
         </div>
         <div class="item-controls">
@@ -14,6 +17,14 @@
         <div class="field">
             <label>Navigation Label</label>
             <input type="text" class="item-title-input" value="{{ item.title }}" onchange="updateItemTitle(this)">
+        </div>
+        <div class="field">
+            <label>Icon (optional)</label>
+            <input type="text" class="item-icon-input" value="{{ item.icon|default:'' }}" placeholder="e.g., fas fa-home">
+            <div class="description">
+                <strong>Font Awesome Icons:</strong> <code>fas fa-home</code> <code>fas fa-user</code> <code>fas fa-envelope</code> <code>fas fa-phone</code> <code>fas fa-building</code> <code>fas fa-cog</code><br>
+                <a href="https://fontawesome.com/icons?d=gallery&m=free" target="_blank">Browse all icons →</a>
+            </div>
         </div>
         <div class="field">
             <label>URL</label>

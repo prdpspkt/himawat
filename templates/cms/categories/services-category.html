@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block meta_description %}{{ category.description|truncatewords:30 }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Gradient Background -->
+<div class="bg-gradient-primary py-20" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container text-center">
+        {% if category.image %}
+        <div class="mb-5">
+            <img src="{{ category.image.url }}" alt="{{ category.name }}" class="img-fluid rounded-circle shadow-lg p-4 bg-white" style="width: 180px; height: 180px; object-fit: contain;">
+        </div>
+        {% endif %}
+        <h1 class="display-4 fw-bold text-white mb-4">{{ category.name }}</h1>
+        {% if category.description %}
+        <p class="fs-5 text-white-90 max-w-3xl mx-auto">{{ category.description }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Child Categories -->
+{% if child_categories %}
+<div class="py-16">
+    <div class="container">
+        <h2 class="display-6 fw-bold text-almost-black mb-5 text-center">Subcategories</h2>
+        <div class="row g-4">
+            {% for child in child_categories %}
+            <div class="col-lg-3 col-md-6">
+                <a href="{{ child.get_absolute_url }}" class="text-decoration-none">
+                    <div class="card card-hover h-100 border-0 shadow-sm">
+                        {% if child.image %}
+                        <div class="card-img-top bg-scarlet-light d-flex align-items-center justify-content-center p-3" style="height: 160px;">
+                            <img src="{{ child.image.url }}" alt="{{ child.name }}" class="img-fluid" style="max-height: 140px; object-fit: contain;">
+                        </div>
+                        {% endif %}
+                        <div class="card-body p-4">
+                            <h3 class="h6 fw-bold text-almost-black mb-2">{{ child.name }}</h3>
+                            {% if child.description %}
+                            <p class="small text-grey-dark mb-3">{{ child.description|truncatewords:10 }}</p>
+                            {% endif %}
+                            <span class="text-primary small fw-semibold">View →</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Posts in this Category with Custom Layout -->
+{% if posts %}
+<div class="py-16">
+    <div class="container">
+        <h2 class="display-6 fw-bold text-almost-black mb-5 text-center">Our {{ category.name }}</h2>
+        <div class="row g-5">
+            {% for post in posts %}
+            <div class="col-lg-6">
+                <a href="{{ post.get_absolute_url }}" class="text-decoration-none">
+                    <div class="card card-hover border-0 shadow-sm overflow-hidden">
+                        <div class="row g-0">
+                            {% if post.featured_image %}
+                            <div class="col-md-5">
+                                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="img-fluid h-100" style="object-fit: cover; min-height: 200px;">
+                            </div>
+                            {% endif %}
+                            <div class="col-md-7">
+                                <div class="card-body p-4">
+                                    {% if post.category %}
+                                    <span class="badge bg-primary mb-2">{{ post.category.name }}</span>
+                                    {% endif %}
+                                    <h3 class="h5 fw-bold text-almost-black mb-3">{{ post.title }}</h3>
+                                    {% if post.excerpt %}
+                                    <p class="text-grey-dark mb-4">{{ post.excerpt|truncatewords:15 }}</p>
+                                    {% endif %}
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <small class="text-grey-dark">
+                                            <i class="far fa-calendar me-1"></i>
+                                            {{ post.published_at|date:"F d, Y" }}
+                                        </small>
+                                        <span class="text-primary small fw-semibold">Read More →</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="py-16">
+    <div class="container text-center">
+        <p class="text-grey-dark">No posts found in this category.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

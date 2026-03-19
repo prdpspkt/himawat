@@ -3,7 +3,6 @@ from django.views.generic import (
     View, TemplateView, ListView, CreateView, UpdateView, DeleteView, DetailView
 )
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.db.models import Count, Q
@@ -16,6 +15,7 @@ from dashboard.models import (
     Menu, CompanyInfo, CEOInfo, Video, PageRevision, PostRevision, AIConfiguration
 )
 from dashboard.forms import PageForm, PostForm, FAQForm, ProductForm
+from dashboard.decorators import staff_member_required
 from accounts.models import User
 
 
@@ -590,9 +590,9 @@ class ConsultationListView(BaseListView):
     model = Consultation
     template_name = 'dashboard/consultation_list.html'
     context_object_name = 'consultations'
-    
+
     def get_queryset(self):
-        return Consultation.objects.order_by('-created_at')
+        return Consultation.objects.prefetch_related('files').order_by('-created_at')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -606,7 +606,10 @@ class ConsultationDetailView(AdminRequiredMixin, UpdateView):
     model = Consultation
     template_name = 'dashboard/consultation_detail.html'
     fields = ['status', 'notes']
-    
+
+    def get_queryset(self):
+        return Consultation.objects.prefetch_related('files')
+
     def get_success_url(self):
         return reverse_lazy('dashboard:consultation_detail', kwargs={'pk': self.object.pk})
     
@@ -700,7 +703,6 @@ class UserListView(BaseListView):
 
 
 # AJAX Views for Categories and Tags
-from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.http import require_POST
 
 
@@ -881,15 +883,14 @@ class AIConfigurationListView(AdminRequiredMixin, ListView):
     context_object_name = 'configs'
 
     def get_queryset(self):
-        return AIConfiguration.objects.order_by('-is_default', '-created_at')
+        return AIConfiguration.objects.order_by('-created_at')
 
 
 class AIConfigurationCreateView(AdminRequiredMixin, CreateView):
     """Create a new AI configuration"""
     model = AIConfiguration
     template_name = 'dashboard/ai_config_form.html'
-    fields = ['name', 'api_key', 'model', 'system_prompt',
-              'max_tokens', 'temperature', 'status', 'is_default']
+    fields = ['name', 'model_name', 'api_endpoint', 'api_key', 'system_prompt']
     success_url = reverse_lazy('dashboard:ai_config_list')
 
     def form_valid(self, form):
@@ -902,8 +903,7 @@ class AIConfigurationUpdateView(AdminRequiredMixin, UpdateView):
     """Update an AI configuration"""
     model = AIConfiguration
     template_name = 'dashboard/ai_config_form.html'
-    fields = ['name', 'api_key', 'model', 'system_prompt',
-              'max_tokens', 'temperature', 'status', 'is_default']
+    fields = ['name', 'model_name', 'api_endpoint', 'api_key', 'system_prompt']
     success_url = reverse_lazy('dashboard:ai_config_list')
 
     def form_valid(self, form):
@@ -922,31 +922,16 @@ class AIConfigurationDeleteView(AdminRequiredMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-@staff_member_required
-@require_POST
-def activate_ai_config(request, config_id):
-    """Activate an AI configuration"""
-    try:
-        config = get_object_or_404(AIConfiguration, pk=config_id)
-        config.status = 'active'
-        config.save()
-
-        # Deactivate all other configs
-        AIConfiguration.objects.filter(status='active').exclude(pk=config_id).update(status='inactive')
-
-        messages.success(request, f'AI configuration "{config.name}" activated successfully!')
-        return JsonResponse({'success': True})
-    except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
-
-
 # AI Content Generation API
 @staff_member_required
 def generate_content_with_ai(request):
     """Generate content using DeepSeek AI with streaming support"""
     import json
+    import logging
     from django.http import StreamingHttpResponse
     from openai import OpenAI
+
+    logger = logging.getLogger(__name__)
 
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Only POST method is allowed'})
@@ -955,13 +940,21 @@ def generate_content_with_ai(request):
         # Get active AI configuration
         ai_config = AIConfiguration.get_active()
         if not ai_config:
+            logger.error("No active AI configuration found")
             return JsonResponse({
                 'success': False,
                 'error': 'No active AI configuration found. Please activate an AI configuration first.'
             })
 
+        logger.info(f"Using AI config: {ai_config.name} (model: {ai_config.model_name})")
+
         # Get request data
-        data = json.loads(request.body)
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in request body: {e}")
+            return JsonResponse({'success': False, 'error': 'Invalid JSON in request body'})
+
         prompt = data.get('prompt', '').strip()
         action = data.get('action', 'generate')  # generate, replace, edit
         current_content = data.get('current_content', '')
@@ -969,58 +962,117 @@ def generate_content_with_ai(request):
         if not prompt:
             return JsonResponse({'success': False, 'error': 'Prompt is required'})
 
+        logger.info(f"AI generation request - Action: {action}, Prompt length: {len(prompt)}")
+
         # Prepare messages based on action
         messages = []
 
         # Add system prompt if configured
-        if ai_config.system_prompt:
-            messages.append({
-                'role': 'system',
-                'content': ai_config.system_prompt
-            })
+        system_prompt = ai_config.system_prompt or "You are a helpful AI assistant that generates high-quality content."
+        # Enhance system prompt for better code generation
+        enhanced_system_prompt = system_prompt + """
+
+When generating HTML, CSS, or JavaScript code:
+- Always wrap the code in markdown code blocks with the appropriate language identifier (e.g., ```html, ```css, ```javascript)
+- Include the complete, working code - never truncate or use placeholders like "// insert code here"
+- Make sure the code is properly formatted and indented
+- For HTML, include proper DOCTYPE, html, head, and body tags if generating a complete page
+- For CSS, include complete rules with proper selectors and properties
+- Always complete the code block with closing ``` markers
+
+When generating regular text content (not code):
+- Write naturally without markdown code blocks
+- Use proper formatting with paragraphs, headings, and lists as needed
+- Never wrap regular content in ```code blocks"""
+
+        messages.append({
+            'role': 'system',
+            'content': enhanced_system_prompt
+        })
 
         # Prepare user prompt based on action
         user_prompt = prompt
         if action == 'edit' and current_content:
             user_prompt = f"{prompt}\n\nCurrent content:\n{current_content}\n\nPlease improve the above content based on my instructions."
+        elif action == 'generate':
+            # Add instruction for clarity
+            if any(keyword in prompt.lower() for keyword in ['html', 'css', 'javascript', 'code', 'component', 'button', 'form', 'layout']):
+                user_prompt = f"{prompt}\n\nPlease provide the complete code in a markdown code block. Ensure all code is complete and functional."
 
         messages.append({
             'role': 'user',
             'content': user_prompt
         })
 
-        # Create OpenAI client for DeepSeek
-        client = OpenAI(
-            api_key=ai_config.api_key,
-            base_url='https://api.z.ai/api/paas/v4/'
-        )
+        # Create OpenAI client with configured endpoint
+        try:
+            client = OpenAI(
+                api_key=ai_config.api_key,
+                base_url=ai_config.api_endpoint
+            )
+            logger.info(f"OpenAI client created with endpoint: {ai_config.api_endpoint}")
+        except Exception as e:
+            logger.error(f"Failed to create OpenAI client: {e}")
+            return JsonResponse({'success': False, 'error': f'Failed to initialize AI client: {str(e)}'})
+
+        logger.info(f"About to create generator function")
 
         def generate():
             """Generator function for streaming response"""
+            logger.info(f"Generator function called, starting AI generation")
             try:
-                # Create streaming completion
+                logger.info(f"Attempting to create stream with model: {ai_config.model_name}")
                 stream = client.chat.completions.create(
-                    model="glm-4.5",
+                    model=ai_config.model_name,
                     messages=messages,
-                    max_tokens=ai_config.max_tokens,
-                    temperature=ai_config.temperature,
+                    max_tokens=4000,
+                    temperature=0.7,
                     stream=True
                 )
+                logger.info("Stream object created successfully, starting to iterate")
 
                 # Stream the response
+                chunk_count = 0
                 for chunk in stream:
-                    if chunk.choices[0].delta.content is not None:
-                        content = chunk.choices[0].delta.content
-                        # Send as SSE format
-                        yield f"data: {json.dumps({'content': content})}\n\n"
+                    chunk_count += 1
+                    logger.debug(f"Received chunk #{chunk_count}")
+
+                    if chunk.choices and len(chunk.choices) > 0:
+                        delta = chunk.choices[0].delta
+                        if hasattr(delta, 'content') and delta.content is not None:
+                            content = delta.content
+                            logger.debug(f"Sending content chunk: {len(content)} chars")
+                            yield f"data: {json.dumps({'content': content})}\n\n"
 
                 # Send completion signal
+                logger.info(f"AI generation completed successfully after {chunk_count} chunks")
                 yield f"data: {json.dumps({'done': True})}\n\n"
 
             except Exception as e:
-                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+                logger.error(f"Error during AI streaming: {type(e).__name__}: {str(e)}", exc_info=True)
+                error_msg = str(e)
+                # Include more details for common errors
+                if 'timeout' in str(e).lower():
+                    error_msg = "The AI request timed out. Please try again with a shorter prompt."
+                elif 'connection' in str(e).lower():
+                    error_msg = "Could not connect to AI service. Please check your API configuration."
+                elif 'key' in str(e).lower() or 'auth' in str(e).lower():
+                    error_msg = "Authentication failed. Please check your API key."
+                elif 'model' in str(e).lower():
+                    error_msg = f"Model '{ai_config.model_name}' not found. Please check your AI configuration."
+                yield f"data: {json.dumps({'error': error_msg})}\n\n"
 
-        return StreamingHttpResponse(generate(), content_type='text/event-stream')
+        logger.info(f"About to create StreamingHttpResponse")
+        try:
+            response = StreamingHttpResponse(generate(), content_type='text/event-stream')
+            response['X-Accel-Buffering'] = 'no'
+            response['Cache-Control'] = 'no-cache, no-transform'
+            logger.info(f"StreamingHttpResponse created successfully, about to return")
+            return response
+        except Exception as e:
+            logger.error(f"Failed to create StreamingHttpResponse: {type(e).__name__}: {str(e)}", exc_info=True)
+            return JsonResponse({'success': False, 'error': f'Failed to create streaming response: {str(e)}'})
 
     except Exception as e:
+        logger.error(f"Unexpected error in generate_content_with_ai: {e}", exc_info=True)
         return JsonResponse({'success': False, 'error': f'Server error: {str(e)}'})

@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ service.meta_title|default:service.title }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block meta_description %}{{ service.meta_description|default:service.short_description|truncatewords:30 }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-off-white py-20">
+    <div class="container text-center">
+        {% if service.featured_image %}
+        <div class="mb-5">
+            <img src="{{ service.featured_image.url }}" alt="{{ service.title }}" class="img-fluid rounded-circle shadow-sm p-4 bg-scarlet-light" style="width: 180px; height: 180px; object-fit: contain;">
+        </div>
+        {% elif service.image %}
+        <div class="mb-5">
+            <img src="{{ service.image.url }}" alt="{{ service.title }}" class="img-fluid rounded-circle shadow-sm p-4 bg-scarlet-light" style="width: 180px; height: 180px; object-fit: contain;">
+        </div>
+        {% elif service.icon %}
+        <div class="mb-5">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-scarlet-light shadow-sm" style="width: 180px; height: 180px;">
+                <i class="{{ service.icon }} text-6xl text-primary"></i>
+            </div>
+        </div>
+        {% endif %}
+        <h1 class="display-3 fw-bold text-primary mb-4">{{ service.title }}</h1>
+        {% if service.short_description %}
+        <p class="fs-5 text-grey-dark max-w-3xl mx-auto">{{ service.short_description }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Service Details -->
+{% if service.description or service.price or service.price_display %}
+<div class="py-16">
+    <div class="container">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <div class="bg-white rounded-2xl shadow-sm p-8 mb-8">
+                    {% if service.description %}
+                    <div class="prose prose-lg max-w-none">
+                        {{ service.description|safe }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- CTA Section -->
+                <div class="bg-gradient-to-r rounded-2xl p-8 text-center">
+                    <h2 class="display-6 fw-bold text-white mb-4">Ready to Get Started?</h2>
+                    <p class="fs-5 mb-4" style="color: rgba(254, 254, 254, 0.9);">Contact us today to discuss your requirements and get a personalized quote.</p>
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                        <a href="{% url 'pages:consultation' %}" class="btn btn-light btn-lg text-primary">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            Get Consultation
+                        </a>
+                        {% if company_info and company_info.whatsapp_number %}
+                        <a href="https://wa.me/{{ company_info.whatsapp_number|cut:'+' }}" target="_blank" class="btn btn-success btn-lg">
+                            <i class="fab fa-whatsapp me-2"></i>
+                            WhatsApp
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Pricing Card -->
+                {% if service.price or service.price_display %}
+                <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+                    <h3 class="h5 fw-bold text-almost-black mb-4">Pricing</h3>
+                    {% if service.price_display %}
+                    <p class="display-6 fw-bold text-primary mb-2">{{ service.price_display }}</p>
+                    {% elif service.price %}
+                    <p class="display-6 fw-bold text-primary mb-2">NPR {{ service.price }}</p>
+                    <p class="small text-grey-dark mb-4">Starting price</p>
+                    {% endif %}
+                    <a href="{% url 'pages:consultation' %}" class="btn btn-primary btn-lg w-100">
+                        Get Quote
+                    </a>
+                </div>
+                {% endif %}
+
+                <!-- Category Info -->
+                <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+                    <h3 class="h5 fw-bold text-almost-black mb-4">Category</h3>
+                    <a href="{{ service.category.get_absolute_url }}" class="d-flex align-items-center gap-3 text-decoration-none">
+                        {% if service.category.icon %}
+                        <div class="rounded bg-scarlet-light d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <i class="{{ service.category.icon }} text-primary"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <p class="fw-semibold text-primary mb-0">{{ service.category.name }}</p>
+                            <p class="small text-grey-dark mb-0">View all services</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Quick Contact -->
+                <div class="bg-white rounded-2xl shadow-sm p-6">
+                    <h3 class="h5 fw-bold text-almost-black mb-4">Quick Contact</h3>
+                    {% if company_info %}
+                    <div class="space-y-3">
+                        {% if company_info.phone %}
+                        <a href="tel:{{ company_info.phone }}" class="d-flex align-items-center gap-3 text-decoration-none text-grey-dark">
+                            <div class="rounded bg-scarlet-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-phone text-primary"></i>
+                            </div>
+                            <span>{{ company_info.phone }}</span>
+                        </a>
+                        {% endif %}
+                        {% if company_info.email %}
+                        <a href="mailto:{{ company_info.email }}" class="d-flex align-items-center gap-3 text-decoration-none text-grey-dark">
+                            <div class="rounded bg-scarlet-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-envelope text-primary"></i>
+                            </div>
+                            <span class="text-truncate">{{ company_info.email }}</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Related Services -->
+{% if related_services %}
+<div class="bg-off-white py-16">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-6 fw-bold text-almost-black mb-3">Related Services</h2>
+            <p class="fs-5 text-grey-dark">You might also be interested in</p>
+        </div>
+        <div class="row g-4">
+            {% for related in related_services %}
+            <div class="col-lg-3 col-md-6">
+                <a href="{{ related.get_absolute_url }}" class="text-decoration-none">
+                    <div class="card card-hover h-100 border-0 shadow-sm">
+                        {% if related.featured_image %}
+                        <div class="card-img-top bg-scarlet-light d-flex align-items-center justify-content-center p-3" style="height: 160px;">
+                            <img src="{{ related.featured_image.url }}" alt="{{ related.title }}" class="img-fluid" style="max-height: 140px; object-fit: contain;">
+                        </div>
+                        {% elif related.icon %}
+                        <div class="card-img-top bg-scarlet-light d-flex align-items-center justify-content-center p-3" style="height: 160px;">
+                            <i class="{{ related.icon }} text-4xl text-primary"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body p-4">
+                            <h3 class="h6 fw-bold text-almost-black mb-2">{{ related.title }}</h3>
+                            {% if related.short_description %}
+                            <p class="small text-grey-dark mb-3">{{ related.short_description|truncatewords:10 }}</p>
+                            {% endif %}
+                            <span class="text-primary small fw-semibold">Learn More →</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

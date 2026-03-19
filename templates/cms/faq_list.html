@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Frequently Asked Questions - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block meta_description %}Find answers to frequently asked questions about Vastu Shastra, engineering design, construction services, and training programs.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="py-16 bg-gradient-primary" style="background: linear-gradient(135deg, rgba(218, 37, 28, 0.05) 0%, rgba(0, 109, 50, 0.05) 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-4 fw-bold text-almost-black mb-4">Frequently Asked Questions</h1>
+                <p class="fs-5 text-dim-grey-dark mb-5">
+                    Find answers to commonly asked questions about our services, courses, and expertise
+                </p>
+
+                <!-- Quick Stats -->
+                {% if total_vastu or total_engineering %}
+                <div class="row g-4 mt-4">
+                    {% if total_vastu %}
+                    <div class="col-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="display-6 fw-bold text-primary mb-2">{{ total_vastu }}</div>
+                                <div class="text-dim-grey">Vastu FAQs</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if total_engineering %}
+                    <div class="col-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center p-4">
+                                <div class="display-6 fw-bold text-success mb-2">{{ total_engineering }}</div>
+                                <div class="text-dim-grey">Engineering FAQs</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ Categories Tabs -->
+{% if vastu_faqs or engineering_faqs %}
+<div class="py-12">
+    <div class="container">
+        <div class="row justify-content-center mb-5">
+            <div class="col-auto">
+                <div class="btn-group" role="group" aria-label="FAQ categories">
+                    <button type="button" class="btn btn-outline-primary active" id="tab-vastu" onclick="showCategory('vastu')">
+                        <i class="fas fa-om me-2"></i>Vastu FAQs
+                    </button>
+                    <button type="button" class="btn btn-outline-success" id="tab-engineering" onclick="showCategory('engineering')">
+                        <i class="fas fa-hard-hat me-2"></i>Engineering FAQs
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vastu FAQs Section -->
+        {% if vastu_faqs %}
+        <div id="category-vastu" class="faq-category">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion" id="vastuFaqAccordion">
+                        {% for faq in vastu_faqs %}
+                        <div class="accordion-item border-0 mb-3">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#vastuCollapse{{ faq.id }}">
+                                    <span class="badge bg-primary me-3 rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 16px;">{{ forloop.counter }}</span>
+                                    {{ faq.question }}
+                                </button>
+                            </h2>
+                            <div id="vastuCollapse{{ faq.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#vastuFaqAccordion">
+                                <div class="accordion-body bg-white border border-top-0">
+                                    {{ faq.answer|safe }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Engineering FAQs Section -->
+        {% if engineering_faqs %}
+        <div id="category-engineering" class="faq-category d-none">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion" id="engineeringFaqAccordion">
+                        {% for faq in engineering_faqs %}
+                        <div class="accordion-item border-0 mb-3">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#engineeringCollapse{{ faq.id }}">
+                                    <span class="badge bg-success me-3 rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 16px;">{{ forloop.counter }}</span>
+                                    {{ faq.question }}
+                                </button>
+                            </h2>
+                            <div id="engineeringCollapse{{ faq.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#engineeringFaqAccordion">
+                                <div class="accordion-body bg-white border border-top-0">
+                                    {{ faq.answer|safe }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- CTA Section -->
+<div class="py-16" style="background: linear-gradient(135deg, var(--primary-scarlet) 0%, var(--primary-scarlet-dark) 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="display-5 fw-bold text-white mb-4">Still Have Questions?</h2>
+                <p class="text-white-90 mb-5 fs-5">Can't find the answer you're looking for? Please reach out to our team.</p>
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    <a href="{% url 'pages:consultation' %}" class="btn btn-light btn-lg px-5">
+                        <i class="fas fa-calendar-check me-2"></i>
+                        Get Consultation
+                    </a>
+                    <a href="{% url 'pages:page_detail' 'contact' %}" class="btn btn-outline-light btn-lg px-5">
+                        <i class="fas fa-envelope me-2"></i>
+                        Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showCategory(category) {
+    // Hide all categories
+    document.querySelectorAll('.faq-category').forEach(el => {
+        el.classList.add('d-none');
+    });
+
+    // Remove active class from all tabs
+    document.querySelectorAll('#tab-vastu, #tab-engineering').forEach(el => {
+        el.classList.remove('active');
+    });
+
+    // Show selected category
+    const categoryDiv = document.getElementById('category-' + category);
+    if (categoryDiv) {
+        categoryDiv.classList.remove('d-none');
+    }
+
+    // Add active class to selected tab
+    const tab = document.getElementById('tab-' + category);
+    if (tab) {
+        tab.classList.add('active');
+    }
+}
+</script>
+{% endblock %}

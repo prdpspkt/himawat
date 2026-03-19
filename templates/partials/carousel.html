@@ -1,0 +1,50 @@
+<!-- Image Carousel -->
+{% load static %}
+{% if carousel_slides %}
+<div id="mainCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="hover">
+    <!-- Indicators -->
+    <div class="carousel-indicators">
+        {% for slide in carousel_slides %}
+        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+        {% endfor %}
+    </div>
+
+    <!-- Slides -->
+    <div class="carousel-inner">
+        {% for slide in carousel_slides %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            {% if slide.link_url %}
+            <a href="{{ slide.link_url }}" class="text-decoration-none">
+            {% endif %}
+
+            <img src="{{ slide.image.url }}" alt="{{ slide.title }}" class="d-block w-100 carousel-image">
+
+            {% if slide.title or slide.caption %}
+            <div class="carousel-caption d-none d-md-block">
+                {% if slide.title %}
+                <h2 class="display-6 fw-bold mb-3">{{ slide.title }}</h2>
+                {% endif %}
+                {% if slide.caption %}
+                <p class="fs-5 mb-0">{{ slide.caption }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if slide.link_url %}
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+{% endif %}

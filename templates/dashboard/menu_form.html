@@ -29,8 +29,17 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
                 <input type="text" name="location" value="{{ form.location.value|default:'' }}"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-                <p class="text-xs text-gray-500 mt-1">Where this menu appears (e.g., main, footer, sidebar)</p>
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                       list="menu-locations">
+                <datalist id="menu-locations">
+                    <option value="main">Main Navigation</option>
+                    <option value="top-bar">Top Bar Menu</option>
+                    <option value="footer-1">Footer Column 1</option>
+                    <option value="footer-2">Footer Column 2</option>
+                </datalist>
+                <p class="text-xs text-gray-500 mt-1">
+                    <strong>Available locations:</strong> main, top-bar, footer-1, footer-2
+                </p>
             </div>
             
             <div>

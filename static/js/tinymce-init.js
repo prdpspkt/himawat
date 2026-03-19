@@ -32,7 +32,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Theme and skin
             skin: 'oxide',
             theme: 'silver',
-            content_css: '/static/css/editor-content.css',
+            content_css: [
+                'https://cdn.jsdelivr.net/npm/tailwindcss@3.4.17/dist/tailwind.min.css',
+                '/static/css/style.css'
+            ],
 
             // Plugins - using community edition plugins
             plugins: [
@@ -123,16 +126,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Mark textarea as initialized
                 textarea.setAttribute('data-mce-initialized', 'true');
 
-                // Update textarea on change
-                editor.on('change keyup', function() {
+                // Function to sync content to textarea
+                const syncContent = function() {
                     textarea.value = editor.getContent();
+                };
+
+                // Update textarea on multiple events
+                editor.on('change keyup blur', function() {
+                    syncContent();
                 });
+
+                // Also sync periodically (every 2 seconds)
+                setInterval(syncContent, 2000);
 
                 // Handle form submission
                 const form = textarea.closest('form');
                 if (form) {
-                    form.addEventListener('submit', function() {
-                        textarea.value = editor.getContent();
+                    // Sync on form submit
+                    form.addEventListener('submit', function(e) {
+                        syncContent();
+                    });
+
+                    // Find all submit buttons in the form and sync on click
+                    const submitButtons = form.querySelectorAll('button[type="submit"], input[type="submit"]');
+                    submitButtons.forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            syncContent();
+                        });
                     });
                 }
 
@@ -225,6 +245,10 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <style>
                 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; transform: scale(1); }
+                    50% { opacity: 0.5; transform: scale(0.95); }
+                }
             </style>
         `;
 
@@ -236,6 +260,109 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.querySelector('#ai-close-result').onclick = closeModal;
 
         let generatedContent = '';
+        let isStreamRunning = false;
+
+        // Function to strip markdown code blocks from content
+        const stripMarkdownCodeBlocks = (content) => {
+            // Remove ```html or ``` code blocks
+            const codeBlockRegex = /```(?:html|HTML)?\n([\s\S]*?)```/g;
+            const match = content.match(codeBlockRegex);
+
+            if (match) {
+                // Extract content from code block
+                let extracted = content.replace(codeBlockRegex, '$1');
+                return extracted.trim();
+            }
+
+            // If no code block, return as-is
+            return content;
+        };
+
+        // Function to check stream status
+        const checkStreamStatus = () => ({
+            isRunning: isStreamRunning,
+            hasContent: generatedContent.length > 0,
+            contentLength: generatedContent.length
+        });
+
+        // Function to update button states
+        const updateButtonStates = (disabled) => {
+            const retryBtn = modal.querySelector('#ai-retry');
+            const insertBtn = modal.querySelector('#ai-insert');
+            const closeBtn = modal.querySelector('#ai-close-result');
+
+            if (retryBtn) retryBtn.disabled = disabled;
+            if (insertBtn) insertBtn.disabled = disabled;
+            if (closeBtn) closeBtn.disabled = disabled;
+
+            // Update visual appearance
+            if (disabled) {
+                if (retryBtn) {
+                    retryBtn.style.opacity = '0.5';
+                    retryBtn.style.cursor = 'not-allowed';
+                }
+                if (insertBtn) {
+                    insertBtn.style.opacity = '0.5';
+                    insertBtn.style.cursor = 'not-allowed';
+                }
+                if (closeBtn) {
+                    closeBtn.style.opacity = '0.5';
+                    closeBtn.style.cursor = 'not-allowed';
+                }
+            } else {
+                if (retryBtn) {
+                    retryBtn.style.opacity = '1';
+                    retryBtn.style.cursor = 'pointer';
+                }
+                if (insertBtn) {
+                    insertBtn.style.opacity = '1';
+                    insertBtn.style.cursor = 'pointer';
+                }
+                if (closeBtn) {
+                    closeBtn.style.opacity = '1';
+                    closeBtn.style.cursor = 'pointer';
+                }
+            }
+        };
+
+        // Initialize retry and insert buttons as disabled
+        updateButtonStates(true);
+
+        // Update stream status UI
+        const updateStreamStatusUI = (running, finished = false) => {
+            let statusDiv = modal.querySelector('#ai-stream-status');
+            const resultDiv = modal.querySelector('#ai-result');
+            if (!statusDiv) {
+                statusDiv = document.createElement('div');
+                statusDiv.id = 'ai-stream-status';
+                statusDiv.style.cssText = 'padding: 8px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 12px;';
+                if (resultDiv) {
+                    resultDiv.insertBefore(statusDiv, resultDiv.firstChild);
+                }
+            }
+
+            if (running) {
+                statusDiv.style.background = '#dbeafe';
+                statusDiv.style.color = '#1e40af';
+                statusDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="animation: pulse 1.5s ease-in-out infinite;">🔄</span>
+                        <span>Generating content... (${generatedContent.length} characters)</span>
+                    </div>
+                `;
+            } else if (finished) {
+                statusDiv.style.background = '#d1fae5';
+                statusDiv.style.color = '#065f46';
+                statusDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span>✅</span>
+                        <span>Generation completed! (${generatedContent.length} characters)</span>
+                    </div>
+                `;
+            } else {
+                statusDiv.remove();
+            }
+        };
 
         modal.querySelector('#ai-generate').onclick = async () => {
             const action = modal.querySelector('#ai-action').value;
@@ -255,6 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Reset state
             generatedContent = '';
+            isStreamRunning = true;
             previewDiv.innerHTML = '';
             errorDiv.style.display = 'none';
 
@@ -263,6 +391,12 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingDiv.style.display = 'block';
             resultDiv.style.display = 'none';
             generateBtn.disabled = true;
+
+            // Disable retry and insert buttons during generation
+            updateButtonStates(true);
+
+            console.log('Starting AI generation with prompt:', prompt);
+            console.log('Stream status:', checkStreamStatus());
 
             try {
                 const response = await fetch('/dashboard/api/ai/generate/', {
@@ -286,21 +420,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
                 let buffer = '';
+                let chunkCount = 0;
 
                 // Hide loading and show result once streaming starts
                 loadingDiv.style.display = 'none';
                 resultDiv.style.display = 'block';
+                updateStreamStatusUI(true);
 
                 while (true) {
                     const { done, value } = await reader.read();
 
                     if (done) {
-                        console.log('Stream completed');
+                        console.log('Stream completed after', chunkCount, 'chunks');
+                        console.log('Final content length:', generatedContent.length);
+                        isStreamRunning = false;
+                        updateStreamStatusUI(false, true);
+                        // Enable retry and insert buttons when generation completes
+                        updateButtonStates(false);
                         break;
                     }
 
                     // Decode the chunk and add to buffer
                     buffer += decoder.decode(value, { stream: true });
+                    chunkCount++;
 
                     // Process complete SSE messages
                     const lines = buffer.split('\n\n');
@@ -320,18 +462,34 @@ document.addEventListener('DOMContentLoaded', function() {
                                         errorDiv.style.display = 'block';
                                         resultDiv.style.display = 'none';
                                         setupForm.style.display = 'block';
+                                        isStreamRunning = false;
+                                        updateStreamStatusUI(false);
                                         break;
                                     }
 
                                     if (parsed.content) {
                                         generatedContent += parsed.content;
-                                        previewDiv.innerHTML = generatedContent;
-                                        console.log('Received chunk:', parsed.content);
+
+                                        // Strip markdown code blocks and render as HTML
+                                        const cleanContent = stripMarkdownCodeBlocks(generatedContent);
+                                        previewDiv.innerHTML = cleanContent;
+
+                                        console.log('Received chunk #' + chunkCount + ':', parsed.content.length, 'chars');
+                                        console.log('Stream status:', checkStreamStatus());
+
+                                        // Update status UI every 5 chunks
+                                        if (chunkCount % 5 === 0) {
+                                            updateStreamStatusUI(true);
+                                        }
                                     }
 
                                     if (parsed.done) {
-                                        console.log('Content generation completed');
-                                        // Stream finished naturally
+                                        console.log('Content generation completed naturally');
+                                        console.log('Final stream status:', checkStreamStatus());
+                                        isStreamRunning = false;
+                                        updateStreamStatusUI(false, true);
+                                        // Enable retry and insert buttons when generation completes
+                                        updateButtonStates(false);
                                         break;
                                     }
                                 } catch (e) {
@@ -342,8 +500,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
 
-                if (generatedContent && !errorDiv.style.display || errorDiv.style.display === 'none') {
+                if (generatedContent && (!errorDiv.style.display || errorDiv.style.display === 'none')) {
                     console.log('Content generated successfully');
+                    console.log('Preview:', generatedContent.substring(0, 200) + '...');
                 }
 
             } catch (err) {
@@ -353,10 +512,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadingDiv.style.display = 'none';
                 resultDiv.style.display = 'none';
                 setupForm.style.display = 'block';
+                isStreamRunning = false;
+                updateStreamStatusUI(false);
+                // Enable buttons on error
+                updateButtonStates(false);
             } finally {
                 generateBtn.disabled = false;
                 // Ensure loading is hidden no matter what
                 loadingDiv.style.display = 'none';
+                // Ensure buttons are enabled in finally block
+                updateButtonStates(false);
             }
         };
 
@@ -371,12 +536,21 @@ document.addEventListener('DOMContentLoaded', function() {
             const action = modal.querySelector('#ai-action').value;
 
             if (generatedContent) {
+                console.log('Inserting content. Length:', generatedContent.length);
+                console.log('Content preview:', generatedContent.substring(0, 100) + '...');
+
+                // Strip markdown code blocks before inserting
+                const cleanContent = stripMarkdownCodeBlocks(generatedContent);
+                console.log('Clean content length:', cleanContent.length);
+
                 if (action === 'edit') {
-                    editor.insertContent(generatedContent);
+                    editor.insertContent(cleanContent);
                 } else {
-                    editor.setContent(generatedContent);
+                    editor.setContent(cleanContent);
                 }
                 closeModal();
+            } else {
+                console.error('No content to insert!');
             }
         };
     }

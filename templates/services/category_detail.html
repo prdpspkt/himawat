@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.meta_title|default:category.name }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block meta_description %}{{ category.meta_description|default:category.description|truncatewords:30 }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-off-white py-20">
+    <div class="container text-center">
+        {% if category.icon %}
+        <div class="mb-4">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-scarlet-light shadow-sm" style="width: 120px; height: 120px;">
+                <i class="{{ category.icon }} text-5xl text-primary"></i>
+            </div>
+        </div>
+        {% elif category.image %}
+        <div class="mb-4">
+            <img src="{{ category.image.url }}" alt="{{ category.name }}" class="img-fluid rounded-circle shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
+        </div>
+        {% endif %}
+        <h1 class="display-3 fw-bold text-primary mb-4">{{ category.name }}</h1>
+        {% if category.description %}
+        <p class="fs-5 text-grey-dark max-w-3xl mx-auto">{{ category.description }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Services List -->
+{% if services %}
+<div class="py-16">
+    <div class="container">
+        <div class="row g-4">
+            {% for service in services %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card card-hover h-100 border-0 shadow-sm">
+                    {% if service.featured_image %}
+                    <div class="card-img-top bg-scarlet-light d-flex align-items-center justify-content-center p-4" style="height: 220px;">
+                        <img src="{{ service.featured_image.url }}" alt="{{ service.title }}" class="img-fluid" style="max-height: 200px; object-fit: contain;">
+                    </div>
+                    {% elif service.image %}
+                    <div class="card-img-top bg-scarlet-light d-flex align-items-center justify-content-center p-4" style="height: 220px;">
+                        <img src="{{ service.image.url }}" alt="{{ service.title }}" class="img-fluid" style="max-height: 200px; object-fit: contain;">
+                    </div>
+                    {% elif service.icon %}
+                    <div class="card-img-top bg-scarlet-light d-flex align-items-center justify-content-center p-4" style="height: 220px;">
+                        <i class="{{ service.icon }} text-5xl text-primary"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body p-4">
+                        <h3 class="h5 fw-bold text-almost-black mb-3">{{ service.title }}</h3>
+                        {% if service.short_description %}
+                        <p class="text-grey-dark mb-4">{{ service.short_description|truncatewords:20 }}</p>
+                        {% endif %}
+                        {% if service.price_display %}
+                        <p class="text-primary fw-bold mb-4">{{ service.price_display }}</p>
+                        {% elif service.price %}
+                        <p class="text-primary fw-bold mb-4">Starting from NPR {{ service.price }}</p>
+                        {% endif %}
+                        <a href="{{ service.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                            Learn More
+                            <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="py-16">
+    <div class="container text-center">
+        <p class="text-grey-dark">No services available in this category.</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- CTA Section -->
+<div class="bg-gradient-to-r py-16">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+        <h2 class="display-6 fw-bold text-white mb-4">Need Help Choosing the Right Service?</h2>
+        <p class="fs-5 mb-4" style="color: rgba(254, 254, 254, 0.9);">Contact us today for a free consultation and we'll guide you to the best solution for your needs.</p>
+        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+            <a href="{% url 'pages:consultation' %}" class="btn btn-light btn-lg text-primary">
+                Get Consultation
+            </a>
+            {% if company_info and company_info.whatsapp_number %}
+            <a href="https://wa.me/{{ company_info.whatsapp_number|cut:'+' }}" target="_blank" class="btn btn-success btn-lg">
+                <i class="fab fa-whatsapp me-2"></i>
+                WhatsApp
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

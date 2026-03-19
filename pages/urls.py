@@ -12,6 +12,9 @@ urlpatterns = [
     path('blog/category/<slug:category_slug>/', views.PostListView.as_view(), name='post_category'),
     path('blog/tag/<slug:tag_slug>/', views.PostListView.as_view(), name='post_tag'),
     path('blog/<slug:slug>/', views.PostDetailView.as_view(), name='post_detail'),
+
+    # Categories
+    path('category/<slug:slug>/', views.CategoryDetailView.as_view(), name='category_detail'),
     
     # Pages
     path('page/<slug:slug>/', views.page_detail, name='page_detail'),
@@ -31,7 +34,10 @@ urlpatterns = [
     
     # Testimonials
     path('testimonials/', views.TestimonialListView.as_view(), name='testimonial_list'),
-    
+
+    # FAQs
+    path('faqs/', views.FAQListView.as_view(), name='faq_list'),
+
     # Products
     path('products/', views.ProductListView.as_view(), name='product_list'),
     path('products/<slug:slug>/', views.ProductDetailView.as_view(), name='product_detail'),

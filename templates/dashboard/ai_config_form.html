@@ -10,8 +10,8 @@
 
         <div class="bg-white shadow rounded-lg">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">DeepSeek AI Configuration</h3>
-                <p class="text-sm text-gray-500 mt-1">Configure your DeepSeek AI API settings for content generation</p>
+                <h3 class="text-lg font-semibold text-gray-900">AI Configuration</h3>
+                <p class="text-sm text-gray-500 mt-1">Configure your AI API settings for content generation</p>
             </div>
             <div class="px-6 py-4 space-y-4">
                 <div>
@@ -21,76 +21,49 @@
                     {% if form.name.errors %}
                     <p class="mt-1 text-sm text-red-600">{{ form.name.errors }}</p>
                     {% endif %}
-                    <p class="mt-1 text-xs text-gray-500">A friendly name to identify this configuration (e.g., "Main DeepSeek Chat")</p>
+                    <p class="mt-1 text-xs text-gray-500">A friendly name to identify this configuration (e.g., "Main AI")</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="id_model" class="block text-sm font-medium text-gray-700">DeepSeek Model</label>
-                        <select name="model" id="id_model" required
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
-                            {% for value, label in form.fields.model.choices %}
-                            <option value="{{ value }}" {% if form.model.value == value %}selected{% endif %}>{{ label }}</option>
-                            {% endfor %}
-                        </select>
-                        {% if form.model.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ form.model.errors }}</p>
+                        <label for="id_model_name" class="block text-sm font-medium text-gray-700">Model Name</label>
+                        <input type="text" name="model_name" id="id_model_name" value="{{ form.model_name.value|default:'glm-4.5' }}" required
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                               placeholder="e.g., glm-4.5, deepseek-chat, gpt-4">
+                        {% if form.model_name.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.model_name.errors }}</p>
                         {% endif %}
-                        <p class="mt-1 text-xs text-gray-500">Choose the DeepSeek model to use</p>
+                        <p class="mt-1 text-xs text-gray-500">The model identifier for your AI provider</p>
                     </div>
 
                     <div>
-                        <label for="id_status" class="block text-sm font-medium text-gray-700">Status</label>
-                        <select name="status" id="id_status"
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
-                            {% for value, label in form.fields.status.choices %}
-                            <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
-                            {% endfor %}
-                        </select>
-                        {% if form.status.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ form.status.errors }}</p>
+                        <label for="id_api_endpoint" class="block text-sm font-medium text-gray-700">API Endpoint</label>
+                        <input type="url" name="api_endpoint" id="id_api_endpoint" value="{{ form.api_endpoint.value|default:'https://api.z.ai/api/paas/v4/' }}" required
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                               placeholder="https://api.example.com/v1/">
+                        {% if form.api_endpoint.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.api_endpoint.errors }}</p>
                         {% endif %}
-                        <p class="mt-1 text-xs text-gray-500">Only active configurations can be used</p>
+                        <p class="mt-1 text-xs text-gray-500">Base URL for the API endpoint</p>
                     </div>
                 </div>
 
-                <div class="flex items-center">
-                    <div class="flex items-start">
-                        <div class="flex items-center h-5">
-                            <input type="checkbox" name="is_default" id="id_is_default" {% if form.is_default.value %}checked{% endif %}
-                                   class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded">
-                        </div>
-                        <div class="ml-3 text-sm">
-                            <label for="id_is_default" class="font-medium text-gray-700">Set as Default</label>
-                            <p class="text-gray-500">Mark this as the default AI configuration</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">API Configuration</h3>
-            </div>
-            <div class="px-6 py-4 space-y-4">
                 <div>
-                    <label for="id_api_key" class="block text-sm font-medium text-gray-700">DeepSeek API Key</label>
+                    <label for="id_api_key" class="block text-sm font-medium text-gray-700">API Key</label>
                     <input type="password" name="api_key" id="id_api_key" value="{{ form.api_key.value|default:'' }}" required
                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
                     {% if form.api_key.errors %}
                     <p class="mt-1 text-sm text-red-600">{{ form.api_key.errors }}</p>
                     {% endif %}
-                    <p class="mt-1 text-xs text-gray-500">
-                        Get your API key from <a href="https://platform.deepseek.com/" target="_blank" class="text-indigo-600 hover:text-indigo-900">platform.deepseek.com</a>
-                    </p>
+                    <p class="mt-1 text-xs text-gray-500">Your API key for the AI service</p>
                 </div>
             </div>
         </div>
 
         <div class="bg-white shadow rounded-lg">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">AI Behavior Settings</h3>
+                <h3 class="text-lg font-semibold text-gray-900">System Prompt</h3>
+                <p class="text-sm text-gray-500 mt-1">Define the AI's behavior and guidelines</p>
             </div>
             <div class="px-6 py-4 space-y-4">
                 <div>
@@ -108,28 +81,6 @@
 - SEO-friendly with proper keyword usage
 - Formatted with HTML headings, paragraphs, and lists
 - Professional but accessible tone</pre>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="id_max_tokens" class="block text-sm font-medium text-gray-700">Max Tokens</label>
-                        <input type="number" name="max_tokens" id="id_max_tokens" value="{{ form.max_tokens.value|default:2000 }}" min="1" max="8000" required
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
-                        {% if form.max_tokens.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ form.max_tokens.errors }}</p>
-                        {% endif %}
-                        <p class="mt-1 text-xs text-gray-500">Maximum length of generated content (2000 = ~1500 words)</p>
-                    </div>
-
-                    <div>
-                        <label for="id_temperature" class="block text-sm font-medium text-gray-700">Temperature</label>
-                        <input type="number" name="temperature" id="id_temperature" value="{{ form.temperature.value|default:0.7 }}" min="0" max="2" step="0.1" required
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
-                        {% if form.temperature.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ form.temperature.errors }}</p>
-                        {% endif %}
-                        <p class="mt-1 text-xs text-gray-500">0.0 = focused, 1.0 = creative, 1.5+ = very creative</p>
                     </div>
                 </div>
             </div>

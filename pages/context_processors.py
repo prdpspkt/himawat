@@ -20,36 +20,38 @@ def site_context(request):
     
     # Main navigation menu
     try:
-        main_menu = Menu.objects.filter(location='main', slug='main-menu').first()
+        # Try to find by location first, more flexible
+        main_menu = Menu.objects.filter(location='main').first()
         if not main_menu:
+            # Fallback to any menu if no main menu exists
             main_menu = Menu.objects.first()
         if main_menu:
             context['main_menu'] = main_menu.items.filter(is_active=True, parent=None).prefetch_related('children')
     except:
         context['main_menu'] = []
-    
+
     # Top menu
     try:
-        top_menu = Menu.objects.filter(location='top-bar', slug='top-menu').first()
+        top_menu = Menu.objects.filter(location='top-bar').first()
         if top_menu:
             context['top_menu'] = top_menu.items.filter(is_active=True, parent=None)
         else:
             context['top_menu'] = []
     except:
         context['top_menu'] = []
-    
+
     # Footer menus
     try:
-        footer_menu1 = Menu.objects.filter(location='footer-1', slug='footer-services').first()
+        footer_menu1 = Menu.objects.filter(location='footer-1').first()
         if footer_menu1:
             context['footer_menu1'] = footer_menu1.items.filter(is_active=True, parent=None)
         else:
             context['footer_menu1'] = []
     except:
         context['footer_menu1'] = []
-    
+
     try:
-        footer_menu2 = Menu.objects.filter(location='footer-2', slug='footer-quick-links').first()
+        footer_menu2 = Menu.objects.filter(location='footer-2').first()
         if footer_menu2:
             context['footer_menu2'] = footer_menu2.items.filter(is_active=True, parent=None)
         else:

@@ -156,6 +156,12 @@
         color: #1d2327;
         font-size: 13px;
     }
+
+    .item-icon {
+        margin-right: 8px;
+        color: #2271b1;
+        font-size: 14px;
+    }
     
     .item-controls {
         display: flex;
@@ -630,6 +636,14 @@
                 <input type="text" class="item-title-input" value="" onchange="updateItemTitle(this)">
             </div>
             <div class="field">
+                <label>Icon (optional)</label>
+                <input type="text" class="item-icon-input" value="" placeholder="e.g., fas fa-home">
+                <div class="description">
+                    <strong>Font Awesome Icons:</strong> <code>fas fa-home</code> <code>fas fa-user</code> <code>fas fa-envelope</code> <code>fas fa-phone</code> <code>fas fa-building</code> <code>fas fa-cog</code><br>
+                    <a href="https://fontawesome.com/icons?d=gallery&m=free" target="_blank">Browse all icons →</a>
+                </div>
+            </div>
+            <div class="field">
                 <label>URL</label>
                 <input type="text" class="item-url-input" value="" onchange="updateItemUrl(this)">
             </div>
@@ -1059,24 +1073,25 @@
         const item = $(btn).closest('.menu-item');
         const itemId = item.data('id');
         const itemType = item.data('type');
-        
+
         let url = item.find('.item-url-input').val();
         // Normalize URL for custom links
         if (itemType === 'custom_link') {
             url = normalizeUrl(url);
         }
-        
+
         const data = {
             title: item.find('.item-title-input').val(),
+            icon: item.find('.item-icon-input').val(),
             url: url,
             css_class: item.find('.item-class-input').val(),
             target: item.find('.item-target-input').val(),
         };
-        
+
         // Update display
         item.find('.item-title').text(data.title);
         item.find('.menu-item-settings').removeClass('open');
-        
+
         // Save to server if it's an existing item
         if (itemId && !itemId.toString().startsWith('new-')) {
             $.ajax({

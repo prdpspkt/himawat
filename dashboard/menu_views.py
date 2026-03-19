@@ -4,9 +4,9 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
 
 from dashboard.models import Menu, MenuItem, Page, Category
+from dashboard.decorators import staff_member_required
 
 
 @staff_member_required
@@ -36,17 +36,18 @@ def menu_item_create_ajax(request):
         data = json.loads(request.body)
         menu_id = data.get('menu_id')
         title = data.get('title', '').strip()
+        icon = data.get('icon', '').strip()
         item_type = data.get('type', 'custom_link')
         url = data.get('url', '').strip()
         page_id = data.get('page_id')
         category_id = data.get('category_id')
         parent_id = data.get('parent_id') or None
-        
+
         if not title:
             return JsonResponse({'success': False, 'error': 'Title is required'})
-        
+
         menu = get_object_or_404(Menu, pk=menu_id)
-        
+
         # Determine URL based on type
         if item_type == 'page' and page_id:
             page = get_object_or_404(Page, pk=page_id)
@@ -54,14 +55,15 @@ def menu_item_create_ajax(request):
         elif item_type == 'category' and category_id:
             category = get_object_or_404(Category, pk=category_id)
             url = category.get_absolute_url()
-        
+
         # Get max order for this level
         queryset = MenuItem.objects.filter(menu=menu, parent_id=parent_id)
         max_order = queryset.count()
-        
+
         item = MenuItem.objects.create(
             menu=menu,
             title=title,
+            icon=icon,
             type=item_type,
             url=url,
             page_id=page_id if item_type == 'page' else None,
@@ -69,12 +71,13 @@ def menu_item_create_ajax(request):
             order=max_order,
             is_active=True
         )
-        
+
         return JsonResponse({
             'success': True,
             'item': {
                 'id': item.id,
                 'title': item.title,
+                'icon': item.icon,
                 'type': item.type,
                 'url': item.url,
                 'order': item.order,
@@ -91,20 +94,21 @@ def menu_item_update_ajax(request, pk):
     try:
         data = json.loads(request.body)
         item = get_object_or_404(MenuItem, pk=pk)
-        
+
         item.title = data.get('title', item.title)
+        item.icon = data.get('icon', item.icon)
         item.url = data.get('url', item.url)
         item.css_class = data.get('css_class', item.css_class)
         item.target = data.get('target', item.target)
         item.is_active = data.get('is_active', item.is_active)
-        
+
         if 'page_id' in data and item.type == 'page':
             item.page_id = data['page_id']
             if item.page:
                 item.url = item.page.get_absolute_url()
-        
+
         item.save()
-        
+
         return JsonResponse({'success': True})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})

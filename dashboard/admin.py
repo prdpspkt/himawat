@@ -29,15 +29,31 @@ class BaseAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(BaseAdmin):
-    list_display = ['name', 'slug', 'parent', 'post_count', 'status', 'sort_order']
+    list_display = ['name', 'slug', 'parent', 'post_count', 'status', 'sort_order', 'template_display']
     list_filter = ['status', 'created_at']
     search_fields = ['name', 'description']
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ['status', 'sort_order']
-    
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'slug', 'description', 'parent')
+        }),
+        ('Template & Settings', {
+            'fields': ('template_name', 'image', 'status', 'sort_order'),
+            'classes': ('collapse',),
+        }),
+    )
+
     def post_count(self, obj):
         return obj.posts.count()
     post_count.short_description = 'Posts'
+
+    def template_display(self, obj):
+        if obj.template_name:
+            return format_html('<span style="color: green;">Custom</span>')
+        return format_html('<span style="color: #999;">Auto</span>')
+    template_display.short_description = 'Template'
 
 
 @admin.register(Tag)
@@ -52,7 +68,7 @@ class TagAdmin(BaseAdmin):
 @admin.register(Post)
 class PostAdmin(BaseAdmin):
     form = PostForm
-    list_display = ['title', 'author', 'category', 'status', 'view_count', 'published_at', 'featured_image_preview']
+    list_display = ['title', 'author', 'category', 'status', 'view_count', 'published_at', 'featured_image_preview', 'template_display']
     list_filter = ['status', 'category', 'created_at', 'published_at']
     search_fields = ['title', 'content', 'excerpt', 'keywords']
     prepopulated_fields = {'slug': ('title',)}
@@ -67,8 +83,9 @@ class PostAdmin(BaseAdmin):
         ('Organization', {
             'fields': ('category', 'tags', 'author')
         }),
-        ('Settings', {
-            'fields': ('status', 'allow_comments', 'published_at')
+        ('Template & Settings', {
+            'fields': ('template_name', 'status', 'allow_comments', 'published_at'),
+            'classes': ('collapse',),
         }),
         ('SEO', {
             'fields': ('keywords', 'custom_fields'),
@@ -82,6 +99,12 @@ class PostAdmin(BaseAdmin):
         return '-'
     featured_image_preview.short_description = 'Image'
 
+    def template_display(self, obj):
+        if obj.template_name:
+            return format_html('<span style="color: green;">Custom</span>')
+        return format_html('<span style="color: #999;">Auto</span>')
+    template_display.short_description = 'Template'
+
     def save_model(self, request, obj, form, change):
         if not obj.author_id:
             obj.author = request.user
@@ -91,7 +114,7 @@ class PostAdmin(BaseAdmin):
 @admin.register(Page)
 class PageAdmin(BaseAdmin):
     form = PageForm
-    list_display = ['title', 'slug', 'parent', 'template', 'status', 'order', 'updated_at']
+    list_display = ['title', 'slug', 'parent', 'template', 'status', 'order', 'updated_at', 'custom_template_display']
     list_filter = ['status', 'template', 'created_at']
     search_fields = ['title', 'content', 'meta_title', 'meta_description']
     prepopulated_fields = {'slug': ('title',)}
@@ -105,7 +128,7 @@ class PageAdmin(BaseAdmin):
             'fields': ('parent', 'order')
         }),
         ('Template & Settings', {
-            'fields': ('template', 'status')
+            'fields': ('template', 'template_name', 'status')
         }),
         ('SEO', {
             'fields': ('meta_title', 'meta_description', 'meta_keywords'),
@@ -116,6 +139,12 @@ class PageAdmin(BaseAdmin):
             'classes': ('collapse',)
         }),
     )
+
+    def custom_template_display(self, obj):
+        if obj.template_name:
+            return format_html('<span style="color: green;">Custom</span>')
+        return format_html('<span style="color: #999;">Auto</span>')
+    custom_template_display.short_description = 'Custom Template'
 
 
 class GalleryImageInline(admin.TabularInline):
@@ -302,16 +331,66 @@ class ConsultationFileAdmin(BaseAdmin):
 class MenuItemInline(admin.TabularInline):
     model = MenuItem
     extra = 1
-    fields = ['title', 'type', 'page', 'url', 'order', 'parent', 'is_active']
+    fields = ('order', 'title', 'icon', 'icon_preview_inline', 'type', 'page', 'url', 'is_active')
+    readonly_fields = ('icon_preview_inline',)
     autocomplete_fields = ['page', 'parent']
+
+    def icon_preview_inline(self, obj):
+        if obj.icon:
+            return format_html('<span style="font-size: 1.2em;"><i class="{}"></i> {}</span>', obj.icon, obj.icon)
+        return format_html('<span style="color: #999;">No icon</span>')
+    icon_preview_inline.short_description = 'Preview'
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        formset.form.base_fields['icon'].help_text = '''
+            <strong>Font Awesome Icons:</strong><br>
+            Common: <code>fas fa-home</code> <code>fas fa-user</code> <code>fas fa-envelope</code> <code>fas fa-phone</code><br>
+            Business: <code>fas fa-building</code> <code>fas fa-briefcase</code> <code>fas fa-cog</code> <code>fas fa-concierge-bell</code><br>
+            Content: <code>fas fa-newspaper</code> <code>fas fa-images</code> <code>fas fa-video</code> <code>fas fa-file-alt</code><br>
+            Misc: <code>fas fa-info-circle</code> <code>fas fa-question-circle</code> <code>fas fa-chevron-right</code><br>
+            <small><a href="https://fontawesome.com/icons?d=gallery&m=free" target="_blank">Browse all icons →</a></small>
+        '''
+        return formset
 
 
 @admin.register(MenuItem)
 class MenuItemAdmin(BaseAdmin):
-    list_display = ['title', 'menu', 'type', 'order', 'is_active']
+    list_display = ['title', 'icon_preview', 'menu', 'type', 'order', 'is_active']
     list_filter = ['menu', 'type', 'is_active']
     search_fields = ['title', 'url']
     list_editable = ['order', 'is_active']
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('menu', 'title', 'icon')
+        }),
+        ('Link Details', {
+            'fields': ('type', 'url', 'page')
+        }),
+        ('Settings', {
+            'fields': ('parent', 'order', 'target', 'css_class', 'is_active')
+        }),
+    )
+
+    def icon_preview(self, obj):
+        if obj.icon:
+            return format_html('<span style="font-size: 1.2em;"><i class="{}"></i><br><small>{}</small></span>', obj.icon, obj.icon)
+        return format_html('<span style="color: #999;">No icon</span>')
+    icon_preview.short_description = 'Icon'
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'icon' in form.base_fields:
+            form.base_fields['icon'].help_text = '''
+                <strong>Font Awesome Icons:</strong><br>
+                Common: <code>fas fa-home</code> <code>fas fa-user</code> <code>fas fa-envelope</code> <code>fas fa-phone</code><br>
+                Business: <code>fas fa-building</code> <code>fas fa-briefcase</code> <code>fas fa-cog</code> <code>fas fa-concierge-bell</code><br>
+                Content: <code>fas fa-newspaper</code> <code>fas fa-images</code> <code>fas fa-video</code> <code>fas fa-file-alt</code><br>
+                Misc: <code>fas fa-info-circle</code> <code>fas fa-question-circle</code> <code>fas fa-chevron-right</code><br>
+                <small><a href="https://fontawesome.com/icons?d=gallery&m=free" target="_blank">Browse all icons →</a></small>
+            '''
+        return form
 
 
 @admin.register(Menu)
@@ -400,28 +479,23 @@ class PostRevisionAdmin(BaseAdmin):
 
 @admin.register(AIConfiguration)
 class AIConfigurationAdmin(BaseAdmin):
-    list_display = ['name', 'model', 'status', 'is_default', 'created_at']
-    list_filter = ['status', 'model', 'created_at']
-    search_fields = ['name', 'model']
-    list_editable = ['status', 'is_default']
+    list_display = ['name', 'model_name', 'api_endpoint', 'created_at']
+    search_fields = ['name', 'model_name', 'api_endpoint']
 
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'model', 'status', 'is_default')
+            'fields': ('name', 'model_name', 'api_endpoint')
         }),
         ('API Configuration', {
             'fields': ('api_key',)
         }),
         ('AI Settings', {
-            'fields': ('system_prompt', 'max_tokens', 'temperature'),
+            'fields': ('system_prompt',),
             'description': 'Configure how the AI should behave. System prompt defines the AI persona and behavior.'
         }),
     )
 
     def save_model(self, request, obj, form, change):
-        # Ensure only one configuration is marked as default
-        if obj.is_default:
-            AIConfiguration.objects.filter(is_default=True).update(is_default=False)
         if not change:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)

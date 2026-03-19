@@ -113,7 +113,6 @@ urlpatterns = [
     path('settings/ai-config/create/', views.AIConfigurationCreateView.as_view(), name='ai_config_create'),
     path('settings/ai-config/<int:pk>/edit/', views.AIConfigurationUpdateView.as_view(), name='ai_config_edit'),
     path('settings/ai-config/<int:pk>/delete/', views.AIConfigurationDeleteView.as_view(), name='ai_config_delete'),
-    path('settings/ai-config/<int:config_id>/activate/', views.activate_ai_config, name='ai_config_activate'),
 
     # AI Content Generation API
     path('api/ai/generate/', views.generate_content_with_ai, name='ai_generate_content'),

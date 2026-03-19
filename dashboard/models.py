@@ -30,6 +30,7 @@ class Category(TimestampModel):
     image = models.ImageField(upload_to='categories/', null=True, blank=True)
     sort_order = models.IntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    template_name = models.CharField(max_length=255, blank=True, help_text="Custom template path (e.g., 'cms/categories/services-category.html'). Leave empty for auto-detection.")
 
     class Meta:
         verbose_name_plural = 'Categories'
@@ -45,6 +46,35 @@ class Category(TimestampModel):
 
     def get_absolute_url(self):
         return reverse('pages:category_detail', kwargs={'slug': self.slug})
+
+    def get_template(self):
+        """
+        Get the template for this category with priority:
+        1. Custom template_name field (manually assigned)
+        2. Slug-based template (e.g., 'cms/categories/services-category.html')
+        3. Default template (e.g., 'cms/categories/category.html')
+        """
+        from django.template.loader import select_template
+
+        # Priority 1: Custom template_name (manually assigned - highest priority)
+        if self.template_name:
+            return self.template_name
+
+        # Priority 2: Slug-based template (auto-discovery based on slug)
+        slug_template = f'cms/categories/{self.slug}-category.html'
+        templates_to_try = [slug_template, 'cms/categories/category.html']
+
+        # select_template returns the first template that exists
+        try:
+            template = select_template(templates_to_try)
+            # Return the slug template if it exists, otherwise default
+            if template.name == slug_template:
+                return slug_template
+        except:
+            pass
+
+        # Priority 3: Default template
+        return 'cms/categories/category.html'
 
 
 class Tag(TimestampModel):
@@ -93,6 +123,7 @@ class Post(TimestampModel):
     view_count = models.PositiveIntegerField(default=0)
     allow_comments = models.BooleanField(default=True)
     published_at = models.DateTimeField(null=True, blank=True)
+    template_name = models.CharField(max_length=255, blank=True, help_text="Custom template path (e.g., 'cms/posts/services-post.html'). Leave empty for auto-detection.")
 
     class Meta:
         ordering = ['-published_at', '-created_at']
@@ -107,6 +138,35 @@ class Post(TimestampModel):
 
     def get_absolute_url(self):
         return reverse('pages:post_detail', kwargs={'slug': self.slug})
+
+    def get_template(self):
+        """
+        Get the template for this post with priority:
+        1. Custom template_name field (manually assigned)
+        2. Slug-based template (e.g., 'cms/posts/services-post.html')
+        3. Default template (e.g., 'cms/posts/post.html')
+        """
+        from django.template.loader import select_template
+
+        # Priority 1: Custom template_name (manually assigned - highest priority)
+        if self.template_name:
+            return self.template_name
+
+        # Priority 2: Slug-based template (auto-discovery based on slug)
+        slug_template = f'cms/posts/{self.slug}-post.html'
+        templates_to_try = [slug_template, 'cms/posts/post.html']
+
+        # select_template returns the first template that exists
+        try:
+            template = select_template(templates_to_try)
+            # Return the slug template if it exists, otherwise default
+            if template.name == slug_template:
+                return slug_template
+        except:
+            pass
+
+        # Priority 3: Default template
+        return 'cms/posts/post.html'
 
 
 class Page(TimestampModel):
@@ -132,7 +192,8 @@ class Page(TimestampModel):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
     order = models.IntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
-    template = models.CharField(max_length=50, choices=TEMPLATE_CHOICES, default='default')
+    template = models.CharField(max_length=50, choices=TEMPLATE_CHOICES, default='default', blank=True, help_text="Preset template or leave empty for custom template")
+    template_name = models.CharField(max_length=255, blank=True, help_text="Custom template path (e.g., 'cms/pages/services-page.html'). Overrides preset template if specified.")
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
     meta_keywords = models.CharField(max_length=255, blank=True)
@@ -151,6 +212,47 @@ class Page(TimestampModel):
 
     def get_absolute_url(self):
         return reverse('pages:page_detail', kwargs={'slug': self.slug})
+
+    def get_template(self):
+        """
+        Get the template for this page with priority:
+        1. Custom template_name field (manually assigned - highest priority)
+        2. Preset template field (e.g., 'home', 'about', etc.)
+        3. Slug-based template (e.g., 'cms/pages/services-page.html')
+        4. Default template (e.g., 'cms/pages/default.html')
+        """
+        from django.template.loader import select_template
+
+        # Priority 1: Custom template_name (manually assigned - highest priority)
+        if self.template_name:
+            return self.template_name
+
+        # Priority 2: Use preset template if specified
+        if self.template and self.template != 'default':
+            template_map = {
+                'home': 'cms/home.html',
+                'about': 'cms/pages/about.html',
+                'contact': 'cms/pages/contact.html',
+                'full_width': 'cms/pages/full_width.html',
+            }
+            if self.template in template_map:
+                return template_map[self.template]
+
+        # Priority 3: Slug-based template (auto-discovery based on slug)
+        slug_template = f'cms/pages/{self.slug}-page.html'
+        templates_to_try = [slug_template, 'cms/pages/default.html']
+
+        # select_template returns the first template that exists
+        try:
+            template = select_template(templates_to_try)
+            # Return the slug template if it exists, otherwise default
+            if template.name == slug_template:
+                return slug_template
+        except:
+            pass
+
+        # Priority 4: Default template
+        return 'cms/pages/default.html'
 
 
 class Download(TimestampModel):
@@ -509,6 +611,7 @@ class MenuItem(TimestampModel):
     url = models.CharField(max_length=500, blank=True)
     page = models.ForeignKey(Page, on_delete=models.CASCADE, null=True, blank=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+    icon = models.CharField(max_length=100, blank=True, help_text="Font Awesome icon class (e.g., 'fas fa-home', 'fas fa-user')")
     order = models.IntegerField(default=0)
     target = models.CharField(max_length=20, choices=TARGET_CHOICES, default='_self')
     css_class = models.CharField(max_length=255, blank=True)
@@ -729,42 +832,24 @@ class PostRevision(TimestampModel):
 # ===== AI CONFIGURATION MODEL =====
 
 class AIConfiguration(TimestampModel):
-    """AI service configurations for content generation - DeepSeek"""
-    STATUS_CHOICES = [
-        ('active', 'Active'),
-        ('inactive', 'Inactive'),
-    ]
-
-    DEEPSEEK_MODEL_CHOICES = [
-        ('deepseek-chat', 'DeepSeek Chat'),
-        ('deepseek-coder', 'DeepSeek Coder'),
-    ]
+    """AI service configurations for content generation"""
 
     name = models.CharField(max_length=255, help_text="Friendly name for this configuration")
-    api_key = models.CharField(max_length=500, help_text="DeepSeek API key")
-    model = models.CharField(max_length=50, choices=DEEPSEEK_MODEL_CHOICES, default='deepseek-chat', help_text="DeepSeek model to use")
+    model_name = models.CharField(max_length=100, default='glm-4.5', help_text="Model name (e.g., glm-4.5, deepseek-chat, gpt-4)")
+    api_endpoint = models.CharField(max_length=500, default='https://api.z.ai/api/paas/v4/', help_text="API endpoint URL")
+    api_key = models.CharField(max_length=500, help_text="API key")
     system_prompt = models.TextField(blank=True, help_text="System prompt to guide AI behavior")
-    max_tokens = models.PositiveIntegerField(default=2000, help_text="Maximum tokens for generation")
-    temperature = models.FloatField(default=0.7, help_text="Creativity (0.0-2.0)")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='inactive')
-    is_default = models.BooleanField(default=False, help_text="Set as default configuration")
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='ai_configs')
 
     class Meta:
         verbose_name = 'AI Configuration'
         verbose_name_plural = 'AI Configurations'
-        ordering = ['-is_default', '-created_at']
+        ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.name} ({self.get_model_display()})"
-
-    def save(self, *args, **kwargs):
-        # Ensure only one default config exists
-        if self.is_default:
-            AIConfiguration.objects.filter(is_default=True).update(is_default=False)
-        super().save(*args, **kwargs)
+        return f"{self.name} ({self.model_name})"
 
     @classmethod
     def get_active(cls):
-        """Get the active AI configuration"""
-        return cls.objects.filter(status='active').order_by('-is_default').first()
+        """Get the first available AI configuration"""
+        return cls.objects.first()

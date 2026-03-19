@@ -1,0 +1,18 @@
+/* Base Styles - Extracted from style.css */
+
+/* Paragraphs */
+p {
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+}
+
+/* Links */
+a {
+    transition: color 0.2s ease;
+}
+
+/* Images */
+.img-placeholder {
+    @apply bg-gray-200 flex items-center justify-center text-gray-400;
+}

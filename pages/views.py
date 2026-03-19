@@ -99,52 +99,114 @@ class PostListView(ListView):
 class PostDetailView(DetailView):
     """Blog post detail view"""
     model = Post
-    template_name = 'cms/post_detail.html'
+    template_name = 'cms/post_detail.html'  # Fallback template
     context_object_name = 'post'
     slug_url_kwarg = 'slug'
-    
+
+    def get_template_names(self):
+        """
+        Get template with priority:
+        1. Custom template_name field
+        2. Slug-based template
+        3. Default template
+        """
+        obj = self.get_object()
+        return [obj.get_template()]
+
     def get_queryset(self):
         return Post.objects.filter(
             status='published',
             published_at__lte=timezone.now()
         ).select_related('category', 'author').prefetch_related('tags')
-    
+
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
         # Increment view count
         obj.view_count += 1
         obj.save(update_fields=['view_count'])
         return obj
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        post = self.get_object()
-        
+        post = self.object
+
         # Related posts
         context['related_posts'] = Post.objects.filter(
             status='published',
             category=post.category
         ).exclude(id=post.id).select_related('category')[:3]
-        
+
+        return context
+
+
+class CategoryDetailView(DetailView):
+    """Category detail view with dynamic template support"""
+    model = Category
+    template_name = 'cms/categories/category.html'  # Fallback template
+    context_object_name = 'category'
+    slug_url_kwarg = 'slug'
+
+    def get_template_names(self):
+        """
+        Get template with priority:
+        1. Custom template_name field
+        2. Slug-based template
+        3. Default template
+        """
+        obj = self.get_object()
+        return [obj.get_template()]
+
+    def get_queryset(self):
+        return Category.objects.filter(status='active').prefetch_related('posts__author')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        category = self.object
+
+        # Get posts in this category
+        context['posts'] = Post.objects.filter(
+            category=category,
+            status='published',
+            published_at__lte=timezone.now()
+        ).select_related('author').order_by('-published_at')
+
+        # Get child categories if any
+        context['child_categories'] = Category.objects.filter(
+            parent=category,
+            status='active'
+        ).order_by('sort_order', 'name')
+
         return context
 
 
 class PageDetailView(DetailView):
-    """CMS Page detail view"""
+    """CMS Page detail view with dynamic template support"""
     model = Page
-    template_name = 'cms/page_detail.html'
+    template_name = 'cms/pages/default.html'  # Fallback template
     context_object_name = 'page'
     slug_url_kwarg = 'slug'
-    
+
+    def get_template_names(self):
+        """
+        Get template with priority:
+        1. Custom template_name field
+        2. Preset template field
+        3. Slug-based template
+        4. Default template
+        """
+        obj = self.get_object()
+        return [obj.get_template()]
+
     def get_queryset(self):
         return Page.objects.filter(status='active')
 
 
 def page_detail(request, slug):
-    """Page detail view with fallback"""
+    """Page detail view with template priority system"""
     page = get_object_or_404(Page, slug=slug, status='active')
-    
-    template_name = f'cms/pages/{page.template}.html'
+
+    # Use the get_template method with priority system
+    template_name = page.get_template()
     return render(request, template_name, {'page': page})
 
 
@@ -214,12 +276,12 @@ class TestimonialListView(ListView):
     template_name = 'cms/testimonial_list.html'
     context_object_name = 'testimonials'
     paginate_by = 12
-    
+
     def get_queryset(self):
         return Testimonial.objects.filter(
             status='published'
         ).order_by('-featured', 'order')
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Calculate average rating
@@ -228,6 +290,32 @@ class TestimonialListView(ListView):
             avg_rating = sum(t.rating for t in testimonials) / len(testimonials)
             context['average_rating'] = round(avg_rating, 1)
             context['total_count'] = len(testimonials)
+        return context
+
+
+class FAQListView(TemplateView):
+    """FAQ list view"""
+    template_name = 'cms/faq_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Get all active FAQs grouped by category
+        vastu_faqs = FAQ.objects.filter(
+            category='vastu',
+            status='active'
+        ).order_by('sort_order')
+
+        engineering_faqs = FAQ.objects.filter(
+            category='engineering',
+            status='active'
+        ).order_by('sort_order')
+
+        context['vastu_faqs'] = vastu_faqs
+        context['engineering_faqs'] = engineering_faqs
+        context['total_vastu'] = vastu_faqs.count()
+        context['total_engineering'] = engineering_faqs.count()
+
         return context
 
 
@@ -292,15 +380,17 @@ def product_request(request, slug):
 @require_POST
 def consultation_request(request):
     """Handle consultation form"""
+    from dashboard.models import ConsultationFile
+
     name = request.POST.get('name')
     email = request.POST.get('email')
     phone = request.POST.get('phone', '')
     subject = request.POST.get('subject')
     message = request.POST.get('message')
     preferred_date = request.POST.get('preferred_date')
-    
+
     if name and email and subject and message:
-        Consultation.objects.create(
+        consultation = Consultation.objects.create(
             name=name,
             email=email,
             phone=phone,
@@ -308,10 +398,20 @@ def consultation_request(request):
             message=message,
             preferred_date=preferred_date or None
         )
+
+        # Handle file uploads
+        files = request.FILES.getlist('files')
+        if files:
+            for uploaded_file in files:
+                ConsultationFile.objects.create(
+                    consultation=consultation,
+                    file=uploaded_file
+                )
+
         messages.success(request, 'Your consultation request has been submitted. We will contact you soon!')
     else:
         messages.error(request, 'Please fill in all required fields.')
-    
+
     return redirect('cms:home')
 
 
