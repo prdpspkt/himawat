@@ -1,61 +1,15 @@
 ---
-# CloudLinux Deployment Configuration
-# Deploy from /home/negeobag/repositories/cms to /home/negeobag/himawat
+# Simple Deployment Configuration
+# Copy files recursively to deployment directory
 
 deployment:
   user: "%ENV{USER}%"
 
-  # CloudLinux Python Environment
-  python:
-    version: "3.13"
-    module: "himwat.wsgi:application"
-    path: "/home/negeobag/himawat"
-
-  # Environment Variables
-  environment:
-    DJANGO_SETTINGS_MODULE: "himwat.settings"
-    PYTHONPATH: "/home/negeobag/himawat:/home/negeobag/repositories/cms"
-    SECRET_KEY: "%ENV{SECRET_KEY}%"
-    DEBUG: "False"
-    ALLOWED_HOSTS: "himawatkhandavastu.com,www.himawatkhandavastu.com"
-
-  # Source and Destination for file copy
-  source: "/home/negeobag/repositories/cms"
-  destination: "/home/negeobag/himawat"
-
-  # Application Entry Point
-  entrypoint:
-    file: "passenger_wsgi.py"
-    startup_file: "himwat/wsgi.py"
-
-  # Dependencies
-  requirements:
-    - "/home/negeobag/himawat/requirements.txt"
-
-  # Static and Media Files
-  static:
-    url: "/static/"
-    dir: "/home/negeobag/himawat/static"
-
-  media:
-    url: "/media/"
-    dir: "/home/negeobag/himawat/media"
-
-  # Deployment Hooks for CloudLinux
   hooks:
     pre_deploy:
-      # Backup existing installation
-      - name: "Backup existing files"
+      - name: "Copy files to destination"
         command: |
-          if [ -d "/home/negeobag/himawat" ]; then
-            tar -czf /home/negeobag/backups/himawat_$(date +%Y%m%d_%H%M%S).tar.gz -C /home/negeobag himawat
-          fi
-        user: "%ENV{USER}%"
-
-      # Copy files from source to destination
-      - name: "Copy application files"
-        command: |
-          rsync -av --delete \
+          rsync -av --progress \
             --exclude '__pycache__/' \
             --exclude '*.pyc' \
             --exclude '*.pyo' \
@@ -65,47 +19,8 @@ deployment:
             --exclude '*.log' \
             --exclude '.env.local' \
             --exclude 'db.sqlite3' \
-            --exclude 'media/*' \
-            /home/negeobag/repositories/cms/ /home/negeobag/himawat/
+            --exclude 'staticfiles/' \
+            --exclude 'tmp/' \
+            . /home/negeobag/himawat/
         user: "%ENV{USER}%"
 
-    post_deploy:
-      # Set proper permissions
-      - name: "Set file permissions"
-        command: |
-          find /home/negeobag/himawat -type d -exec chmod 755 {} \;
-          find /home/negeobag/himawat -type f -exec chmod 644 {} \;
-        user: "%ENV{USER}%"
-
-      # Install/update Python dependencies
-      - name: "Install dependencies"
-        command: |
-          source /home/negeobag/himawat/venv/bin/activate
-          pip install -r /home/negeobag/himawat/requirements.txt
-        user: "%ENV{USER}%"
-
-      # Run Django migrations
-      - name: "Run database migrations"
-        command: |
-          source /home/negeobag/himawat/venv/bin/activate
-          cd /home/negeobag/himawat && python manage.py migrate --noinput
-        user: "%ENV{USER}%"
-
-      # Collect static files
-      - name: "Collect static files"
-        command: |
-          source /home/negeobag/himawat/venv/bin/activate
-          cd /home/negeobag/himawat && python manage.py collectstatic --noinput --clear
-        user: "%ENV{USER}%"
-
-      # Restart application
-      - name: "Restart application"
-        command: |
-          touch /home/negeobag/himawat/tmp/restart.txt
-        user: "%ENV{USER}%"
-
-  # CloudLinux-specific settings
-  cloudlinux:
-    selector: "default"
-    alt_php_dir: "/alt-php73"
-    alt_python_dir: "/alt-python37"
