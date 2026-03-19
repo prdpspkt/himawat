@@ -1,26 +1,18 @@
 ---
-# Simple Deployment Configuration
-# Copy files recursively to deployment directory
+# Simple copy deployment for cPanel
 
 deployment:
-  user: "%ENV{USER}%"
-
-  hooks:
-    pre_deploy:
-      - name: "Copy files to destination"
-        command: |
-          rsync -av --progress \
-            --exclude '__pycache__/' \
-            --exclude '*.pyc' \
-            --exclude '*.pyo' \
-            --exclude '.git/' \
-            --exclude '.gitignore' \
-            --exclude 'node_modules/' \
-            --exclude '*.log' \
-            --exclude '.env.local' \
-            --exclude 'db.sqlite3' \
-            --exclude 'staticfiles/' \
-            --exclude 'tmp/' \
-            . /home/negeobag/himawat/
-        user: "%ENV{USER}%"
+  pre_build:
+    - cp -R accounts /home/negeobag/himawat/
+    - cp -R dashboard /home/negeobag/himawat/
+    - cp -R himwat /home/negeobag/himawat/
+    - cp -R pages /home/negeobag/himawat/
+    - cp -R services /home/negeobag/himawat/
+    - cp -R static /home/negeobag/himawat/
+    - cp -R templates /home/negeobag/himawat/
+    - cp -R media /home/negeobag/himawat/
+    - cp manage.py /home/negeobag/himawat/
+    - cp requirements.txt /home/negeobag/himawat/
+    - cp .env.example /home/negeobag/himawat/.env
+    - cp passenger_wsgi.py /home/negeobag/himawat/
 
