@@ -15,3 +15,6 @@ deployment:
     - /bin/cp requirements.txt $DEPLOYPATH
     - /bin/cp .env.example $DEPLOYPATH/.env
     - /bin/cp passenger_wsgi.py $DEPLOYPATH
+    - /bin/cp package.json $DEPLOYPATH
+    - bin/cp package-lock.json $DEPLOYPATH
+    - bin/cp -R node_modules $DEPLOYPATH
