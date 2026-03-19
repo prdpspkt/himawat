@@ -67,21 +67,29 @@
             <!-- CEO Profile Card (1/3 width) -->
             <div class="col-lg-4">
                 <div class="card border-0 bg-off-white shadow-none h-100" style="border-radius: 0;">
+                    {% if ceo_info and ceo_info.photo %}
+                    <img src="{{ ceo_info.photo.url }}" alt="CEO of Himawatkhand Vastu" class="card-img-top" style="height: 250px; object-fit: cover;">
+                    {% else %}
                     <img src="{% static 'images/ceo.png' %}" alt="CEO of Himawatkhand Vastu" class="card-img-top" style="height: 250px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x250?text=CEO'">
+                    {% endif %}
                     <div class="card-body text-center">
-                        <h3 class="h4 fw-bold text-almost-black mb-1">Laxmi Prasad Soti</h3>
-                        <p class="text-primary fw-semibold mb-3">Founder & CEO</p>
+                        <h3 class="h4 fw-bold text-almost-black mb-1">{% firstof ceo_info.name 'Laxmi Prasad Soti' %}</h3>
+                        <p class="text-primary fw-semibold mb-3">{% firstof ceo_info.title 'Founder & CEO' %}</p>
+                        {% if ceo_info and ceo_info.bio %}
+                        <p class="text-dim-grey-dark small mb-4">{{ ceo_info.bio }}</p>
+                        {% else %}
                         <p class="text-dim-grey-dark small mb-4">Vedic Architecture, Vastu Shastra, Sustainable Design, Environmental Planning</p>
+                        {% endif %}
 
                         {% if company_info and company_info.whatsapp or company_info.facebook %}
                         <div class="d-flex justify-center gap-3 pt-3 border-top">
                             {% if company_info and company_info.whatsapp %}
-                            <a href="https://wa.me/{{ company_info.whatsapp }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success btn-sm rounded-circle" style="width: 40px; height: 40px; padding: 0;">
+                            <a href="https://wa.me/{{ company_info.whatsapp }}" target="_blank" rel="noopener noreferrer" class="btn  btn-sm rounded-circle" style="width: 60px; height: 60px; padding: 0;">
                                 <i class="fab fa-whatsapp"></i>
                             </a>
                             {% endif %}
                             {% if company_info and company_info.facebook %}
-                            <a href="{{ company_info.facebook }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm rounded-circle" style="width: 40px; height: 40px; padding: 0;">
+                            <a href="{{ company_info.facebook }}" target="_blank" rel="noopener noreferrer" class="btn  btn-sm rounded-circle" style="width: 60px; height: 60px; padding: 0;">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
                             {% endif %}
