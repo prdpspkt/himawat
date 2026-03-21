@@ -137,6 +137,12 @@ urlpatterns = [
     path('settings/ai-config/<int:pk>/edit/', views.AIConfigurationUpdateView.as_view(), name='ai_config_edit'),
     path('settings/ai-config/<int:pk>/delete/', views.AIConfigurationDeleteView.as_view(), name='ai_config_delete'),
 
+    # Email Configuration Management
+    path('settings/email-config/', views.EmailConfigurationListView.as_view(), name='email_config_list'),
+    path('settings/email-config/create/', views.EmailConfigurationCreateView.as_view(), name='email_config_create'),
+    path('settings/email-config/<int:pk>/edit/', views.EmailConfigurationUpdateView.as_view(), name='email_config_edit'),
+    path('settings/email-config/<int:pk>/delete/', views.EmailConfigurationDeleteView.as_view(), name='email_config_delete'),
+
     # AI Content Generation API
     path('api/ai/generate/', views.generate_content_with_ai, name='ai_generate_content'),
 

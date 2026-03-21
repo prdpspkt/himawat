@@ -161,6 +161,7 @@ def menu_item_get_ajax(request, pk):
                 'title': item.title,
                 'type': item.type,
                 'url': item.url,
+                'icon': item.icon,
                 'page_id': item.page_id,
                 'css_class': item.css_class,
                 'target': item.target,

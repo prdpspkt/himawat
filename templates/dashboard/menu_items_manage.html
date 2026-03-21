@@ -541,6 +541,14 @@
                     <option value="{{ page.id }}" data-title="{{ page.title }}" data-url="{{ page.get_absolute_url }}">{{ page.title }}</option>
                     {% endfor %}
                 </select>
+
+                <label for="page-icon">Icon (optional)</label>
+                <input type="text" id="page-icon" placeholder="e.g., fas fa-home">
+                <div class="description">
+                    <strong>Font Awesome Icons:</strong> <code>fas fa-home</code> <code>fas fa-user</code> <code>fas fa-envelope</code> <code>fas fa-phone</code> <code>fas fa-building</code> <code>fas fa-cog</code><br>
+                    <a href="https://fontawesome.com/icons?d=gallery&m=free" target="_blank">Browse all icons →</a>
+                </div>
+
                 <button type="button" class="add-to-menu" onclick="addPageToMenu()">Add to Menu</button>
                 <div style="clear: both;"></div>
             </div>
@@ -555,10 +563,17 @@
             <div class="accordion-content collapsed">
                 <label for="custom-url">URL</label>
                 <input type="url" id="custom-url" placeholder="https://">
-                
+
                 <label for="custom-link-text">Link Text</label>
                 <input type="text" id="custom-link-text" placeholder="Menu Item">
-                
+
+                <label for="custom-icon">Icon (optional)</label>
+                <input type="text" id="custom-icon" placeholder="e.g., fas fa-home">
+                <div class="description">
+                    <strong>Font Awesome Icons:</strong> <code>fas fa-home</code> <code>fas fa-user</code> <code>fas fa-envelope</code> <code>fas fa-phone</code> <code>fas fa-building</code> <code>fas fa-cog</code><br>
+                    <a href="https://fontawesome.com/icons?d=gallery&m=free" target="_blank">Browse all icons →</a>
+                </div>
+
                 <button type="button" class="add-to-menu" onclick="addCustomLinkToMenu()">Add to Menu</button>
                 <div style="clear: both;"></div>
             </div>
@@ -578,6 +593,14 @@
                     <option value="{{ category.id }}" data-title="{{ category.name }}" data-url="{{ category.get_absolute_url }}">{{ category.name }}</option>
                     {% endfor %}
                 </select>
+
+                <label for="category-icon">Icon (optional)</label>
+                <input type="text" id="category-icon" placeholder="e.g., fas fa-home">
+                <div class="description">
+                    <strong>Font Awesome Icons:</strong> <code>fas fa-home</code> <code>fas fa-user</code> <code>fas fa-envelope</code> <code>fas fa-phone</code> <code>fas fa-building</code> <code>fas fa-cog</code><br>
+                    <a href="https://fontawesome.com/icons?d=gallery&m=free" target="_blank">Browse all icons →</a>
+                </div>
+
                 <button type="button" class="add-to-menu" onclick="addCategoryToMenu()">Add to Menu</button>
                 <div style="clear: both;"></div>
             </div>
@@ -1119,36 +1142,40 @@
     function addPageToMenu() {
         const select = $('#page-select');
         const selected = select.find(':selected');
-        
+
         if (!selected.val()) {
             alert('Please select a page');
             return;
         }
-        
+
         const title = selected.data('title');
         const url = selected.data('url');
         const pageId = selected.val();
-        
+        const icon = $('#page-icon').val().trim();
+
         addMenuItem({
             type: 'page',
             title: title,
             url: url,
-            page_id: pageId
+            page_id: pageId,
+            icon: icon
         });
-        
+
         select.val('');
+        $('#page-icon').val('');
     }
     
     // Add Custom Link to Menu
     function addCustomLinkToMenu() {
         let url = $('#custom-url').val().trim();
         const title = $('#custom-link-text').val().trim();
-        
+        const icon = $('#custom-icon').val().trim();
+
         if (!url || !title) {
             alert('Please enter both URL and Link Text');
             return;
         }
-        
+
         // Normalize URL - add https:// if no protocol specified
         if (!url.match(/^(https?:\/\/|mailto:|tel:|\/)/i)) {
             // If it contains a dot, assume it's a website
@@ -1156,50 +1183,55 @@
                 url = 'https://' + url;
             }
         }
-        
+
         addMenuItem({
             type: 'custom_link',
             title: title,
-            url: url
+            url: url,
+            icon: icon
         });
-        
+
         $('#custom-url').val('');
         $('#custom-link-text').val('');
+        $('#custom-icon').val('');
     }
     
     // Add Category to Menu
     function addCategoryToMenu() {
         const select = $('#category-select');
         const selected = select.find(':selected');
-        
+
         if (!selected.val()) {
             alert('Please select a category');
             return;
         }
-        
+
         const title = selected.data('title');
         const url = selected.data('url');
         const categoryId = selected.val();
-        
+        const icon = $('#category-icon').val().trim();
+
         addMenuItem({
             type: 'category',
             title: title,
             url: url,
-            category_id: categoryId
+            category_id: categoryId,
+            icon: icon
         });
-        
+
         select.val('');
+        $('#category-icon').val('');
     }
     
     // Add Menu Item to DOM
     function addMenuItem(data) {
         newItemCounter++;
         const tempId = 'new-' + newItemCounter;
-        
+
         const template = document.getElementById('menu-item-template');
         const clone = template.content.cloneNode(true);
         const itemDiv = $(clone).find('.menu-item');
-        
+
         itemDiv.attr('data-id', tempId);
         itemDiv.attr('data-type', data.type);
         const typeLabels = {
@@ -1211,7 +1243,8 @@
         itemDiv.find('.item-title').text(data.title);
         itemDiv.find('.item-title-input').val(data.title);
         itemDiv.find('.item-url-input').val(data.url);
-        
+        itemDiv.find('.item-icon-input').val(data.icon || '');
+
         // Create via AJAX
         $.ajax({
             url: '/dashboard/api/menu-items/create/',
@@ -1223,6 +1256,7 @@
                 title: data.title,
                 type: data.type,
                 url: data.url,
+                icon: data.icon || '',
                 page_id: data.page_id || null,
                 category_id: data.category_id || null
             }),
@@ -1238,7 +1272,7 @@
                 showNotification('Error adding item', 'error');
             }
         });
-        
+
         $('#menu-items-list').append(itemDiv);
         makeSortable($('#menu-items-list'));
         updateLevelClasses();

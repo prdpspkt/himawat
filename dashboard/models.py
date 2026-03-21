@@ -870,6 +870,70 @@ class AIConfiguration(TimestampModel):
         return cls.objects.first()
 
 
+class EmailConfiguration(TimestampModel):
+    """Email configuration for sending emails system-wide"""
+
+    BACKEND_CHOICES = [
+        ('console', 'Console (Development)'),
+        ('smtp', 'SMTP (Production)'),
+    ]
+
+    name = models.CharField(max_length=255, default='Default Email Configuration', help_text="Friendly name for this configuration")
+    is_active = models.BooleanField(default=True, help_text="Use this configuration as the default")
+    backend = models.CharField(max_length=20, choices=BACKEND_CHOICES, default='console', help_text="Email backend to use")
+
+    # SMTP Settings
+    email_host = models.CharField(max_length=255, blank=True, default='smtp.gmail.com', help_text="SMTP server hostname")
+    email_port = models.IntegerField(default=587, help_text="SMTP server port")
+    email_use_tls = models.BooleanField(default=True, help_text="Use TLS for encryption")
+    email_host_user = models.EmailField(blank=True, default='', help_text="SMTP username (usually email address)")
+    email_host_password = models.CharField(max_length=255, blank=True, default='', help_text="SMTP password or app password")
+
+    # From Email
+    from_email = models.EmailField(blank=True, default='noreply@localhost', help_text="Default from email address")
+    from_name = models.CharField(max_length=255, blank=True, default='Himwatkhanda Vastu', help_text="Sender display name")
+
+    # Admin Email
+    admin_email = models.EmailField(blank=True, default='admin@localhost', help_text="Admin email for notifications")
+
+    notes = models.TextField(blank=True, help_text="Additional notes about this configuration")
+
+    class Meta:
+        verbose_name = 'Email Configuration'
+        verbose_name_plural = 'Email Configurations'
+        ordering = ['-is_active', '-created_at']
+
+    def __str__(self):
+        return f"{self.name} ({self.get_backend_display()})"
+
+    @classmethod
+    def get_active(cls):
+        """Get the active email configuration"""
+        try:
+            return cls.objects.filter(is_active=True).first()
+        except:
+            return None
+
+    def apply_to_settings(self):
+        """Apply this configuration to Django settings"""
+        settings_dict = {
+            'EMAIL_BACKEND': f"django.core.mail.backends.{self.backend}.EmailBackend",
+            'DEFAULT_FROM_EMAIL': self.from_email,
+            'SERVER_EMAIL': self.admin_email,
+        }
+
+        if self.backend == 'smtp':
+            settings_dict.update({
+                'EMAIL_HOST': self.email_host,
+                'EMAIL_PORT': self.email_port,
+                'EMAIL_USE_TLS': self.email_use_tls,
+                'EMAIL_HOST_USER': self.email_host_user,
+                'EMAIL_HOST_PASSWORD': self.email_host_password,
+            })
+
+        return settings_dict
+
+
 # ===== SERVICE MODEL =====
 
 class Service(TimestampModel):

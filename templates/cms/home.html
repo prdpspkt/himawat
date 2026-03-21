@@ -22,6 +22,7 @@
                     <!-- Slides -->
                     <div class="carousel-inner overflow-hidden">
                         {% for slide in carousel_slides %}
+                        {% if slide.image %}
                         <div class="carousel-item {% if forloop.first %}active{% endif %}">
                             {% if slide.link_url %}
                             <a href="{{ slide.link_url }}" class="text-decoration-none">
@@ -44,6 +45,7 @@
                             </a>
                             {% endif %}
                         </div>
+                        {% endif %}
                         {% endfor %}
                     </div>
 

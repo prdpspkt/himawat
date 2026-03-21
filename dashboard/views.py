@@ -13,7 +13,7 @@ from dashboard.models import (
     Post, Page, Category, Tag, Download, Gallery,
     Testimonial, Carousel, FAQ, Product, ProductRequest, ProductRequestItem, ProductImage,
     Consultation,
-    Menu, CompanyInfo, CEOInfo, Video, PageRevision, PostRevision, AIConfiguration,
+    Menu, CompanyInfo, CEOInfo, Video, PageRevision, PostRevision, AIConfiguration, EmailConfiguration,
     Service, ServiceRequest, Training, TrainingRequest
 )
 from dashboard.forms import PageForm, PostForm, FAQForm, ProductForm, CategoryForm
@@ -1159,6 +1159,58 @@ class AIConfigurationDeleteView(AdminRequiredMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'AI configuration deleted successfully!')
+        return super().delete(request, *args, **kwargs)
+
+
+# ===== EMAIL CONFIGURATION VIEWS =====
+
+class EmailConfigurationListView(AdminRequiredMixin, ListView):
+    """List all email configurations"""
+    model = EmailConfiguration
+    template_name = 'dashboard/email_config_list.html'
+    context_object_name = 'email_configs'
+
+
+class EmailConfigurationCreateView(AdminRequiredMixin, CreateView):
+    """Create a new email configuration"""
+    model = EmailConfiguration
+    template_name = 'dashboard/email_config_form.html'
+    fields = ['name', 'is_active', 'backend', 'email_host', 'email_port', 'email_use_tls',
+              'email_host_user', 'email_host_password', 'from_email', 'from_name', 'admin_email', 'notes']
+    success_url = reverse_lazy('dashboard:email_config_list')
+
+    def form_valid(self, form):
+        # If this is set to active, deactivate all others
+        if form.cleaned_data.get('is_active'):
+            EmailConfiguration.objects.update(is_active=False)
+        messages.success(self.request, 'Email configuration created successfully!')
+        return super().form_valid(form)
+
+
+class EmailConfigurationUpdateView(AdminRequiredMixin, UpdateView):
+    """Update an email configuration"""
+    model = EmailConfiguration
+    template_name = 'dashboard/email_config_form.html'
+    fields = ['name', 'is_active', 'backend', 'email_host', 'email_port', 'email_use_tls',
+              'email_host_user', 'email_host_password', 'from_email', 'from_name', 'admin_email', 'notes']
+    success_url = reverse_lazy('dashboard:email_config_list')
+
+    def form_valid(self, form):
+        # If this is set to active, deactivate all others
+        if form.cleaned_data.get('is_active'):
+            EmailConfiguration.objects.exclude(pk=self.object.pk).update(is_active=False)
+        messages.success(self.request, 'Email configuration updated successfully!')
+        return super().form_valid(form)
+
+
+class EmailConfigurationDeleteView(AdminRequiredMixin, DeleteView):
+    """Delete an email configuration"""
+    model = EmailConfiguration
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:email_config_list')
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, 'Email configuration deleted successfully!')
         return super().delete(request, *args, **kwargs)
 
 

@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = 'django-insecure-wnx+#tn3lti*sz@3un)lrl-i6d*ilfzkg##z1&ip@gpgmt8f$4'
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'himawatkhandavastu.com', 'www.himawatkhandavastu.com', '*']
 
@@ -153,6 +153,40 @@ LOGOUT_REDIRECT_URL = '/'
 SITE_NAME = 'Himwatkhanda Vastu Pvt. Ltd.'
 SITE_DESCRIPTION = 'Your Blueprint for Harmony, Structure, and Expertise'
 SITE_URL = 'https://himawatkhandavastu.com'
+
+# Email configuration - will be loaded from database
+# Default fallback settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@localhost'
+SERVER_EMAIL = 'server@localhost'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+
+# Email settings
+EMAIL_SUBJECT_PREFIX = '[Himwatkhanda Vastu] '
+ADMINS = [('Admin', 'admin@localhost')]
+
+# Load email configuration from database if available
+def load_email_config():
+    """Load active email configuration from database"""
+    try:
+        from dashboard.models import EmailConfiguration
+        config = EmailConfiguration.get_active()
+        if config:
+            settings_dict = config.apply_to_settings()
+            for key, value in settings_dict.items():
+                globals()[key] = value
+            # Update ADMINS with admin email from config
+            globals()['ADMINS'] = [('Admin', config.admin_email)]
+    except Exception:
+        # If database is not ready or table doesn't exist yet, use defaults
+        pass
+
+# Load email config after models are available
+load_email_config()
 
 
 # Cache settings - Disabled in development

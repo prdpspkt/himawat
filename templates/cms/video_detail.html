@@ -5,20 +5,13 @@
 {% block meta_description %}{{ video.description|default:video.title|truncatewords:30 }}{% endblock %}
 
 {% block content %}
-<!-- Breadcrumb -->
-<div class="bg-gray-50 border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 py-4">
-        <nav class="flex items-center text-sm text-gray-600">
-            <a href="{% url 'pages:home' %}" class="hover:text-primary transition-colors">Home</a>
-            <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-            <a href="{% url 'pages:video_list' %}" class="hover:text-primary transition-colors">Videos</a>
-            <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-            <span class="text-gray-900 font-medium truncate max-w-xs">{{ video.title }}</span>
-        </nav>
+<!-- Hero Section -->
+<div class="relative bg-gray-50 overflow-hidden">
+    <div class="relative max-w-7xl mx-auto px-4 py-8 md:py-12 text-center">
+        <h1 class="text-3xl md:text-5xl font-bold text-primary mb-4">{{ video.title }}</h1>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+            Watch and learn from our expert insights on Vastu Shastra and Engineering
+        </p>
     </div>
 </div>
 
@@ -30,33 +23,31 @@
             {{ video.embed_code|safe }}
         </div>
     </div>
-    
+
     <!-- Video Info -->
     <div class="mt-8">
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{{ video.title }}</h1>
-        
         <div class="flex items-center text-sm text-gray-500 mb-6">
-            <span class="flex items-center">
+            <span class="flex items-center mr-6">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
                 {{ video.published_at|default:video.created_at|date:"F d, Y" }}
             </span>
         </div>
-        
+
         {% if video.description %}
         <div class="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700">
-            <h2 class="text-lg font-semibold text-gray-900 mb-3">Description</h2>
+            <h2 class="text-lg font-semibold text-gray-900 mb-3">About this video</h2>
             <p class="text-gray-700 whitespace-pre-line">{{ video.description }}</p>
         </div>
         {% endif %}
     </div>
-    
+
     <!-- Share Buttons -->
     <div class="mt-8 pt-8 border-t border-gray-200">
         <h3 class="text-sm font-semibold text-gray-900 mb-3">Share this video</h3>
-        <div class="flex space-x-3">
-            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" 
+        <div class="flex flex-wrap gap-3">
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank"
                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                 <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -86,10 +77,10 @@
 {% if more_videos %}
 <div class="bg-gray-50 py-16">
     <div class="max-w-7xl mx-auto px-4">
-        <h2 class="text-2xl font-bold text-gray-900 mb-8">More Videos</h2>
+        <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">More Videos</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for v in more_videos|slice:":3" %}
-            <div class="bg-white rounded-lg shadow-md overflow-hidden group hover:shadow-lg transition-shadow">
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden group hover:shadow-xl transition-shadow">
                 <a href="{{ v.get_absolute_url }}" class="block relative aspect-video bg-gray-900 overflow-hidden">
                     {% if v.thumbnail %}
                     <img src="{{ v.thumbnail.url }}" alt="{{ v.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
@@ -102,16 +93,16 @@
                     </div>
                     {% endif %}
                     <div class="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
-                        <div class="w-12 h-12 bg-primary/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <svg class="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                        <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M8 5v14l11-7z"/>
                             </svg>
                         </div>
                     </div>
                 </a>
-                <div class="p-4">
-                    <h3 class="font-semibold text-gray-900 line-clamp-2">
-                        <a href="{{ v.get_absolute_url }}" class="hover:text-primary transition-colors">{{ v.title }}</a>
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-primary transition-colors">
+                        <a href="{{ v.get_absolute_url }}">{{ v.title }}</a>
                     </h3>
                 </div>
             </div>
@@ -121,4 +112,20 @@
 </div>
 {% endif %}
 {% endwith %}
+
+<!-- CTA Section -->
+<div class="bg-primary py-16">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold text-white mb-4">Need Expert Guidance?</h2>
+        <p class="text-red-100 mb-8">Get personalized Vastu consultation and engineering design services from our experts.</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'pages:consultation' %}" class="inline-block px-8 py-3 bg-white text-primary rounded-lg hover:bg-gray-100 transition-colors font-semibold">
+                Book Consultation
+            </a>
+            <a href="{% url 'pages:video_list' %}" class="inline-block px-8 py-3 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-primary transition-colors font-semibold">
+                Browse All Videos
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}
