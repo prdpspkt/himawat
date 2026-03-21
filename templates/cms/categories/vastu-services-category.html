@@ -5,28 +5,26 @@
 {% block meta_description %}{{ category.description|truncatewords:30 }}{% endblock %}
 
 {% block content %}
-<!-- Hero Section with Earthy Tones -->
-<div class="py-20" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+<!-- Hero Section -->
+<div class="bg-off-white py-20 border-top">
     <div class="container text-center">
         {% if category.image %}
         <div class="mb-5">
-            <div class="rounded-circle shadow-lg p-4 bg-white d-inline-block">
-                <img src="{{ category.image.url }}" alt="{{ category.name }}" class="img-fluid" style="width: 180px; height: 180px; object-fit: contain;">
-            </div>
+            <img src="{{ category.image.url }}" alt="{{ category.name }}" class="img-fluid rounded-circle shadow-sm p-4 bg-scarlet-light" style="width: 180px; height: 180px; object-fit: contain;">
         </div>
         {% endif %}
-        <h1 class="display-4 fw-bold text-white mb-4">{{ category.name }}</h1>
+        <h1 class="display-4 fw-bold text-primary mb-4">{{ category.name }}</h1>
         {% if category.description %}
-        <p class="fs-5 text-white-90 max-w-3xl mx-auto">{{ category.description }}</p>
+        <p class="fs-5 text-grey-dark max-w-3xl mx-auto">{{ category.description }}</p>
         {% endif %}
     </div>
 </div>
 
 <!-- Child Categories -->
 {% if child_categories %}
-<div class="py-16 bg-light">
+<div class="py-16 border-bottom">
     <div class="container">
-        <h2 class="display-6 fw-bold text-almost-black mb-5 text-center">Explore Subcategories</h2>
+        <h2 class="display-6 fw-bold text-almost-black mb-5 text-center">Subcategories</h2>
         <div class="row g-4">
             {% for child in child_categories %}
             <div class="col-lg-3 col-md-6">
@@ -53,34 +51,36 @@
 </div>
 {% endif %}
 
-<!-- Posts in this Category -->
-{% if posts %}
-<div class="py-16">
+<!-- Services in this Category -->
+{% if services %}
+<div class="py-16 border-top">
     <div class="container">
-        <h2 class="display-6 fw-bold text-almost-black mb-5 text-center">Vastu Services & Solutions</h2>
         <div class="row g-4">
-            {% for post in posts %}
+            {% for service in services %}
             <div class="col-lg-4 col-md-6">
-                <a href="{{ post.get_absolute_url }}" class="text-decoration-none">
-                    <div class="card card-hover h-100 border-0 shadow">
-                        {% if post.featured_image %}
-                        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="card-img-top" style="height: 220px; object-fit: cover;">
+                <a href="{{ service.get_absolute_url }}" class="text-decoration-none">
+                    <div class="card card-hover h-100 border-0 shadow-sm">
+                        {% if service.image %}
+                        <img src="{{ service.image.url }}" alt="{{ service.name }}" class="card-img-top" style="height: 220px; object-fit: cover;">
+                        {% elif service.icon %}
+                        <div class="card-img-top bg-scarlet-light d-flex align-items-center justify-content-center" style="height: 220px;">
+                            <i class="{{ service.icon }} fa-5x text-primary"></i>
+                        </div>
                         {% endif %}
                         <div class="card-body p-4">
-                            {% if post.category %}
-                            <span class="badge bg-gradient mb-2" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">{{ post.category.name }}</span>
+                            {% if service.category %}
+                            <span class="badge bg-primary mb-2">{{ service.category.name }}</span>
                             {% endif %}
-                            <h3 class="h5 fw-bold text-almost-black mb-3">{{ post.title }}</h3>
-                            {% if post.excerpt %}
-                            <p class="text-grey-dark mb-4">{{ post.excerpt|truncatewords:20 }}</p>
-                            {% endif %}
+                            <h3 class="h5 fw-bold text-almost-black mb-3">{{ service.name }}</h3>
+                            <p class="text-grey-dark mb-4">{{ service.excerpt|default:service.description|truncatewords:20 }}</p>
+                            {% if service.price %}
                             <div class="d-flex align-items-center justify-content-between">
-                                <small class="text-grey-dark">
-                                    <i class="far fa-calendar me-1"></i>
-                                    {{ post.published_at|date:"F d, Y" }}
-                                </small>
-                                <span class="fw-semibold" style="color: #f5576c;">Learn More →</span>
+                                <span class="text-primary fw-bold">Starting at ₹{{ service.price }}</span>
+                                <span class="text-primary small fw-semibold">Learn More →</span>
                             </div>
+                            {% else %}
+                            <span class="text-primary small fw-semibold">Learn More →</span>
+                            {% endif %}
                         </div>
                     </div>
                 </a>
@@ -92,7 +92,7 @@
 {% else %}
 <div class="py-16">
     <div class="container text-center">
-        <p class="text-grey-dark">No posts found in this category.</p>
+        <p class="text-grey-dark">No services found in this category.</p>
     </div>
 </div>
 {% endif %}

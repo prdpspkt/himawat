@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils.text import slugify
 import json
@@ -17,10 +19,17 @@ class TimestampModel(models.Model):
 
 
 class Category(TimestampModel):
-    """Blog post categories"""
+    """Unified categories for Posts, Pages, Services, and Trainings"""
     STATUS_CHOICES = [
         ('active', 'Active'),
         ('inactive', 'Inactive'),
+    ]
+
+    CONTENT_TYPE_CHOICES = [
+        ('posts', 'Posts'),
+        ('pages', 'Pages'),
+        ('services', 'Services'),
+        ('trainings', 'Trainings'),
     ]
 
     name = models.CharField(max_length=255)
@@ -31,6 +40,15 @@ class Category(TimestampModel):
     sort_order = models.IntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     template_name = models.CharField(max_length=255, blank=True, help_text="Custom template path (e.g., 'cms/categories/services-category.html'). Leave empty for auto-detection.")
+
+    # Choose which content types this category applies to
+    applies_to = models.ManyToManyField(
+        ContentType,
+        blank=True,
+        related_name='categories',
+        help_text="Select which content types this category applies to",
+        limit_choices_to={'model__in': ['post', 'page', 'service', 'training']}
+    )
 
     class Meta:
         verbose_name_plural = 'Categories'
@@ -47,6 +65,10 @@ class Category(TimestampModel):
     def get_absolute_url(self):
         return reverse('pages:category_detail', kwargs={'slug': self.slug})
 
+    def get_applies_to_display(self):
+        """Get display names of content types this category applies to"""
+        return [ct.model for ct in self.applies_to.all()]
+
     def get_template(self):
         """
         Get the template for this category with priority:
@@ -62,15 +84,14 @@ class Category(TimestampModel):
 
         # Priority 2: Slug-based template (auto-discovery based on slug)
         slug_template = f'cms/categories/{self.slug}-category.html'
-        templates_to_try = [slug_template, 'cms/categories/category.html']
 
-        # select_template returns the first template that exists
+        # Try to load the slug-based template
         try:
-            template = select_template(templates_to_try)
-            # Return the slug template if it exists, otherwise default
-            if template.name == slug_template:
-                return slug_template
+            template = select_template([slug_template])
+            # If no exception, the template exists
+            return slug_template
         except:
+            # Template doesn't exist, fall through to default
             pass
 
         # Priority 3: Default template
@@ -189,6 +210,7 @@ class Page(TimestampModel):
     content = models.TextField()
     excerpt = models.TextField(blank=True)
     featured_image = models.ImageField(upload_to='pages/', null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='pages')
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
     order = models.IntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
@@ -428,13 +450,6 @@ class FAQ(TimestampModel):
 
 class Product(TimestampModel):
     """Products"""
-    CATEGORY_CHOICES = [
-        ('vastu_remedy', 'Vastu Remedy'),
-        ('vastu_product', 'Vastu Product'),
-        ('book', 'Book'),
-        ('consultation', 'Consultation'),
-    ]
-
     STATUS_CHOICES = [
         ('active', 'Active'),
         ('inactive', 'Inactive'),
@@ -444,7 +459,7 @@ class Product(TimestampModel):
     slug = models.SlugField(unique=True)
     description = models.TextField()
     image = models.ImageField(upload_to='products/', null=True, blank=True)
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='vastu_remedy')
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
     featured = models.BooleanField(default=False)
     sort_order = models.IntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
@@ -853,3 +868,127 @@ class AIConfiguration(TimestampModel):
     def get_active(cls):
         """Get the first available AI configuration"""
         return cls.objects.first()
+
+
+# ===== SERVICE MODEL =====
+
+class Service(TimestampModel):
+    """Services offered by the company"""
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+    ]
+
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+    description = models.TextField()
+    excerpt = models.TextField(blank=True, help_text="Brief summary for listing pages")
+    image = models.ImageField(upload_to='services/', null=True, blank=True)
+    icon = models.CharField(max_length=100, blank=True, help_text="Font Awesome icon class (e.g., 'fas fa-home')")
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='services')
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Starting price or leave empty")
+    featured = models.BooleanField(default=False)
+    sort_order = models.IntegerField(default=0)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        ordering = ['-featured', 'sort_order', 'name']
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('pages:service_detail', kwargs={'slug': self.slug})
+
+
+class ServiceRequest(TimestampModel):
+    """Service inquiries/requests"""
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='requests')
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    phone = models.CharField(max_length=50, blank=True)
+    message = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Request #{self.id} by {self.name} for {self.service.name}"
+
+
+# ===== TRAINING MODEL =====
+
+class Training(TimestampModel):
+    """Training courses offered by the company"""
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+    ]
+
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+    description = models.TextField()
+    short_description = models.CharField(max_length=500, blank=True)
+    excerpt = models.TextField(blank=True, help_text="Brief summary for listing pages")
+    image = models.ImageField(upload_to='trainings/', null=True, blank=True)
+    icon = models.CharField(max_length=100, blank=True, help_text="Font Awesome icon class (e.g., 'fas fa-graduation-cap')")
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='trainings')
+    duration = models.CharField(max_length=100, blank=True, help_text="e.g., '5 days', '2 weeks'")
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Training fee or leave empty")
+    featured = models.BooleanField(default=False)
+    sort_order = models.IntegerField(default=0)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        ordering = ['-featured', 'sort_order', 'name']
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('pages:training_detail', kwargs={'slug': self.slug})
+
+
+class TrainingRequest(TimestampModel):
+    """Training inquiries/requests"""
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    training = models.ForeignKey(Training, on_delete=models.CASCADE, related_name='requests')
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    phone = models.CharField(max_length=50, blank=True)
+    message = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Request #{self.id} by {self.name} for {self.training.name}"

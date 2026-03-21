@@ -42,7 +42,17 @@ urlpatterns = [
     path('products/', views.ProductListView.as_view(), name='product_list'),
     path('products/<slug:slug>/', views.ProductDetailView.as_view(), name='product_detail'),
     path('products/<slug:slug>/request/', views.product_request, name='product_request'),
-    
+
+    # Services
+    path('services/', views.ServiceListView.as_view(), name='service_list'),
+    path('services/<slug:slug>/', views.ServiceDetailView.as_view(), name='service_detail'),
+    path('services/<slug:slug>/request/', views.service_request, name='service_request'),
+
+    # Trainings
+    path('trainings/', views.TrainingListView.as_view(), name='training_list'),
+    path('trainings/<slug:slug>/', views.TrainingDetailView.as_view(), name='training_detail'),
+    path('trainings/<slug:slug>/request/', views.training_request, name='training_request'),
+
     # Consultation
     path('consultation/', views.ConsultationView.as_view(), name='consultation'),
     path('consultation/submit/', views.consultation_request, name='consultation_submit'),

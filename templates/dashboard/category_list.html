@@ -4,6 +4,8 @@
 {% block page_title %}Categories{% endblock %}
 
 {% block dashboard_content %}
+{% include 'dashboard/bulk_actions.html' with model_name='category' %}
+
 <div class="bg-white rounded-lg shadow">
     <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
         <h3 class="text-lg font-semibold text-gray-900">All Categories</h3>
@@ -16,9 +18,13 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+                        <input type="checkbox" class="sr-only" aria-label="Select all">
+                    </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applies To</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parent</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Posts</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -27,6 +33,9 @@
             <tbody class="bg-white divide-y divide-gray-200">
                 {% for category in categories %}
                 <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4">
+                        <input type="checkbox" class="item-checkbox h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" value="{{ category.pk }}">
+                    </td>
                     <td class="px-6 py-4">
                         <div class="flex items-center">
                             {% if category.image %}
@@ -42,6 +51,17 @@
                             </div>
                         </div>
                     </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        {% if category.applies_to.exists %}
+                        <div class="flex flex-wrap gap-1">
+                            {% for ct in category.applies_to.all %}
+                            <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs capitalize">{{ ct.model }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <span class="text-gray-400">—</span>
+                        {% endif %}
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {% if category.parent %}
                         {{ category.parent.name }}
@@ -50,7 +70,24 @@
                         {% endif %}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span class="px-2 py-1 bg-gray-100 rounded-full text-xs">{{ category.post_count }}</span>
+                        <div class="flex gap-1">
+                            {% if category.applies_to.exists %}
+                                {% if 'post' in category.get_applies_to_display %}
+                                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs" title="Posts">P: {{ category.posts.count }}</span>
+                                {% endif %}
+                                {% if 'page' in category.get_applies_to_display %}
+                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs" title="Pages">Pg: {{ category.pages.count }}</span>
+                                {% endif %}
+                                {% if 'service' in category.get_applies_to_display %}
+                                <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs" title="Services">S: {{ category.services.count }}</span>
+                                {% endif %}
+                                {% if 'training' in category.get_applies_to_display %}
+                                <span class="px-2 py-1 bg-orange-100 text-orange-800 rounded text-xs" title="Trainings">T: {{ category.trainings.count }}</span>
+                                {% endif %}
+                            {% else %}
+                            <span class="text-gray-400">—</span>
+                            {% endif %}
+                        </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ category.sort_order }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -67,7 +104,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">No categories found.</td>
+                    <td colspan="8" class="px-6 py-4 text-center text-gray-500">No categories found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

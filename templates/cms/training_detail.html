@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ training.name }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="{% if training.short_description %}{{ training.short_description }}{% else %}{{ training.description|striptags|truncatewords:30 }}{% endif %}">
+<meta property="og:title" content="{{ training.name }}">
+<meta property="og:description" content="{% if training.short_description %}{{ training.short_description }}{% else %}{{ training.description|striptags|truncatewords:30 }}{% endif %}">
+<meta property="og:type" content="course">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% if training.image %}
+<meta property="og:image" content="{{ request.build_absolute_uri }}{{ training.image.url }}">
+{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ training.name }}">
+<meta name="twitter:description" content="{% if training.short_description %}{{ training.short_description }}{% else %}{{ training.description|striptags|truncatewords:30 }}{% endif %}">
+{% if training.image %}
+<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ training.image.url }}">
+{% endif %}
+
+<!-- Schema.org Course Markup -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Course",
+  "name": "{{ training.name|escapejs }}",
+  {% if training.image %}
+  "image": "{{ request.build_absolute_uri }}{{ training.image.url }}",
+  {% endif %}
+  "description": "{{ training.description|striptags|escapejs }}",
+  "category": "{{ training.get_category_display }}",
+  {% if training.duration %}
+  "duration": "{{ training.duration|escapejs }}",
+  {% endif %}
+  {% if training.price %}
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ request.build_absolute_uri }}",
+    "priceCurrency": "NPR",
+    "price": "{{ training.price }}",
+    "priceValidUntil": "negotiable",
+    "availability": "https://schema.org/{% if training.status == 'active' %}InStock{% else %}OutOfStock{% endif %}"
+  },
+  {% endif %}
+  "provider": {
+    "@type": "Organization",
+    "name": "{% if company_info %}{{ company_info.company_name|escapejs }}{% else %}Himwatkhanda Vastu{% endif %}",
+    "url": "{{ request.build_absolute_uri }}"
+    {% if company_info.logo %},
+    "logo": "{{ request.build_absolute_uri }}{{ company_info.logo.url }}"
+    {% endif %}
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="border-top pt-5 pb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                {% if training.icon %}
+                <div class="mb-3">
+                    <i class="{{ training.icon }} text-primary" style="font-size: 4rem;"></i>
+                </div>
+                {% endif %}
+                <h1 class="display-5 fw-bold text-primary mb-4">{{ training.name }}</h1>
+                <p class="fs-5 text-success">{{ training.get_category_display }}</p>
+                {% if training.duration %}
+                <p class="fs-5 text-dim-grey-dark"><i class="fas fa-clock me-2"></i>{{ training.duration }}</p>
+                {% endif %}
+                {% if training.short_description %}
+                <p class="fs-5 text-dim-grey-dark">{{ training.short_description }}</p>
+                {% elif training.excerpt %}
+                <p class="fs-5 text-dim-grey-dark">{{ training.excerpt }}</p>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Training Detail -->
+<div class="py-12 border-top">
+    <div class="container">
+        <!-- Training Images - Full Width -->
+        <div class="row g-5 mb-5">
+            <div class="col-12">
+                {% if training.image %}
+                <!-- Training Image -->
+                <div class="rounded-3 overflow-hidden">
+                    <img src="{{ training.image.url }}" alt="{{ training.name }}" class="d-block w-100"
+                         style="height: 450px; object-fit: cover;">
+                </div>
+                {% else %}
+                <!-- No Image Placeholder -->
+                <div class="w-100 bg-light rounded-3 d-flex align-items-center justify-content-center"
+                     style="height: 450px;">
+                    {% if training.icon %}
+                    <i class="{{ training.icon }} text-primary" style="font-size: 5rem;"></i>
+                    {% else %}
+                    <i class="fas fa-graduation-cap text-primary" style="font-size: 5rem;"></i>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-12">
+                <!-- Price -->
+                {% if training.price %}
+                <div class="mb-4">
+                    <div class="alert alert-primary border-0" style="background: var(--primary-scarlet-light);">
+                        <h3 class="h4 fw-bold text-primary mb-0">
+                            <i class="fas fa-tag me-2"></i>Training Fee: NPR {{ training.price }}
+                        </h3>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Description -->
+                <div class="mb-5 border-top">
+                    <h3 class="h1 pt-3 text-center fw-bold text-almost-black mb-4">Training Overview</h3>
+                    <p class="text-dim-grey-dark text-bold">
+                        {{ training.description|safe }}
+                    </p>
+                </div>
+
+                <!-- Inquiry Button -->
+                <div class="col-12 border-top">
+                    <div class="card border-0 shadow-none bg-off-white" style="border-radius: 0;">
+                        <div class="card-body p-5 text-center">
+                            <h3 class="h4 fw-bold text-almost-black mb-3">Interested in this training?</h3>
+                            <p class="text-dim-grey-dark mb-4">Click the button below to send us an inquiry about this
+                                training program.</p>
+                            <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal"
+                                    data-bs-target="#inquiryModal">
+                                <i class="fas fa-envelope me-2"></i>Make an Inquiry
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inquiry Modal -->
+    <div class="modal fade" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-primary" id="inquiryModalLabel">
+                        <i class="fas fa-envelope me-2"></i>Training Inquiry
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <p class="text-dim-grey-dark">You're inquiring about: <strong>{{ training.name }}</strong></p>
+                    </div>
+                    <form method="post" action="{% url 'pages:training_request' training.slug %}" id="inquiryForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-almost-black">Your Name *</label>
+                            <input type="text" name="name" required class="form-control" placeholder="Enter your name">
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-almost-black">Email Address *</label>
+                                <input type="email" name="email" required class="form-control"
+                                       placeholder="your.email@example.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-almost-black">Phone Number</label>
+                                <input type="tel" name="phone" class="form-control" placeholder="+977-XXXXXXXXXX">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-almost-black">Message *</label>
+                            <textarea name="message" rows="4" required class="form-control"
+                                      placeholder="I'm interested in this training. Please provide more information..."></textarea>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-fill">
+                                <i class="fas fa-paper-plane me-2"></i>Send Inquiry
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+
+    {% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle form submission in modal
+            const inquiryForm = document.getElementById('inquiryForm');
+            if (inquiryForm) {
+                inquiryForm.addEventListener('submit', function() {
+                    // Form will submit normally
+                    // After successful submission, Django will redirect or show messages
+                    // The modal will close automatically on page navigation
+                });
+            }
+        });
+    </script>
+    {% endblock %}

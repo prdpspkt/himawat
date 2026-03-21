@@ -5,7 +5,7 @@
 
 {% block content %}
 <!-- Page Header -->
-<div class="bg-off-white py-20">
+<div class="bg-off-white pt-5 mt-3 pb-0 border-b border-t">
     <div class="container text-center">
         <h1 class="display-4 fw-bold text-primary mb-4">{{ page.title }}</h1>
         {% if page.excerpt %}
@@ -15,7 +15,7 @@
 </div>
 
 <!-- Page Content -->
-<div class="max-w-7xl mx-auto px-4 py-12">
+<div class="max-w-7xl mx-auto px-4 pt-2 pb-5">
     {% if page.featured_image %}
     <div class="mb-8 rounded-lg overflow-hidden shadow-lg">
         <img src="{{ page.featured_image.url }}" alt="{{ page.title }}" class="w-full h-80 object-cover">

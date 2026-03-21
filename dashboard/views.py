@@ -11,10 +11,12 @@ from django.http import JsonResponse
 
 from dashboard.models import (
     Post, Page, Category, Tag, Download, Gallery,
-    Testimonial, Carousel, FAQ, Product, ProductRequest, ProductRequestItem, Consultation,
-    Menu, CompanyInfo, CEOInfo, Video, PageRevision, PostRevision, AIConfiguration
+    Testimonial, Carousel, FAQ, Product, ProductRequest, ProductRequestItem, ProductImage,
+    Consultation,
+    Menu, CompanyInfo, CEOInfo, Video, PageRevision, PostRevision, AIConfiguration,
+    Service, ServiceRequest, Training, TrainingRequest
 )
-from dashboard.forms import PageForm, PostForm, FAQForm, ProductForm
+from dashboard.forms import PageForm, PostForm, FAQForm, ProductForm, CategoryForm
 from dashboard.decorators import staff_member_required
 from accounts.models import User
 
@@ -196,22 +198,29 @@ class CategoryListView(BaseListView):
     model = Category
     template_name = 'dashboard/category_list.html'
     context_object_name = 'categories'
-    
+
     def get_queryset(self):
-        return Category.objects.annotate(post_count=Count('posts')).order_by('sort_order')
+        return Category.objects.prefetch_related(
+            'applies_to',
+            'posts',
+            'pages',
+            'services',
+            'trainings',
+            'parent'
+        ).annotate(post_count=Count('posts')).order_by('sort_order')
 
 
 class CategoryCreateView(BaseCreateView):
     model = Category
+    form_class = CategoryForm
     template_name = 'dashboard/category_form.html'
-    fields = ['name', 'slug', 'description', 'parent', 'image', 'sort_order', 'status']
     success_url = reverse_lazy('dashboard:category_list')
 
 
 class CategoryUpdateView(BaseUpdateView):
     model = Category
+    form_class = CategoryForm
     template_name = 'dashboard/category_form.html'
-    fields = ['name', 'slug', 'description', 'parent', 'image', 'sort_order', 'status']
     success_url = reverse_lazy('dashboard:category_list')
 
 
@@ -401,6 +410,109 @@ def gallery_image_update(request, pk):
         return JsonResponse({'success': False, 'error': str(e)})
 
 
+# Product Image Management
+@staff_member_required
+@require_POST
+def product_image_upload(request):
+    """Upload multiple images to a product"""
+    try:
+        product_id = request.POST.get('product_id')
+        product = get_object_or_404(Product, pk=product_id)
+        images = request.FILES.getlist('images')
+
+        if not images:
+            return JsonResponse({'success': False, 'error': 'No images provided'})
+
+        current_count = product.images.count()
+        created_images = []
+
+        for i, image_file in enumerate(images):
+            image = ProductImage.objects.create(
+                product=product,
+                image=image_file,
+                sort_order=current_count + i
+            )
+            created_images.append({
+                'id': image.id,
+                'url': image.image.url
+            })
+
+        return JsonResponse({
+            'success': True,
+            'images': created_images,
+            'count': len(created_images)
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@staff_member_required
+@require_POST
+def product_image_reorder(request):
+    """Reorder product images"""
+    try:
+        data = json.loads(request.body)
+        images = data.get('images', [])
+
+        for img_data in images:
+            ProductImage.objects.filter(pk=img_data['id']).update(
+                sort_order=img_data['order']
+            )
+
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@staff_member_required
+@require_POST
+def product_image_delete(request, pk):
+    """Delete a product image"""
+    try:
+        image = get_object_or_404(ProductImage, pk=pk)
+        image.delete()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@staff_member_required
+def product_image_detail(request, pk):
+    """Get product image details"""
+    try:
+        image = get_object_or_404(ProductImage, pk=pk)
+        return JsonResponse({
+            'success': True,
+            'image': {
+                'id': image.id,
+                'title': image.title,
+                'description': image.description,
+                'alt_text': image.alt_text,
+                'url': image.image.url
+            }
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@staff_member_required
+@require_POST
+def product_image_update(request, pk):
+    """Update product image metadata"""
+    try:
+        image = get_object_or_404(ProductImage, pk=pk)
+        data = json.loads(request.body)
+
+        image.title = data.get('title', image.title)
+        image.description = data.get('description', image.description)
+        image.alt_text = data.get('alt_text', image.alt_text)
+        image.save()
+
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
 # Testimonial Views
 class TestimonialListView(BaseListView):
     model = Testimonial
@@ -444,7 +556,7 @@ class ProductListView(BaseListView):
 class ProductCreateView(BaseCreateView):
     model = Product
     template_name = 'dashboard/product_form.html'
-    fields = ['name', 'slug', 'description', 'image', 'category', 'featured', 'sort_order', 'status']
+    fields = ['name', 'slug', 'description', 'excerpt', 'image', 'icon', 'category', 'price', 'featured', 'sort_order', 'status']
     success_url = reverse_lazy('dashboard:product_list')
     
     def form_valid(self, form):
@@ -455,7 +567,7 @@ class ProductCreateView(BaseCreateView):
 class ProductUpdateView(BaseUpdateView):
     model = Product
     template_name = 'dashboard/product_form.html'
-    fields = ['name', 'slug', 'description', 'image', 'category', 'featured', 'sort_order', 'status']
+    fields = ['name', 'slug', 'description', 'excerpt', 'image', 'icon', 'category', 'price', 'featured', 'sort_order', 'status']
     success_url = reverse_lazy('dashboard:product_list')
 
 
@@ -580,6 +692,134 @@ class ProductRequestDetailView(AdminRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('dashboard:product_request_detail', kwargs={'pk': self.object.pk})
     
+    def form_valid(self, form):
+        messages.success(self.request, 'Request updated successfully!')
+        return super().form_valid(form)
+
+
+# Service Views
+class ServiceListView(BaseListView):
+    model = Service
+    template_name = 'dashboard/service_list.html'
+    context_object_name = 'services'
+
+    def get_queryset(self):
+        return Service.objects.order_by('-featured', 'sort_order')
+
+
+class ServiceCreateView(BaseCreateView):
+    model = Service
+    template_name = 'dashboard/service_form.html'
+    fields = ['name', 'slug', 'description', 'excerpt', 'image', 'icon', 'category', 'price', 'featured', 'sort_order', 'status']
+    success_url = reverse_lazy('dashboard:service_list')
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class ServiceUpdateView(BaseUpdateView):
+    model = Service
+    template_name = 'dashboard/service_form.html'
+    fields = ['name', 'slug', 'description', 'excerpt', 'image', 'icon', 'category', 'price', 'featured', 'sort_order', 'status']
+    success_url = reverse_lazy('dashboard:service_list')
+
+
+class ServiceDeleteView(BaseDeleteView):
+    model = Service
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:service_list')
+
+
+# Service Request Views
+class ServiceRequestListView(BaseListView):
+    model = ServiceRequest
+    template_name = 'dashboard/service_request_list.html'
+    context_object_name = 'requests'
+
+    def get_queryset(self):
+        return ServiceRequest.objects.prefetch_related('items', 'items__service').order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['pending_count'] = ServiceRequest.objects.filter(status='pending').count()
+        context['processing_count'] = ServiceRequest.objects.filter(status='processing').count()
+        context['completed_count'] = ServiceRequest.objects.filter(status='completed').count()
+        return context
+
+
+class ServiceRequestDetailView(AdminRequiredMixin, UpdateView):
+    model = ServiceRequest
+    template_name = 'dashboard/service_request_detail.html'
+    fields = ['status', 'notes']
+
+    def get_success_url(self):
+        return reverse_lazy('dashboard:service_request_detail', kwargs={'pk': self.object.pk})
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Request updated successfully!')
+        return super().form_valid(form)
+
+
+# Training Views
+class TrainingListView(BaseListView):
+    model = Training
+    template_name = 'dashboard/training_list.html'
+    context_object_name = 'trainings'
+
+    def get_queryset(self):
+        return Training.objects.order_by('-featured', 'sort_order')
+
+
+class TrainingCreateView(BaseCreateView):
+    model = Training
+    template_name = 'dashboard/training_form.html'
+    fields = ['name', 'slug', 'description', 'short_description', 'excerpt', 'image', 'icon', 'category', 'duration', 'price', 'featured', 'sort_order', 'status']
+    success_url = reverse_lazy('dashboard:training_list')
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class TrainingUpdateView(BaseUpdateView):
+    model = Training
+    template_name = 'dashboard/training_form.html'
+    fields = ['name', 'slug', 'description', 'short_description', 'excerpt', 'image', 'icon', 'category', 'duration', 'price', 'featured', 'sort_order', 'status']
+    success_url = reverse_lazy('dashboard:training_list')
+
+
+class TrainingDeleteView(BaseDeleteView):
+    model = Training
+    template_name = 'dashboard/confirm_delete.html'
+    success_url = reverse_lazy('dashboard:training_list')
+
+
+# Training Request Views
+class TrainingRequestListView(BaseListView):
+    model = TrainingRequest
+    template_name = 'dashboard/training_request_list.html'
+    context_object_name = 'requests'
+
+    def get_queryset(self):
+        return TrainingRequest.objects.select_related('training').order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['pending_count'] = TrainingRequest.objects.filter(status='pending').count()
+        context['processing_count'] = TrainingRequest.objects.filter(status='processing').count()
+        context['completed_count'] = TrainingRequest.objects.filter(status='completed').count()
+        return context
+
+
+class TrainingRequestDetailView(AdminRequiredMixin, UpdateView):
+    model = TrainingRequest
+    template_name = 'dashboard/training_request_detail.html'
+    fields = ['status', 'notes']
+
+    def get_success_url(self):
+        return reverse_lazy('dashboard:training_request_detail', kwargs={'pk': self.object.pk})
+
     def form_valid(self, form):
         messages.success(self.request, 'Request updated successfully!')
         return super().form_valid(form)
@@ -1076,3 +1316,53 @@ When generating regular text content (not code):
     except Exception as e:
         logger.error(f"Unexpected error in generate_content_with_ai: {e}", exc_info=True)
         return JsonResponse({'success': False, 'error': f'Server error: {str(e)}'})
+
+
+# Bulk Delete View
+@require_POST
+@staff_member_required
+def bulk_delete(request):
+    """Bulk delete items based on model type and IDs"""
+    model_name = request.POST.get('model')
+    item_ids = request.POST.getlist('ids', [])
+    
+    if not model_name or not item_ids:
+        messages.error(request, 'No items selected for deletion.')
+        return redirect(request.META.get('HTTP_REFERER', '/dashboard/'))
+    
+    # Map model names to actual models
+    model_map = {
+        'post': Post,
+        'page': Page,
+        'category': Category,
+        'tag': Tag,
+        'product': Product,
+        'service': Service,
+        'training': Training,
+        'gallery': Gallery,
+        'testimonial': Testimonial,
+        'faq': FAQ,
+        'video': Video,
+        'download': Download,
+        'carousel': Carousel,
+        'menu': Menu,
+        'product_request': ProductRequest,
+        'service_request': ServiceRequest,
+        'training_request': TrainingRequest,
+        'consultation': Consultation,
+    }
+    
+    model_class = model_map.get(model_name)
+    if not model_class:
+        messages.error(request, 'Invalid model type.')
+        return redirect(request.META.get('HTTP_REFERER', '/dashboard/'))
+    
+    try:
+        queryset = model_class.objects.filter(pk__in=item_ids)
+        count = queryset.count()
+        queryset.delete()
+        messages.success(request, f'Successfully deleted {count} item(s).')
+    except Exception as e:
+        messages.error(request, f'Error deleting items: {str(e)}')
+    
+    return redirect(request.META.get('HTTP_REFERER', '/dashboard/'))

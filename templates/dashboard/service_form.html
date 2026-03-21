@@ -1,0 +1,228 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{% if object %}Edit Service{% else %}New Service{% endif %}{% endblock %}
+{% block page_title %}{% if object %}Edit Service{% else %}New Service{% endif %}{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ck-editor-container .ck-editor__editable {
+        min-height: 400px !important;
+    }
+
+    .image-preview {
+        aspect-ratio: 1;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="max-w-7xl mx-auto">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Basic Info -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Basic Information</h4>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Service Name <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="name" value="{{ form.name.value|default:'' }}" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-lg"
+                                   placeholder="Enter service name">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+                            <div class="flex items-center">
+                                <span class="px-3 py-2 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg text-gray-500 text-sm">/services/</span>
+                                <input type="text" name="slug" value="{{ form.slug.value|default:'' }}"
+                                       class="flex-1 px-4 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                                       placeholder="auto-generated-if-empty">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                            <div class="tinymce-wrapper">
+                                {{ form.description }}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Excerpt
+                            </label>
+                            <textarea name="excerpt" rows="3"
+                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                                      placeholder="Brief summary for listing pages (can be longer than short description)">{{ form.excerpt.value|default:'' }}</textarea>
+                            <p class="mt-1 text-xs text-gray-500">A short summary that will be displayed in service listing pages</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Publish Card -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Publish</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                                {% for value, label in form.fields.status.choices %}
+                                <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="flex items-center">
+                            <input type="checkbox" name="featured" id="id_featured" {% if form.featured.value %}checked{% endif %}
+                                   class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                            <label for="id_featured" class="ml-2 block text-sm text-gray-700">
+                                Featured Service
+                            </label>
+                        </div>
+
+                        <button type="submit" class="w-full px-4 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors">
+                            {% if object %}Update{% else %}Save{% endif %}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category & Order -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Organization</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                            <select name="category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                                {% for value, label in form.fields.category.choices %}
+                                <option value="{{ value }}" {% if form.category.value == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
+                            <input type="number" name="sort_order" value="{{ form.sort_order.value|default:0 }}" min="0"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                            <p class="text-xs text-gray-500 mt-1">Lower numbers appear first</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pricing -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Pricing</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Price (NPR)</label>
+                            <input type="number" name="price" value="{{ form.price.value|default:'' }}" step="0.01" min="0"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                                   placeholder="Starting price">
+                            <p class="text-xs text-gray-500 mt-1">Leave empty if not applicable</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Icon -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Icon</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Font Awesome Icon Class</label>
+                            <input type="text" name="icon" value="{{ form.icon.value|default:'' }}"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                                   placeholder="fas fa-concierge-bell">
+                            <p class="text-xs text-gray-500 mt-1">e.g., fas fa-concierge-bell (used if no image)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Image -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Service Image</h3>
+                    </div>
+                    <div class="p-6">
+                        <div id="image-preview" class="mb-4">
+                            {% if object and object.image %}
+                            <img src="{{ object.image.url }}" alt="Current image" class="image-preview w-full">
+                            {% else %}
+                            <div class="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+                                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <input type="file" name="image" id="service_image" accept="image/*"
+                               class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-red-700">
+                        <p class="text-xs text-gray-500 mt-2">Recommended: 800x800px, PNG or JPG</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Featured image preview
+document.getElementById('service_image')?.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('image-preview').innerHTML =
+                `<img src="${e.target.result}" class="image-preview w-full">`;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Auto-generate slug
+document.querySelector('input[name="name"]')?.addEventListener('blur', function() {
+    const slugField = document.querySelector('input[name="slug"]');
+    if (slugField && !slugField.value) {
+        const name = this.value;
+        const slug = name.toLowerCase()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .substring(0, 50);
+        slugField.value = slug;
+    }
+});
+
+// Close modal on outside click
+document.getElementById('image-modal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('image-modal')) {
+        closeModal();
+    }
+});
+</script>
+{% endblock %}

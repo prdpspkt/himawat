@@ -1,70 +1,110 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Products - {% if company_info %}{{ company_info.company_name }}{% else %}Thelix{% endif %}{% endblock %}
+{% block title %}Products - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <div class="text-center mb-12">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">Our Products</h1>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">Explore our range of Vastu products and remedies</p>
-    </div>
-    
-    <!-- Category Filter -->
-    <div class="flex flex-wrap justify-center gap-2 mb-8">
-        <a href="{% url 'pages:product_list' %}" class="px-4 py-2 rounded-full {% if not request.GET.category %}bg-primary text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
-            All
-        </a>
-        {% for key, label in categories.items %}
-        <a href="?category={{ key }}" class="px-4 py-2 rounded-full {% if request.GET.category == key %}bg-primary text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
-            {{ label }}
-        </a>
-        {% endfor %}
-    </div>
-    
-    <!-- Products Grid -->
-    {% if products %}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {% for product in products %}
-        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <a href="{{ product.get_absolute_url }}">
-                {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-56 object-cover">
-                {% else %}
-                <div class="w-full h-56 bg-gray-200 flex items-center justify-center">
-                    <span class="text-gray-400">No image</span>
-                </div>
-                {% endif %}
-            </a>
-            <div class="p-6">
-                <span class="text-xs font-semibold text-primary uppercase tracking-wide">{{ product.get_category_display }}</span>
-                <h2 class="text-xl font-bold text-gray-900 mt-2 mb-2">
-                    <a href="{{ product.get_absolute_url }}" class="hover:text-primary">{{ product.name }}</a>
-                </h2>
-                <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ product.description|striptags|truncatewords:15 }}</p>
-                <a href="{{ product.get_absolute_url }}" class="inline-flex items-center text-primary hover:text-red-700 font-medium">
-                    View Details
-                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                </a>
+<!-- Page Header -->
+<div class="border-top pt-5 pb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-5 fw-bold text-primary mb-4">Products and Remedies</h1>
+                <p class="fs-5 text-dim-grey-dark">Explore our range of Vastu products and remedies to fix Vastu-related problems</p>
             </div>
         </div>
-        {% endfor %}
     </div>
-    
-    {% if is_paginated %}
-    <div class="mt-12 flex justify-center space-x-2">
-        {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Previous</a>
-        {% endif %}
-        <span class="px-4 py-2 bg-primary text-white rounded-lg">{{ page_obj.number }}</span>
-        {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Next</a>
-        {% endif %}
-    </div>
-    {% endif %}
-    {% else %}
-    <div class="text-center py-12">
-        <p class="text-gray-500">No products found.</p>
-    </div>
-    {% endif %}
 </div>
+
+<!-- Category Filter -->
+<div class="py-4 border-top bg-off-white">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="{% url 'pages:product_list' %}" class="btn {% if not request.GET.category %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                All Products
+            </a>
+            {% for category in categories %}
+            <a href="?category={{ category.slug }}" class="btn {% if request.GET.category == category.slug %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                {{ category.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Products Grid -->
+{% if products %}
+<div class="py-12 border-top">
+    <div class="container">
+        <div class="row g-4">
+            {% for product in products %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 card-hover h-100" style="background: linear-gradient(135deg, rgba(218, 37, 28, 0.05) 0%, rgba(218, 37, 28, 0.02) 100%);">
+                    <!-- Product Image -->
+                    <a href="{{ product.get_absolute_url }}" class="text-decoration-none">
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top" style="height: 250px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 250px;">
+                            <i class="fas fa-box-open text-dim-grey" style="font-size: 4rem;"></i>
+                        </div>
+                        {% endif %}
+                    </a>
+
+                    <div class="card-body">
+                        {% if product.category %}
+                        <div class="small text-primary fw-bold text-uppercase mb-2" style="font-size: 11px; letter-spacing: 0.5px;">
+                            {{ product.category.name }}
+                        </div>
+                        {% endif %}
+                        <h5 class="fw-bold text-almost-black mb-3">
+                            <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-almost-black hover:text-primary">
+                                {{ product.name }}
+                            </a>
+                        </h5>
+                        <p class="text-dim-grey-dark small mb-4" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ product.description|striptags|truncatewords:15 }}
+                        </p>
+                        <a href="{{ product.get_absolute_url }}" class="btn btn-outline-primary btn-sm w-100 text-decoration-none">
+                            <i class="fas fa-eye me-2"></i>View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% if is_paginated %}
+<div class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-center gap-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" class="btn btn-outline-secondary">
+                <i class="fas fa-chevron-left me-1"></i>Previous
+            </a>
+            {% endif %}
+            <span class="btn btn-primary">{{ page_obj.number }}</span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" class="btn btn-outline-secondary">
+                Next<i class="fas fa-chevron-right ms-1"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% else %}
+<div class="py-16 border-top">
+    <div class="container text-center">
+        <i class="fas fa-box-open text-dim-grey mb-4" style="font-size: 4rem;"></i>
+        <p class="text-dim-grey fs-5">No products found in this category.</p>
+        <a href="{% url 'pages:product_list' %}" class="btn btn-primary mt-3">
+            <i class="fas fa-th-large me-2"></i>View All Products
+        </a>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

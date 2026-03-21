@@ -33,7 +33,7 @@
 </head>
 <body class="font-sans text-dark bg-off-white">
     <!-- Top Bar with Contact Info & Social Media -->
-    <div class="top-bar bg-off-white py-2 border-bottom">
+    <div class="top-bar bg-off-white border-bottom">
         <div class="container">
             <div class="d-flex align-items-center justify-content-between">
                 <!-- Contact Links -->
@@ -112,33 +112,14 @@
 
     <!-- Logo/Brand Section -->
     <div class="bg-off-white py-4">
-        <div class="container">
-            <div class="row align-items-center">
-                <!-- Logo -->
-                <div class="col-auto">
-                    <a href="{% url 'pages:home' %}" class="d-inline-block">
-                        {% if company_info and company_info.logo %}
-                        <img src="{{ company_info.logo.url }}" alt="{{ company_info.company_name }}" style="height: 70px; width: auto; object-fit: contain;" class="logo-hover">
-                        {% else %}
-                        <img src="{% static 'images/logo.jpg' %}" alt="Himwatkhanda Vastu" style="height: 70px; width: auto; object-fit: contain;" class="logo-hover">
-                        {% endif %}
-                    </a>
-                </div>
-
-                <!-- CTA Buttons -->
-                <div class="col-auto ms-auto">
-                    <div class="d-flex gap-2">
-                        {% if company_info and company_info.whatsapp %}
-                        <a href="https://wa.me/{{ company_info.whatsapp }}" target="_blank" class="btn btn-success btn-lg px-4 d-flex align-items-center gap-2">
-                            <span class="d-none d-sm-inline"><i class="fab fa-whatsapp me-1"></i>WhatsApp</span>
-                        </a>
-                        {% endif %}
-                        <a href="{% url 'pages:consultation' %}" class="btn btn-primary btn-lg px-4 d-flex align-items-center gap-2">
-                            <span class="d-none d-sm-inline"><i class="fas fa-globe me-1"></i>Consult</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
+        <div class="container text-center">
+            <a href="{% url 'pages:home' %}" class="d-inline-block">
+                {% if company_info and company_info.logo %}
+                <img src="{{ company_info.logo.url }}" alt="{{ company_info.company_name }}" style="height: 70px; width: auto; object-fit: contain;" class="logo-hover">
+                {% else %}
+                <img src="{% static 'images/logo.jpg' %}" alt="Himwatkhanda Vastu" style="height: 70px; width: auto; object-fit: contain;" class="logo-hover">
+                {% endif %}
+            </a>
         </div>
     </div>
 
@@ -153,7 +134,7 @@
 
                 <!-- Navigation Links -->
                 <div class="collapse navbar-collapse" id="mainNavbar">
-                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <!-- Services Dropdown -->
                         {% if service_categories %}
                         <li class="nav-item dropdown">
@@ -247,6 +228,18 @@
                             </li>
                         {% endfor %}
                     </ul>
+
+                    <!-- CTA Buttons -->
+                    <div class="d-flex gap-2 ms-lg-3 mb-2 mb-lg-0">
+                        {% if company_info and company_info.whatsapp %}
+                        <a href="https://wa.me/{{ company_info.whatsapp }}" target="_blank" class="btn btn-success btn-lg px-4 d-flex align-items-center gap-2">
+                            <span class="d-none d-sm-inline"><i class="fab fa-whatsapp me-1"></i>WhatsApp</span>
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'pages:consultation' %}" class="btn btn-primary btn-lg px-4 d-flex align-items-center gap-2">
+                            <span class="d-none d-sm-inline"><i class="fas fa-globe me-1"></i>Consult</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -299,13 +292,40 @@
 
                         <!-- CEO Contact -->
                         <div class="col-auto">
-                            <div class="d-flex flex-row gap-2">
-                                <a href="{% url 'pages:consultation' %}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-calendar-check me-1"></i>Consult
+                            <div class="d-flex flex-row gap-3 align-items-center">
+                                {% if ceo_info.email %}
+                                <a href="mailto:{{ ceo_info.email }}" class="text-primary hover:text-danger transition-colors" title="Email">
+                                    <i class="fas fa-envelope fa-lg"></i>
                                 </a>
-                                {% if ceo_info and ceo_info.phone %}
-                                <a href="https://wa.me/{{ ceo_info.phone|cut:'+' }}" target="_blank" class="btn btn-success btn-sm">
-                                    <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                                {% endif %}
+                                {% if ceo_info.phone %}
+                                <a href="tel:{{ ceo_info.phone|cut:'+' }}" class="text-primary hover:text-danger transition-colors" title="Phone">
+                                    <i class="fas fa-phone fa-lg"></i>
+                                </a>
+                                {% endif %}
+                                {% if company_info.facebook %}
+                                <a href="{{ company_info.facebook }}" target="_blank" class="text-primary hover:text-danger transition-colors" title="Facebook">
+                                    <i class="fab fa-facebook fa-lg"></i>
+                                </a>
+                                {% endif %}
+                                {% if company_info.instagram %}
+                                <a href="{{ company_info.instagram }}" target="_blank" class="text-primary hover:text-danger transition-colors" title="Instagram">
+                                    <i class="fab fa-instagram fa-lg"></i>
+                                </a>
+                                {% endif %}
+                                {% if company_info.twitter %}
+                                <a href="{{ company_info.twitter }}" target="_blank" class="text-primary hover:text-danger transition-colors" title="Twitter">
+                                    <i class="fab fa-twitter fa-lg"></i>
+                                </a>
+                                {% endif %}
+                                {% if company_info.linkedin %}
+                                <a href="{{ company_info.linkedin }}" target="_blank" class="text-primary hover:text-danger transition-colors" title="LinkedIn">
+                                    <i class="fab fa-linkedin fa-lg"></i>
+                                </a>
+                                {% endif %}
+                                {% if company_info.youtube %}
+                                <a href="{{ company_info.youtube }}" target="_blank" class="text-primary hover:text-danger transition-colors" title="YouTube">
+                                    <i class="fab fa-youtube fa-lg"></i>
                                 </a>
                                 {% endif %}
                             </div>

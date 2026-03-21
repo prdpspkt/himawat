@@ -1,68 +1,221 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}{{ product.name }} - {% if company_info %}{{ company_info.company_name }}{% else %}Thelix{% endif %}{% endblock %}
+{% block title %}{{ product.name }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="{{ product.description|striptags|truncatewords:30 }}">
+<meta property="og:title" content="{{ product.name }}">
+<meta property="og:description" content="{{ product.description|striptags|truncatewords:30 }}">
+<meta property="og:type" content="product">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% if product.image %}
+<meta property="og:image" content="{{ request.build_absolute_uri }}{{ product.image.url }}">
+{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ product.name }}">
+<meta name="twitter:description" content="{{ product.description|striptags|truncatewords:30 }}">
+{% if product.image %}
+<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ product.image.url }}">
+{% endif %}
+
+<!-- Schema.org Product Markup -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ product.name|escapejs }}",
+  {% if product.image %}
+  "image": [
+    "{{ request.build_absolute_uri }}{{ product.image.url }}"
+    {% if product.images.all %}
+    {% for img in product.images.all %}
+    ,"{{ request.build_absolute_uri }}{{ img.image.url }}"
+    {% endfor %}
+    {% endif %}
+  ],
+  {% endif %}
+  "description": "{{ product.description|striptags|escapejs }}",
+  "sku": "10 units",
+  "category": "{{ product.get_category_display }}",
+  {% if product.price %}
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ request.build_absolute_uri }}",
+    "priceCurrency": "NPR",
+    "price": "{{ product.price }}",
+    "priceValidUntil": "negotiable",
+    "availability": "https://schema.org/{% if product.status == 'active' %}InStock{% else %}OutOfStock{% endif %}",
+    "itemCondition": "https://schema.org/NewCondition"
+  },
+  {% endif %}
+  "brand": {
+    "@type": "Brand",
+    "name": "{% if company_info %}{{ company_info.company_name|escapejs }}{% else %}Himwatkhanda Vastu{% endif %}"
+  }
+  {% if company_info %}
+  ,"seller": {
+    "@type": "Organization",
+    "name": "{{ company_info.company_name|escapejs }}",
+    "url": "{{ request.build_absolute_uri }}"
+    {% if company_info.logo %}
+    ,"logo": "{{ request.build_absolute_uri }}{{ company_info.logo.url }}"
+    {% endif %}
+  }
+  {% endif %}
+}
+</script>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-12">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <!-- Product Images -->
-        <div>
-            <div class="mb-4">
-                {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-96 object-cover rounded-lg" id="main-image">
+<!-- Page Header -->
+<div class="border-top pt-5 pb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-5 fw-bold text-primary mb-4">{{ product.name }}</h1>
+                <p class="fs-5 text-dim-grey-dark">{{ product.get_category_display }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Product Detail -->
+<div class="py-12 border-top">
+    <div class="container">
+        <div class="row g-5">
+            <!-- Product Images -->
+            <div class="col-lg-6">
+                {% if product.image or product.images.all %}
+                <!-- Carousel -->
+                <div id="productCarousel" class="carousel slide rounded-3" data-bs-ride="carousel">
+                    <!-- Indicators -->
+                    <div class="carousel-indicators">
+                        {% if product.image %}
+                        <button type="button" data-bs-target="#productCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        {% endif %}
+                        {% for img in product.images.all %}
+                        <button type="button" data-bs-target="#productCarousel" data-bs-slide-to="{% if product.image %}{{ forloop.counter|add:1 }}{% else %}{{ forloop.counter0 }}{% endif %}" {% if forloop.first and not product.image %}class="active"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Slides -->
+                    <div class="carousel-inner">
+                        {% if product.image %}
+                        <div class="carousel-item active">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="d-block w-100" style="height: 450px; object-fit: cover;">
+                        </div>
+                        {% endif %}
+                        {% for img in product.images.all %}
+                        <div class="carousel-item {% if forloop.first and not product.image %}active{% endif %}">
+                            <img src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}" class="d-block w-100" style="height: 450px; object-fit: cover;">
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Controls -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+
+                <!-- Thumbnail Navigation -->
+                <div class="mt-3">
+                    <div class="row g-2">
+                        {% if product.image %}
+                        <div class="col-3">
+                            <button type="button" data-bs-target="#productCarousel" data-bs-slide-to="0" class="thumbnail-btn active p-0 border-2 border-primary rounded-3 overflow-hidden" style="height: 80px; cursor: pointer; transition: all 0.2s;">
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-100 h-100 object-cover">
+                            </button>
+                        </div>
+                        {% endif %}
+                        {% for img in product.images.all %}
+                        <div class="col-3">
+                            <button type="button" data-bs-target="#productCarousel" data-bs-slide-to="{% if product.image %}{{ forloop.counter|add:1 }}{% else %}{{ forloop.counter0 }}{% endif %}" class="thumbnail-btn p-0 border-2 border-silver rounded-3 overflow-hidden {% if forloop.first and not product.image %}border-primary{% else %}border-transparent{% endif %}" style="height: 80px; cursor: pointer; transition: all 0.2s;">
+                                <img src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}" class="w-100 h-100 object-cover">
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
                 {% else %}
-                <div class="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
-                    <span class="text-gray-400">No image</span>
+                <!-- No Image Placeholder -->
+                <div class="w-100 bg-light rounded-3 d-flex align-items-center justify-content-center" style="height: 450px;">
+                    <i class="fas fa-box-open text-dim-grey" style="font-size: 5rem;"></i>
                 </div>
                 {% endif %}
             </div>
-            {% if product.images.all %}
-            <div class="grid grid-cols-4 gap-2">
-                <div class="cursor-pointer border-2 border-primary rounded" onclick="changeImage('{{ product.image.url }}')">
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-20 object-cover rounded">
+
+            <!-- Product Info -->
+            <div class="col-lg-6">
+                <!-- Description -->
+                <div class="mb-5">
+                    <h3 class="h4 fw-bold text-almost-black mb-4">Description</h3>
+                    <div class="prose text-dim-grey-dark">
+                        {{ product.description|safe }}
+                    </div>
                 </div>
-                {% for img in product.images.all %}
-                <div class="cursor-pointer border-2 border-transparent hover:border-primary rounded" onclick="changeImage('{{ img.image.url }}')">
-                    <img src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}" class="w-full h-20 object-cover rounded">
+
+                <!-- Inquiry Button -->
+                <div class="card border-0 shadow-none bg-off-white" style="border-radius: 0;">
+                    <div class="card-body p-5 text-center">
+                        <h3 class="h4 fw-bold text-almost-black mb-3">Interested in this product?</h3>
+                        <p class="text-dim-grey-dark mb-4">Click the button below to send us an inquiry about this product.</p>
+                        <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#inquiryModal">
+                            <i class="fas fa-envelope me-2"></i>Make an Inquiry
+                        </button>
+                    </div>
                 </div>
-                {% endfor %}
             </div>
-            {% endif %}
         </div>
-        
-        <!-- Product Info -->
-        <div>
-            <span class="text-sm text-primary font-semibold uppercase tracking-wide">{{ product.get_category_display }}</span>
-            <h1 class="text-3xl font-bold text-gray-900 mt-2 mb-4">{{ product.name }}</h1>
-            
-            <div class="prose text-gray-600 mb-8">
-                {{ product.description|safe }}
+    </div>
+</div>
+
+<!-- Inquiry Modal -->
+<div class="modal fade" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-primary" id="inquiryModalLabel">
+                    <i class="fas fa-envelope me-2"></i>Product Inquiry
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            
-            <!-- Request Form -->
-            <div class="bg-gray-50 rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Request Information</h3>
-                <form method="post" action="{% url 'pages:product_request' product.slug %}">
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <p class="text-dim-grey-dark">You're inquiring about: <strong>{{ product.name }}</strong></p>
+                </div>
+                <form method="post" action="{% url 'pages:product_request' product.slug %}" id="inquiryForm">
                     {% csrf_token %}
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Your Name *</label>
-                            <input type="text" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-almost-black">Your Name *</label>
+                        <input type="text" name="name" required class="form-control" placeholder="Enter your name">
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-almost-black">Email Address *</label>
+                            <input type="email" name="email" required class="form-control" placeholder="your.email@example.com">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
-                            <input type="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-almost-black">Phone Number</label>
+                            <input type="tel" name="phone" class="form-control" placeholder="+977-XXXXXXXXXX">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                            <input type="tel" name="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Message *</label>
-                            <textarea name="message" rows="3" required placeholder="I'm interested in this product..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"></textarea>
-                        </div>
-                        <button type="submit" class="w-full px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-red-700 transition-colors">
-                            Send Request
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-almost-black">Message *</label>
+                        <textarea name="message" rows="4" required class="form-control" placeholder="I'm interested in this product. Please provide more information..."></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="fas fa-paper-plane me-2"></i>Send Inquiry
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            Cancel
                         </button>
                     </div>
                 </form>
@@ -70,12 +223,56 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 <script>
-function changeImage(src) {
-    document.getElementById('main-image').src = src;
-}
+document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.getElementById('productCarousel');
+    const thumbnails = document.querySelectorAll('.thumbnail-btn');
+
+    if (carousel && thumbnails.length > 0) {
+        // Update active thumbnail when carousel slides
+        carousel.addEventListener('slid.bs.carousel', function(event) {
+            // Remove active class from all thumbnails
+            thumbnails.forEach(thumb => {
+                thumb.classList.remove('border-primary');
+                thumb.classList.add('border-transparent');
+            });
+
+            // Add active class to current thumbnail
+            const activeIndex = event.to;
+            if (thumbnails[activeIndex]) {
+                thumbnails[activeIndex].classList.remove('border-transparent');
+                thumbnails[activeIndex].classList.add('border-primary');
+            }
+        });
+
+        // Handle thumbnail click - Bootstrap will handle the slide, we just need visual feedback
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('click', function() {
+                // Remove active class from all thumbnails
+                thumbnails.forEach(t => {
+                    t.classList.remove('border-primary');
+                    t.classList.add('border-transparent');
+                });
+
+                // Add active class to clicked thumbnail
+                this.classList.remove('border-transparent');
+                this.classList.add('border-primary');
+            });
+        });
+    }
+
+    // Handle form submission in modal
+    const inquiryForm = document.getElementById('inquiryForm');
+    if (inquiryForm) {
+        inquiryForm.addEventListener('submit', function() {
+            // Form will submit normally
+            // After successful submission, Django will redirect or show messages
+            // The modal will close automatically on page navigation
+        });
+    }
+});
 </script>
-{% endblock %}
 {% endblock %}

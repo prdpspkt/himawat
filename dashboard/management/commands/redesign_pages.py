@@ -363,7 +363,7 @@ class Command(BaseCommand):
 <section class="bg-gradient-to-br from-green-50 to-teal-50 py-16 px-4">
     <div class="max-w-4xl mx-auto text-center">
         <h1 class="text-5xl font-bold text-gray-900 mb-6">Contact Us</h1>
-        <p class="text-xl text-gray-600 mb-8">Get in touch for Vastu consultation, engineering design, or training courses. We're here to help!</p>
+        <p class="text-xl text-gray-600 mb-8">Get in touch for Vastu consultation, engineering design, or construction services. We're here to help!</p>
     </div>
 </section>
 
@@ -466,7 +466,6 @@ class Command(BaseCommand):
                                     <option value="vastu-consultation">Vastu Consultation</option>
                                     <option value="engineering-design">Engineering Design</option>
                                     <option value="construction">Construction Services</option>
-                                    <option value="training">Training Course</option>
                                     <option value="other">Other</option>
                                 </select>
                             </div>
@@ -501,7 +500,7 @@ class Command(BaseCommand):
 </section>
 ''',
                 'meta_title': 'Contact Us - Vastu & Engineering Services',
-                'meta_description': 'Contact us for Vastu consultation, engineering design, and training courses. Office hours and contact information.',
+                'meta_description': 'Contact us for Vastu consultation, engineering design, and construction services. Office hours and contact information.',
             },
         }
 

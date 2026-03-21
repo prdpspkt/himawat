@@ -48,7 +48,17 @@ urlpatterns = [
     path('products/create/', views.ProductCreateView.as_view(), name='product_create'),
     path('products/<int:pk>/edit/', views.ProductUpdateView.as_view(), name='product_edit'),
     path('products/<int:pk>/delete/', views.ProductDeleteView.as_view(), name='product_delete'),
-    
+
+    path('services/', views.ServiceListView.as_view(), name='service_list'),
+    path('services/create/', views.ServiceCreateView.as_view(), name='service_create'),
+    path('services/<int:pk>/edit/', views.ServiceUpdateView.as_view(), name='service_edit'),
+    path('services/<int:pk>/delete/', views.ServiceDeleteView.as_view(), name='service_delete'),
+
+    path('trainings/', views.TrainingListView.as_view(), name='training_list'),
+    path('trainings/create/', views.TrainingCreateView.as_view(), name='training_create'),
+    path('trainings/<int:pk>/edit/', views.TrainingUpdateView.as_view(), name='training_edit'),
+    path('trainings/<int:pk>/delete/', views.TrainingDeleteView.as_view(), name='training_delete'),
+
     path('carousels/', views.CarouselListView.as_view(), name='carousel_list'),
     path('carousels/create/', views.CarouselCreateView.as_view(), name='carousel_create'),
     path('carousels/<int:pk>/edit/', views.CarouselUpdateView.as_view(), name='carousel_edit'),
@@ -79,7 +89,14 @@ urlpatterns = [
     path('api/gallery/images/<int:pk>/delete/', views.gallery_image_delete, name='gallery_image_delete'),
     path('api/gallery/images/<int:pk>/', views.gallery_image_detail, name='gallery_image_detail'),
     path('api/gallery/images/<int:pk>/update/', views.gallery_image_update, name='gallery_image_update'),
-    
+
+    # Product Image API
+    path('api/product/images/upload/', views.product_image_upload, name='product_image_upload'),
+    path('api/product/images/reorder/', views.product_image_reorder, name='product_image_reorder'),
+    path('api/product/images/<int:pk>/delete/', views.product_image_delete, name='product_image_delete'),
+    path('api/product/images/<int:pk>/', views.product_image_detail, name='product_image_detail'),
+    path('api/product/images/<int:pk>/update/', views.product_image_update, name='product_image_update'),
+
     # Category and Tag AJAX API
     path('api/categories/create/', views.category_create_ajax, name='category_create_ajax'),
     path('api/tags/create/', views.tag_create_ajax, name='tag_create_ajax'),
@@ -87,6 +104,12 @@ urlpatterns = [
     # Requests & Consultations
     path('product-requests/', views.ProductRequestListView.as_view(), name='product_request_list'),
     path('product-requests/<int:pk>/', views.ProductRequestDetailView.as_view(), name='product_request_detail'),
+
+    path('service-requests/', views.ServiceRequestListView.as_view(), name='service_request_list'),
+    path('service-requests/<int:pk>/', views.ServiceRequestDetailView.as_view(), name='service_request_detail'),
+
+    path('training-requests/', views.TrainingRequestListView.as_view(), name='training_request_list'),
+    path('training-requests/<int:pk>/', views.TrainingRequestDetailView.as_view(), name='training_request_detail'),
 
     path('consultations/', views.ConsultationListView.as_view(), name='consultation_list'),
     path('consultations/<int:pk>/', views.ConsultationDetailView.as_view(), name='consultation_detail'),
@@ -119,4 +142,7 @@ urlpatterns = [
 
     # Media Upload API
     path('api/media/upload/', media_views.media_upload, name='media_upload'),
+
+    # Bulk Actions
+    path('api/bulk-delete/', views.bulk_delete, name='bulk_delete'),
 ]

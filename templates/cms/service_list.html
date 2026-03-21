@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Services - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="border-top pt-5 pb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-5 fw-bold text-primary mb-4">Our Services</h1>
+                <p class="fs-5 text-dim-grey-dark">Explore our comprehensive range of professional services designed to meet your needs</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Category Filter -->
+<div class="py-4 border-top bg-off-white">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="{% url 'pages:service_list' %}" class="btn {% if not request.GET.category %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                All Services
+            </a>
+            {% for category in categories %}
+            <a href="?category={{ category.slug }}" class="btn {% if request.GET.category == category.slug %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                {{ category.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Services Grid -->
+{% if services %}
+<div class="py-12 border-top">
+    <div class="container">
+        <div class="row g-4">
+            {% for service in services %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 card-hover h-100" style="background: linear-gradient(135deg, rgba(218, 37, 28, 0.05) 0%, rgba(0, 109, 50, 0.05) 100%);">
+                    <!-- Service Image -->
+                    <a href="{{ service.get_absolute_url }}" class="text-decoration-none">
+                        {% if service.image %}
+                        <img src="{{ service.image.url }}" alt="{{ service.name }}" class="card-img-top" style="height: 250px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 250px;">
+                            {% if service.icon %}
+                            <i class="{{ service.icon }} text-primary" style="font-size: 4rem;"></i>
+                            {% else %}
+                            <i class="fas fa-concierge-bell text-primary" style="font-size: 4rem;"></i>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </a>
+
+                    <div class="card-body">
+                        {% if service.category %}
+                        <div class="small text-primary fw-bold text-uppercase mb-2" style="font-size: 11px; letter-spacing: 0.5px;">
+                            {{ service.category.name }}
+                        </div>
+                        {% endif %}
+                        <h5 class="fw-bold text-almost-black mb-3">
+                            <a href="{{ service.get_absolute_url }}" class="text-decoration-none text-almost-black hover:text-primary">
+                                {{ service.name }}
+                            </a>
+                        </h5>
+                        {% if service.price %}
+                        <p class="text-primary fw-bold mb-3">
+                            <i class="fas fa-tag me-1"></i>Starting from NPR {{ service.price }}
+                        </p>
+                        {% endif %}
+                        <p class="text-dim-grey-dark small mb-4" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ service.description|striptags|truncatewords:15 }}
+                        </p>
+                        <a href="{{ service.get_absolute_url }}" class="btn btn-outline-primary btn-sm w-100 text-decoration-none">
+                            <i class="fas fa-eye me-2"></i>View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% if is_paginated %}
+<div class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-center gap-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" class="btn btn-outline-secondary text-decoration-none">
+                <i class="fas fa-chevron-left me-1"></i>Previous
+            </a>
+            {% endif %}
+            <span class="btn btn-primary">{{ page_obj.number }}</span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" class="btn btn-outline-secondary text-decoration-none">
+                Next<i class="fas fa-chevron-right ms-1"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% else %}
+<div class="py-16 border-top">
+    <div class="container text-center">
+        <i class="fas fa-concierge-bell text-dim-grey mb-4" style="font-size: 4rem;"></i>
+        <p class="text-dim-grey fs-5">No services found in this category.</p>
+        <a href="{% url 'pages:service_list' %}" class="btn btn-primary mt-3">
+            <i class="fas fa-th-large me-2"></i>View All Services
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

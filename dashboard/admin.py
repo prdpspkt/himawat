@@ -6,7 +6,8 @@ from dashboard.models import (
     Category, Tag, Post, Page, Download, Gallery, GalleryImage,
     Testimonial, Carousel, FAQ, Product, ProductImage,
     ProductRequest, ProductRequestItem, Consultation, ConsultationFile,
-    Menu, MenuItem, CompanyInfo, CEOInfo, PageRevision, PostRevision, AIConfiguration
+    Menu, MenuItem, CompanyInfo, CEOInfo, PageRevision, PostRevision, AIConfiguration,
+    Service, ServiceRequest, Training, TrainingRequest
 )
 from dashboard.forms import PageForm, PostForm, FAQForm, ProductForm
 
@@ -286,6 +287,76 @@ class ProductRequestItemAdmin(BaseAdmin):
     list_display = ['request', 'product', 'quantity', 'created_at']
     list_filter = ['created_at']
     autocomplete_fields = ['request', 'product']
+
+
+# ===== SERVICE ADMIN =====
+
+@admin.register(Service)
+class ServiceAdmin(BaseAdmin):
+    list_display = ['name', 'category', 'price', 'featured', 'status', 'sort_order', 'image_preview']
+    list_filter = ['category', 'status', 'featured', 'created_at']
+    search_fields = ['name', 'description']
+    prepopulated_fields = {'slug': ('name',)}
+    list_editable = ['category', 'featured', 'status', 'sort_order']
+
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="max-height: 50px; max-width: 100px;" />', obj.image.url)
+        return '-'
+    image_preview.short_description = 'Image'
+
+
+@admin.register(ServiceRequest)
+class ServiceRequestAdmin(BaseAdmin):
+    list_display = ['id', 'service', 'name', 'email', 'status', 'created_at']
+    list_filter = ['status', 'service', 'created_at']
+    search_fields = ['name', 'email', 'message']
+    list_editable = ['status']
+    readonly_fields = ['created_at']
+
+    fieldsets = (
+        ('Request Info', {
+            'fields': ('service', 'name', 'email', 'phone', 'message', 'created_at')
+        }),
+        ('Admin', {
+            'fields': ('status', 'notes')
+        }),
+    )
+
+
+# ===== TRAINING ADMIN =====
+
+@admin.register(Training)
+class TrainingAdmin(BaseAdmin):
+    list_display = ['name', 'category', 'duration', 'price', 'featured', 'status', 'sort_order', 'image_preview']
+    list_filter = ['category', 'status', 'featured', 'created_at']
+    search_fields = ['name', 'description']
+    prepopulated_fields = {'slug': ('name',)}
+    list_editable = ['category', 'featured', 'status', 'sort_order']
+
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="max-height: 50px; max-width: 100px;" />', obj.image.url)
+        return '-'
+    image_preview.short_description = 'Image'
+
+
+@admin.register(TrainingRequest)
+class TrainingRequestAdmin(BaseAdmin):
+    list_display = ['id', 'training', 'name', 'email', 'status', 'created_at']
+    list_filter = ['status', 'training', 'created_at']
+    search_fields = ['name', 'email', 'message']
+    list_editable = ['status']
+    readonly_fields = ['created_at']
+
+    fieldsets = (
+        ('Request Info', {
+            'fields': ('training', 'name', 'email', 'phone', 'message', 'created_at')
+        }),
+        ('Admin', {
+            'fields': ('status', 'notes')
+        }),
+    )
 
 
 class ConsultationFileInline(admin.TabularInline):

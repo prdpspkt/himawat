@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ service.name }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="{{ service.description|striptags|truncatewords:30 }}">
+<meta property="og:title" content="{{ service.name }}">
+<meta property="og:description" content="{{ service.description|striptags|truncatewords:30 }}">
+<meta property="og:type" content="service">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% if service.image %}
+<meta property="og:image" content="{{ request.build_absolute_uri }}{{ service.image.url }}">
+{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ service.name }}">
+<meta name="twitter:description" content="{{ service.description|striptags|truncatewords:30 }}">
+{% if service.image %}
+<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ service.image.url }}">
+{% endif %}
+
+<!-- Schema.org Service Markup -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Service",
+  "name": "{{ service.name|escapejs }}",
+  {% if service.image %}
+  "image": "{{ request.build_absolute_uri }}{{ service.image.url }}",
+  {% endif %}
+  "description": "{{ service.description|striptags|escapejs }}",
+  "category": "{{ service.get_category_display }}",
+  {% if service.price %}
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ request.build_absolute_uri }}",
+    "priceCurrency": "NPR",
+    "price": "{{ service.price }}",
+    "priceValidUntil": "negotiable",
+    "availability": "https://schema.org/{% if service.status == 'active' %}InStock{% else %}OutOfStock{% endif %}"
+  },
+  {% endif %}
+  "provider": {
+    "@type": "Organization",
+    "name": "{% if company_info %}{{ company_info.company_name|escapejs }}{% else %}Himwatkhanda Vastu{% endif %}",
+    "url": "{{ request.build_absolute_uri }}"
+    {% if company_info.logo %},
+    "logo": "{{ request.build_absolute_uri }}{{ company_info.logo.url }}"
+    {% endif %}
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="border-top pt-5 pb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                {% if service.icon %}
+                <div class="mb-3">
+                    <i class="{{ service.icon }} text-primary" style="font-size: 4rem;"></i>
+                </div>
+                {% endif %}
+                <h1 class="display-5 fw-bold text-primary mb-4">{{ service.name }}</h1>
+                <p class="fs-5 text-success">{{ service.get_category_display }}</p>
+                <p class="fs-5 text-dim-grey-dark">{{ service.excerpt }}</p>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Service Detail -->
+<div class="py-12 border-top">
+    <div class="container">
+        <!-- Service Images - Full Width -->
+        <div class="row g-5 mb-5">
+            <div class="col-12">
+                {% if service.image %}
+                <!-- Service Image -->
+                <div class="rounded-3 overflow-hidden">
+                    <img src="{{ service.image.url }}" alt="{{ service.name }}" class="d-block w-100"
+                         style="height: 450px; object-fit: cover;">
+                </div>
+                {% else %}
+                <!-- No Image Placeholder -->
+                <div class="w-100 bg-light rounded-3 d-flex align-items-center justify-content-center"
+                     style="height: 450px;">
+                    {% if service.icon %}
+                    <i class="{{ service.icon }} text-primary" style="font-size: 5rem;"></i>
+                    {% else %}
+                    <i class="fas fa-concierge-bell text-primary" style="font-size: 5rem;"></i>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-12">
+                <!-- Price -->
+                {% if service.price %}
+                <div class="mb-4">
+                    <div class="alert alert-primary border-0" style="background: var(--primary-scarlet-light);">
+                        <h3 class="h4 fw-bold text-primary mb-0">
+                            <i class="fas fa-tag me-2"></i>Starting from NPR {{ service.price }}
+                        </h3>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Description -->
+                <div class="mb-5 border-top">
+                    <h3 class="h1 pt-3 text-center fw-bold text-almost-black mb-4">Service Overview</h3>
+                    <p class="text-dim-grey-dark text-bold">
+                        {{ service.description|safe }}
+                    </p>
+                </div>
+
+                <!-- Inquiry Button -->
+                <div class="col-12 border-top">
+                    <div class="card border-0 shadow-none bg-off-white" style="border-radius: 0;">
+                        <div class="card-body p-5 text-center">
+                            <h3 class="h4 fw-bold text-almost-black mb-3">Interested in this service?</h3>
+                            <p class="text-dim-grey-dark mb-4">Click the button below to send us an inquiry about this
+                                service.</p>
+                            <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal"
+                                    data-bs-target="#inquiryModal">
+                                <i class="fas fa-envelope me-2"></i>Make an Inquiry
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inquiry Modal -->
+    <div class="modal fade" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-primary" id="inquiryModalLabel">
+                        <i class="fas fa-envelope me-2"></i>Service Inquiry
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <p class="text-dim-grey-dark">You're inquiring about: <strong>{{ service.name }}</strong></p>
+                    </div>
+                    <form method="post" action="{% url 'pages:service_request' service.slug %}" id="inquiryForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-almost-black">Your Name *</label>
+                            <input type="text" name="name" required class="form-control" placeholder="Enter your name">
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-almost-black">Email Address *</label>
+                                <input type="email" name="email" required class="form-control"
+                                       placeholder="your.email@example.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-almost-black">Phone Number</label>
+                                <input type="tel" name="phone" class="form-control" placeholder="+977-XXXXXXXXXX">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-almost-black">Message *</label>
+                            <textarea name="message" rows="4" required class="form-control"
+                                      placeholder="I'm interested in this service. Please provide more information..."></textarea>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-fill">
+                                <i class="fas fa-paper-plane me-2"></i>Send Inquiry
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+
+    {% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle form submission in modal
+            const inquiryForm = document.getElementById('inquiryForm');
+            if (inquiryForm) {
+                inquiryForm.addEventListener('submit', function() {
+                    // Form will submit normally
+                    // After successful submission, Django will redirect or show messages
+                    // The modal will close automatically on page navigation
+                });
+            }
+        });
+    </script>
+    {% endblock %}

@@ -10,7 +10,8 @@ from django.utils import timezone
 
 from dashboard.models import (
     Post, Page, Category, Tag, Download, Gallery,
-    Testimonial, Carousel, FAQ, Product, ProductRequest, Consultation, Video
+    Testimonial, Carousel, FAQ, Product, ProductRequest, Consultation, Video,
+    Service, ServiceRequest, Training, TrainingRequest
 )
 
 
@@ -157,7 +158,7 @@ class CategoryDetailView(DetailView):
         return [obj.get_template()]
 
     def get_queryset(self):
-        return Category.objects.filter(status='active').prefetch_related('posts__author')
+        return Category.objects.filter(status='active').prefetch_related('posts__author', 'pages', 'services', 'trainings')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -169,6 +170,24 @@ class CategoryDetailView(DetailView):
             status='published',
             published_at__lte=timezone.now()
         ).select_related('author').order_by('-published_at')
+
+        # Get pages in this category
+        context['pages'] = Page.objects.filter(
+            category=category,
+            status='active'
+        ).order_by('order', 'title')
+
+        # Get services in this category
+        context['services'] = Service.objects.filter(
+            category=category,
+            status='active'
+        ).order_by('-featured', 'sort_order', 'name')
+
+        # Get trainings in this category
+        context['trainings'] = Training.objects.filter(
+            category=category,
+            status='active'
+        ).order_by('-featured', 'sort_order', 'name')
 
         # Get child categories if any
         context['child_categories'] = Category.objects.filter(
@@ -325,19 +344,25 @@ class ProductListView(ListView):
     template_name = 'cms/product_list.html'
     context_object_name = 'products'
     paginate_by = 12
-    
+
     def get_queryset(self):
-        queryset = Product.objects.filter(status='active')
-        
-        category = self.request.GET.get('category')
-        if category:
-            queryset = queryset.filter(category=category)
-        
+        queryset = Product.objects.filter(status='active').select_related('category')
+
+        category_slug = self.request.GET.get('category')
+        if category_slug:
+            queryset = queryset.filter(category__slug=category_slug)
+
         return queryset.order_by('-featured', 'sort_order')
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['categories'] = dict(Product.CATEGORY_CHOICES)
+        # Get only categories that have active products
+        from dashboard.models import Category
+        active_categories = Category.objects.filter(
+            products__status='active',
+            status='active'
+        ).distinct().order_by('sort_order', 'name')
+        context['categories'] = active_categories
         return context
 
 
@@ -420,6 +445,72 @@ class ConsultationView(TemplateView):
     template_name = 'cms/consultation.html'
 
 
+# ===== SERVICE VIEWS =====
+
+class ServiceListView(ListView):
+    """Service list view"""
+    model = Service
+    template_name = 'cms/service_list.html'
+    context_object_name = 'services'
+    paginate_by = 12
+
+    def get_queryset(self):
+        queryset = Service.objects.filter(status='active').select_related('category')
+
+        category_slug = self.request.GET.get('category')
+        if category_slug:
+            queryset = queryset.filter(category__slug=category_slug)
+
+        return queryset.order_by('-featured', 'sort_order')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Get only categories that have active services
+        from dashboard.models import Category
+        active_categories = Category.objects.filter(
+            services__status='active',
+            status='active'
+        ).distinct().order_by('sort_order', 'name')
+        context['categories'] = active_categories
+        return context
+
+
+class ServiceDetailView(DetailView):
+    """Service detail view"""
+    model = Service
+    template_name = 'cms/service_detail.html'
+    context_object_name = 'service'
+    slug_url_kwarg = 'slug'
+
+    def get_queryset(self):
+        return Service.objects.filter(status='active')
+
+
+@require_POST
+def service_request(request, slug):
+    """Handle service request form"""
+    service = get_object_or_404(Service, slug=slug, status='active')
+
+    name = request.POST.get('name')
+    email = request.POST.get('email')
+    phone = request.POST.get('phone', '')
+    message = request.POST.get('message')
+
+    if name and email and message:
+        ServiceRequest.objects.create(
+            service=service,
+            name=name,
+            email=email,
+            phone=phone,
+            message=message
+        )
+        messages.success(request, 'Your request has been submitted. We will contact you soon!')
+    else:
+        messages.error(request, 'Please fill in all required fields.')
+
+    return redirect('pages:service_detail', slug=slug)
+
+
 class VideoListView(ListView):
     """Video list view"""
     model = Video
@@ -443,6 +534,72 @@ class VideoDetailView(DetailView):
     
     def get_queryset(self):
         return Video.objects.filter(status='published')
+
+
+# ===== TRAINING VIEWS =====
+
+class TrainingListView(ListView):
+    """Training list view"""
+    model = Training
+    template_name = 'cms/training_list.html'
+    context_object_name = 'trainings'
+    paginate_by = 12
+
+    def get_queryset(self):
+        queryset = Training.objects.filter(status='active').select_related('category')
+
+        category_slug = self.request.GET.get('category')
+        if category_slug:
+            queryset = queryset.filter(category__slug=category_slug)
+
+        return queryset.order_by('-featured', 'sort_order')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Get only categories that have active trainings
+        from dashboard.models import Category
+        active_categories = Category.objects.filter(
+            trainings__status='active',
+            status='active'
+        ).distinct().order_by('sort_order', 'name')
+        context['categories'] = active_categories
+        return context
+
+
+class TrainingDetailView(DetailView):
+    """Training detail view"""
+    model = Training
+    template_name = 'cms/training_detail.html'
+    context_object_name = 'training'
+    slug_url_kwarg = 'slug'
+
+    def get_queryset(self):
+        return Training.objects.filter(status='active')
+
+
+@require_POST
+def training_request(request, slug):
+    """Handle training request form"""
+    training = get_object_or_404(Training, slug=slug, status='active')
+
+    name = request.POST.get('name')
+    email = request.POST.get('email')
+    phone = request.POST.get('phone', '')
+    message = request.POST.get('message')
+
+    if name and email and message:
+        TrainingRequest.objects.create(
+            training=training,
+            name=name,
+            email=email,
+            phone=phone,
+            message=message
+        )
+        messages.success(request, 'Your request has been submitted. We will contact you soon!')
+    else:
+        messages.error(request, 'Please fill in all required fields.')
+
+    return redirect('pages:training_detail', slug=slug)
 
 
 def search(request):

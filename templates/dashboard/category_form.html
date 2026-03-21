@@ -66,6 +66,21 @@
                     {% endfor %}
                 </select>
             </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Applies To (Content Types)</label>
+                <div class="space-y-2">
+                    {% for ct in form.applies_to.field.queryset %}
+                    <label class="flex items-center">
+                        <input type="checkbox" name="applies_to" value="{{ ct.pk }}"
+                               class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                               {% if ct.pk in form.applies_to.value %}checked{% endif %}>
+                        <span class="ml-2 text-sm text-gray-700 capitalize">{{ ct.model|title }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Select which content types this category applies to</p>
+            </div>
         </div>
         
         <div class="mt-8 flex space-x-4">

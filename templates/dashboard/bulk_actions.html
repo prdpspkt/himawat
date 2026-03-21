@@ -1,0 +1,119 @@
+{# Bulk Actions Snippet #}
+{# Usage: {% include 'dashboard/bulk_actions.html' with model_name='post' %} #}
+
+<div class="mb-4 bg-white rounded-lg shadow p-4">
+    <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center">
+                <input type="checkbox" id="select-all" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                       onchange="toggleAllCheckboxes(this)">
+                <label for="select-all" class="ml-2 text-sm text-gray-700">Select All</label>
+            </div>
+            <span id="selected-count" class="text-sm text-gray-500">0 selected</span>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <select id="bulk-action" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm" disabled>
+                <option value="">Bulk Actions</option>
+                <option value="delete">Delete Selected</option>
+            </select>
+
+            <button type="button" id="apply-bulk-action" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                Apply
+            </button>
+        </div>
+    </div>
+</div>
+
+<form id="bulk-action-form" method="post" action="{% url 'dashboard:bulk_delete' %}" style="display: none;">
+    {% csrf_token %}
+    <input type="hidden" name="model" value="{{ model_name }}">
+    <div id="selected-ids"></div>
+</form>
+
+<script>
+(function() {
+    let selectedCount = 0;
+    const selectAllCheckbox = document.getElementById('select-all');
+    const selectedCountSpan = document.getElementById('selected-count');
+    const bulkActionSelect = document.getElementById('bulk-action');
+    const applyButton = document.getElementById('apply-bulk-action');
+    const bulkActionForm = document.getElementById('bulk-action-form');
+    const selectedIdsContainer = document.getElementById('selected-ids');
+
+    // Track individual checkboxes
+    function updateSelectedCount() {
+        const checkboxes = document.querySelectorAll('.item-checkbox:checked');
+        selectedCount = checkboxes.length;
+        selectedCountSpan.textContent = `${selectedCount} selected`;
+
+        // Update select all checkbox state
+        const allCheckboxes = document.querySelectorAll('.item-checkbox');
+        if (allCheckboxes.length > 0 && selectedCount === allCheckboxes.length) {
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+        } else if (selectedCount > 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = true;
+        } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+
+        // Enable/disable bulk action controls
+        bulkActionSelect.disabled = selectedCount === 0;
+        applyButton.disabled = selectedCount === 0;
+    }
+
+    // Expose toggleAllCheckboxes function globally
+    window.toggleAllCheckboxes = function(checkbox) {
+        const checkboxes = document.querySelectorAll('.item-checkbox');
+        checkboxes.forEach(cb => {
+            cb.checked = checkbox.checked;
+        });
+        updateSelectedCount();
+    };
+
+    // Add event listeners to all item checkboxes
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.item-checkbox');
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateSelectedCount);
+        });
+    });
+
+    // Handle bulk action application
+    applyButton.addEventListener('click', function() {
+        const action = bulkActionSelect.value;
+        if (!action) {
+            alert('Please select an action');
+            return;
+        }
+
+        if (action === 'delete') {
+            if (selectedCount === 0) {
+                alert('No items selected');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to delete ${selectedCount} item(s)?`)) {
+                return;
+            }
+
+            // Collect all selected IDs
+            const checkboxes = document.querySelectorAll('.item-checkbox:checked');
+            selectedIdsContainer.innerHTML = '';
+            checkboxes.forEach(cb => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'ids';
+                input.value = cb.value;
+                selectedIdsContainer.appendChild(input);
+            });
+
+            // Submit form
+            bulkActionForm.submit();
+        }
+    });
+})();
+</script>
