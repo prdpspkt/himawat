@@ -863,10 +863,11 @@ class CompanyInfoUpdateView(AdminRequiredMixin, UpdateView):
     model = CompanyInfo
     template_name = 'dashboard/company_info_form.html'
     fields = [
-        'company_name', 'description', 'logo', 'favicon', 'email', 'phone', 
-        'address', 'city', 'state', 'postal_code', 'country', 
+        'company_name', 'description', 'logo', 'favicon', 'email', 'phone',
+        'address', 'city', 'state', 'postal_code', 'country',
         'latitude', 'longitude',
-        'facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'whatsapp'
+        'facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'whatsapp',
+        'anthem'
     ]
     success_url = reverse_lazy('dashboard:company_info')
     

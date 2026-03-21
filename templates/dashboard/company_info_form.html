@@ -144,6 +144,19 @@
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
                     <p class="text-xs text-gray-500 mt-1">Include country code, e.g., 97798XXXXXXXX</p>
                 </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-900 mb-1">VASTU ANTHEM (MP3)</label>
+                    {% if object and object.anthem %}
+                    <div class="flex items-center gap-2 mb-2">
+                        <audio controls src="{{ object.anthem.url }}" class="h-8" style="width: 200px;"></audio>
+                        <span class="text-xs text-gray-500">Current file</span>
+                    </div>
+                    {% endif %}
+                    <input type="file" name="anthem" accept="audio/mp3,audio/mpeg"
+                           class="w-full text-sm text-gray-500">
+                    <p class="text-xs text-gray-500 mt-1">Upload MP3 file (max 10MB recommended)</p>
+                </div>
             </div>
         </div>
         

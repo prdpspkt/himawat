@@ -508,6 +508,9 @@ class CompanyInfoAdmin(admin.ModelAdmin):
         ('Social Media', {
             'fields': ('facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'whatsapp')
         }),
+        ('Company Anthem', {
+            'fields': ('anthem',)
+        }),
     )
 
     def has_add_permission(self, request):

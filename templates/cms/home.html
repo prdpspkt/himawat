@@ -82,21 +82,6 @@
                         {% else %}
                         <p class="text-dim-grey-dark small mb-4">Vedic Architecture, Vastu Shastra, Sustainable Design, Environmental Planning</p>
                         {% endif %}
-
-                        {% if company_info and company_info.whatsapp or company_info.facebook %}
-                        <div class="d-flex justify-center gap-3 pt-3 border-top">
-                            {% if company_info and company_info.whatsapp %}
-                            <a href="https://wa.me/{{ company_info.whatsapp }}" target="_blank" rel="noopener noreferrer" class="btn  btn-sm rounded-circle" style="width: 60px; height: 60px; padding: 0;">
-                                <i class="fab fa-whatsapp"></i>
-                            </a>
-                            {% endif %}
-                            {% if company_info and company_info.facebook %}
-                            <a href="{{ company_info.facebook }}" target="_blank" rel="noopener noreferrer" class="btn  btn-sm rounded-circle" style="width: 60px; height: 60px; padding: 0;">
-                                <i class="fab fa-facebook-f"></i>
-                            </a>
-                            {% endif %}
-                        </div>
-                        {% endif %}
                     </div>
                 </div>
             </div>

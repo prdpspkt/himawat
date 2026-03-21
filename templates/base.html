@@ -66,28 +66,6 @@
 
                     <!-- Right side: Permanent links -->
                     <div class="d-flex align-items-center gap-3">
-                        <div class="d-flex align-items-center gap-2">
-                            {% if company_info and company_info.facebook %}
-                            <a href="{{ company_info.facebook }}" target="_blank" class="top-nav-link" title="Facebook" aria-label="Facebook">
-                                <i class="fab fa-facebook-f"></i>
-                            </a>
-                            {% endif %}
-                            {% if company_info and company_info.instagram %}
-                            <a href="{{ company_info.instagram }}" target="_blank" class="top-nav-link" title="Instagram" aria-label="Instagram">
-                                <i class="fab fa-instagram"></i>
-                            </a>
-                            {% endif %}
-                            {% if company_info and company_info.twitter %}
-                            <a href="{{ company_info.twitter }}" target="_blank" class="top-nav-link" title="Twitter" aria-label="Twitter">
-                                <i class="fab fa-twitter"></i>
-                            </a>
-                            {% endif %}
-                            {% if company_info and company_info.linkedin %}
-                            <a href="{{ company_info.linkedin }}" target="_blank" class="top-nav-link" title="LinkedIn" aria-label="LinkedIn">
-                                <i class="fab fa-linkedin-in"></i>
-                            </a>
-                            {% endif %}
-                        </div>
                         <!-- Auth Section -->
                         {% if user.is_authenticated %}
                             <div class="d-flex align-items-center gap-3">
@@ -120,6 +98,20 @@
                 <img src="{% static 'images/logo.jpg' %}" alt="Himwatkhanda Vastu" style="height: 70px; width: auto; object-fit: contain;" class="logo-hover">
                 {% endif %}
             </a>
+
+            <!-- Company Anthem Audio Player -->
+            {% if company_info and company_info.anthem %}
+            <div class="d-inline-flex align-items-center gap-2 ms-3">
+                <audio id="companyAnthem" preload="auto">
+                    <source src="{{ company_info.anthem.url }}" type="audio/mpeg">
+                </audio>
+                <button id="playAnthemBtn" onclick="toggleAnthem()" class="btn btn-outline-primary btn-sm rounded-circle" style="width: 40px; height: 40px; padding: 0;" title="Play Vastu Anthem">
+                    <i class="fas fa-play" id="playIcon" style="font-size: 14px;"></i>
+                    <i class="fas fa-pause d-none" id="pauseIcon" style="font-size: 14px;"></i>
+                </button>
+                <span class="small fw-bold text-dim-grey d-none d-sm-inline">VASTU ANTHEM</span>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -229,21 +221,72 @@
                         {% endfor %}
                     </ul>
 
-                    <!-- CTA Buttons -->
-                    <div class="d-flex gap-2 ms-lg-3 mb-2 mb-lg-0">
-                        {% if company_info and company_info.whatsapp %}
-                        <a href="https://wa.me/{{ company_info.whatsapp }}" target="_blank" class="btn btn-success btn-lg px-4 d-flex align-items-center gap-2">
-                            <span class="d-none d-sm-inline"><i class="fab fa-whatsapp me-1"></i>WhatsApp</span>
-                        </a>
-                        {% endif %}
-                        <a href="{% url 'pages:consultation' %}" class="btn btn-primary btn-lg px-4 d-flex align-items-center gap-2">
-                            <span class="d-none d-sm-inline"><i class="fas fa-globe me-1"></i>Consult</span>
+                    <!-- Appointment Link -->
+                    <div class="ms-lg-4">
+                        <a href="{% url 'pages:consultation' %}" class="text-primary fw-semibold border border-2 border-primary px-3 py-2 text-decoration-none rounded">
+                            <i class="fas fa-calendar-check me-1"></i>APPOINTMENT
                         </a>
                     </div>
                 </div>
             </div>
         </nav>
     </header>
+
+    <!-- Floating Social Links Box -->
+    <div class="position-fixed end-0 top-1/2 translate-middle-y" style="right: 0; top: 50%; z-index: 9999;">
+        <div class="bg-off-white shadow rounded-start" style="box-shadow: -2px 2px 8px rgba(0,0,0,0.1);">
+            <div class="d-flex flex-col p-2 gap-2">
+                {% if company_info %}
+                {% if company_info.facebook %}
+                <a href="{{ company_info.facebook }}" target="_blank" class="text-primary hover:text-danger transition-all text-decoration-none d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" title="Facebook">
+                    <i class="fab fa-facebook-f fs-5"></i>
+                </a>
+                {% endif %}
+                {% if company_info.twitter %}
+                <a href="{{ company_info.twitter }}" target="_blank" class="text-primary hover:text-primary transition-all text-decoration-none d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" title="Twitter">
+                    <i class="fab fa-twitter fs-5"></i>
+                </a>
+                {% endif %}
+                {% if company_info.linkedin %}
+                <a href="{{ company_info.linkedin }}" target="_blank" class="text-primary hover:text-info transition-all text-decoration-none d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" title="LinkedIn">
+                    <i class="fab fa-linkedin-in fs-5"></i>
+                </a>
+                {% endif %}
+                {% if company_info.instagram %}
+                <a href="{{ company_info.instagram }}" target="_blank" class="text-primary hover:text-danger transition-all text-decoration-none d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" title="Instagram">
+                    <i class="fab fa-instagram fs-5"></i>
+                </a>
+                {% endif %}
+                {% if company_info.youtube %}
+                <a href="{{ company_info.youtube }}" target="_blank" class="text-primary hover:text-danger transition-all text-decoration-none d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" title="YouTube">
+                    <i class="fab fa-youtube fs-5"></i>
+                </a>
+                {% endif %}
+                {% if company_info.whatsapp %}
+                <a href="https://wa.me/{{ company_info.whatsapp }}" target="_blank" class="text-success hover:text-success transition-all text-decoration-none d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" title="WhatsApp">
+                    <i class="fab fa-whatsapp fs-5"></i>
+                </a>
+                {% endif %}
+                {% else %}
+                <a href="https://facebook.com" target="_blank" class="text-primary hover:text-danger transition-all text-decoration-none d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" title="Facebook">
+                    <i class="fab fa-facebook-f fs-5"></i>
+                </a>
+                <a href="https://twitter.com" target="_blank" class="text-primary hover:text-primary transition-all text-decoration-none d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" title="Twitter">
+                    <i class="fab fa-twitter fs-5"></i>
+                </a>
+                <a href="https://linkedin.com" target="_blank" class="text-primary hover:text-info transition-all text-decoration-none d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" title="LinkedIn">
+                    <i class="fab fa-linkedin-in fs-5"></i>
+                </a>
+                <a href="https://instagram.com" target="_blank" class="text-primary hover:text-danger transition-all text-decoration-none d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" title="Instagram">
+                    <i class="fab fa-instagram fs-5"></i>
+                </a>
+                <a href="https://youtube.com" target="_blank" class="text-primary hover:text-danger transition-all text-decoration-none d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" title="YouTube">
+                    <i class="fab fa-youtube fs-5"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 
     <!-- Messages -->
     {% if messages %}
@@ -418,12 +461,8 @@
         <div class="py-3 border-top">
             <div class="container">
                 <div class="text-center small text-grey">
-                    <div class="mb-1">
+                    <div>
                         © {% now "Y" %} {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhand Vastu{% endif %}. All rights reserved.
-                    </div>
-                    <div class="fw-semibold">
-                        Made with <span class="text-danger">❤️</span> by
-                        <a href="https://fb.me/psapkota23" target="_blank" class="text-primary text-decoration-none">Pradeep Sapkota</a>
                     </div>
                 </div>
             </div>
@@ -435,6 +474,40 @@
 
     <!-- Scripts -->
     <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- Company Anthem Audio Player Script -->
+    <script>
+    let isPlaying = false;
+    let audio = null;
+
+    function toggleAnthem() {
+        if (!audio) {
+            audio = document.getElementById('companyAnthem');
+        }
+
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+
+        if (isPlaying) {
+            audio.pause();
+            playIcon.classList.remove('d-none');
+            pauseIcon.classList.add('d-none');
+            isPlaying = false;
+        } else {
+            audio.play();
+            playIcon.classList.add('d-none');
+            pauseIcon.classList.remove('d-none');
+            isPlaying = true;
+
+            // Reset to play icon when audio ends
+            audio.onended = function() {
+                playIcon.classList.remove('d-none');
+                pauseIcon.classList.add('d-none');
+                isPlaying = false;
+            };
+        }
+    }
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

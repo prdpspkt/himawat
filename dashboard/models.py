@@ -750,6 +750,7 @@ class CompanyInfo(models.Model):
     linkedin = models.URLField(blank=True)
     youtube = models.URLField(blank=True)
     whatsapp = models.CharField(max_length=50, blank=True)
+    anthem = models.FileField(upload_to='company/anthem/', null=True, blank=True, help_text="Company anthem MP3 file")
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
