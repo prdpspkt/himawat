@@ -28,6 +28,7 @@ class Category(TimestampModel):
     CONTENT_TYPE_CHOICES = [
         ('posts', 'Posts'),
         ('pages', 'Pages'),
+        ('products', 'Products'),
         ('services', 'Services'),
         ('trainings', 'Trainings'),
     ]
@@ -47,7 +48,7 @@ class Category(TimestampModel):
         blank=True,
         related_name='categories',
         help_text="Select which content types this category applies to",
-        limit_choices_to={'model__in': ['post', 'page', 'service', 'training']}
+        limit_choices_to={'model__in': ['post', 'page', 'product', 'service', 'training']}
     )
 
     class Meta:
@@ -555,7 +556,9 @@ class Consultation(TimestampModel):
     name = models.CharField(max_length=255)
     email = models.EmailField()
     phone = models.CharField(max_length=50, blank=True)
+    country = models.CharField(max_length=100, blank=True)
     subject = models.CharField(max_length=255)
+    service_type = models.CharField(max_length=50, blank=True, help_text='Comma-separated: onsite, online')
     message = models.TextField()
     preferred_date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
@@ -589,6 +592,33 @@ class ConsultationFile(TimestampModel):
             self.file_type = self.file.name.split('.')[-1] if '.' in self.file.name else ''
             self.file_size = self.file.size
         super().save(*args, **kwargs)
+
+
+class Contact(TimestampModel):
+    """Contact form submissions"""
+    STATUS_CHOICES = [
+        ('new', 'New'),
+        ('read', 'Read'),
+        ('replied', 'Replied'),
+        ('archived', 'Archived'),
+    ]
+
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    phone = models.CharField(max_length=50, blank=True)
+    subject = models.CharField(max_length=255)
+    message = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
+    notes = models.TextField(blank=True, help_text='Internal notes about this contact')
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Contacts'
+
+    def __str__(self):
+        return f"Contact: {self.subject} by {self.name}"
 
 
 class Menu(TimestampModel):

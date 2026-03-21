@@ -11,7 +11,7 @@ from django.utils import timezone
 from dashboard.models import (
     Post, Page, Category, Tag, Download, Gallery,
     Testimonial, Carousel, FAQ, Product, ProductRequest, Consultation, Video,
-    Service, ServiceRequest, Training, TrainingRequest
+    Service, ServiceRequest, Training, TrainingRequest, Contact
 )
 
 
@@ -441,16 +441,23 @@ def consultation_request(request):
     name = request.POST.get('name')
     email = request.POST.get('email')
     phone = request.POST.get('phone', '')
+    country = request.POST.get('country', '')
     subject = request.POST.get('subject')
     message = request.POST.get('message')
     preferred_date = request.POST.get('preferred_date')
+
+    # Handle service_type checkboxes (can be multiple)
+    service_types = request.POST.getlist('service_type')
+    service_type = ','.join(service_types) if service_types else ''
 
     if name and email and subject and message:
         consultation = Consultation.objects.create(
             name=name,
             email=email,
             phone=phone,
+            country=country,
             subject=subject,
+            service_type=service_type,
             message=message,
             preferred_date=preferred_date or None
         )
@@ -474,6 +481,51 @@ def consultation_request(request):
 class ConsultationView(TemplateView):
     """Consultation page view"""
     template_name = 'cms/consultation.html'
+
+
+class ContactView(TemplateView):
+    """Contact page view"""
+    template_name = 'cms/contact.html'
+
+
+@require_POST
+def contact_submit(request):
+    """Handle contact form submission"""
+    # Get client info for tracking
+    ip_address = get_client_ip(request)
+    user_agent = request.META.get('HTTP_USER_AGENT', '')[:500]  # Limit length
+
+    name = request.POST.get('name')
+    email = request.POST.get('email')
+    phone = request.POST.get('phone', '')
+    subject = request.POST.get('subject')
+    message = request.POST.get('message')
+
+    if name and email and subject and message:
+        Contact.objects.create(
+            name=name,
+            email=email,
+            phone=phone,
+            subject=subject,
+            message=message,
+            ip_address=ip_address,
+            user_agent=user_agent
+        )
+        messages.success(request, 'Thank you for your message! We will get back to you soon.')
+    else:
+        messages.error(request, 'Please fill in all required fields.')
+
+    return redirect('pages:contact')
+
+
+def get_client_ip(request):
+    """Get the client's IP address"""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 
 # ===== SERVICE VIEWS =====

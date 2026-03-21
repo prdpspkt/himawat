@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from dashboard.models import (
     Post, Page, Category, Tag, Download, Gallery,
     Testimonial, Carousel, FAQ, Product, ProductRequest, ProductRequestItem, ProductImage,
-    Consultation,
+    Consultation, Contact,
     Menu, CompanyInfo, CEOInfo, Video, PageRevision, PostRevision, AIConfiguration, EmailConfiguration,
     Service, ServiceRequest, Training, TrainingRequest
 )
@@ -855,6 +855,34 @@ class ConsultationDetailView(AdminRequiredMixin, UpdateView):
     
     def form_valid(self, form):
         messages.success(self.request, 'Consultation updated successfully!')
+        return super().form_valid(form)
+
+
+# Contact Views
+class ContactListView(BaseListView):
+    model = Contact
+    template_name = 'dashboard/contact_list.html'
+    context_object_name = 'contacts'
+
+    def get_queryset(self):
+        return Contact.objects.all().order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['new_count'] = Contact.objects.filter(status='new').count()
+        context['read_count'] = Contact.objects.filter(status='read').count()
+        context['replied_count'] = Contact.objects.filter(status='replied').count()
+        return context
+
+
+class ContactDetailView(AdminRequiredMixin, UpdateView):
+    model = Contact
+    template_name = 'dashboard/contact_detail.html'
+    fields = ['status', 'notes']
+    success_url = reverse_lazy('dashboard:contact_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Contact updated successfully!')
         return super().form_valid(form)
 
 

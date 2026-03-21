@@ -54,10 +54,11 @@ class CategoryForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Filter applies_to to show only specific content types without duplicates
-        # We want: post (cms), page (cms), service (services), training (dashboard)
+        # We want: post (cms), page (cms), product (dashboard), service (services), training (dashboard)
         self.fields['applies_to'].queryset = ContentType.objects.filter(
             models.Q(app_label='cms', model='post') |
             models.Q(app_label='cms', model='page') |
+            models.Q(app_label='dashboard', model='product') |
             models.Q(app_label='services', model='service') |
             models.Q(app_label='dashboard', model='training')
         ).order_by('model')

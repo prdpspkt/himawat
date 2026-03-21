@@ -114,6 +114,10 @@ urlpatterns = [
     path('consultations/', views.ConsultationListView.as_view(), name='consultation_list'),
     path('consultations/<int:pk>/', views.ConsultationDetailView.as_view(), name='consultation_detail'),
 
+    # Contacts
+    path('contacts/', views.ContactListView.as_view(), name='contact_list'),
+    path('contacts/<int:pk>/', views.ContactDetailView.as_view(), name='contact_detail'),
+
     # Profile
     path('profile/', views.UserProfileUpdateView.as_view(), name='user_profile'),
 

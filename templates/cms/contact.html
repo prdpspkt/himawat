@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="border-top pt-5 pb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-5 fw-bold text-primary mb-4">
+                    Contact Us
+                </h1>
+                <p class="fs-5 text-dim-grey-dark">
+                    Have a question or need assistance? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Form Section -->
+<div class="py-12 border-top">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-none bg-off-white" style="border-radius: 0;">
+                    <div class="card-body p-5">
+                        <form method="post" action="{% url 'pages:contact_submit' %}">
+                            {% csrf_token %}
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold text-almost-black">Full Name *</label>
+                                <input type="text" name="name" required class="form-control" placeholder="Enter your full name">
+                            </div>
+
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-almost-black">Email Address *</label>
+                                    <input type="email" name="email" required class="form-control" placeholder="your.email@example.com">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-almost-black">Phone Number</label>
+                                    <input type="tel" name="phone" class="form-control" placeholder="+977-XXXXXXXXXX">
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold text-almost-black">Subject *</label>
+                                <input type="text" name="subject" required class="form-control" placeholder="e.g., Inquiry about Vastu Services">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold text-almost-black">Message *</label>
+                                <textarea name="message" rows="6" required class="form-control" placeholder="Please describe your inquiry or message..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg px-5 w-100">
+                                <i class="fas fa-paper-plane me-2"></i>Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Info Section -->
+<div class="py-12 border-top bg-off-white">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-6 fw-bold text-almost-black mb-3">Other Ways to Reach Us</h2>
+            <p class="text-dim-grey fs-5">Connect with us through any of these channels</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <!-- Phone -->
+            <div class="col-md-4">
+                <div class="card border-0 card-hover h-100" style="background: linear-gradient(135deg, rgba(218, 37, 28, 0.05) 0%, rgba(218, 37, 28, 0.02) 100%);">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-box mx-auto mb-3" style="background: var(--primary-scarlet-light);">
+                            <i class="fas fa-phone-alt text-primary fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold text-almost-black mb-2">Phone</h5>
+                        {% if company_info and company_info.phone %}
+                        <a href="tel:{{ company_info.phone }}" class="text-primary text-decoration-none">{{ company_info.phone }}</a>
+                        {% else %}
+                        <p class="text-dim-grey mb-0">+977-XXXXXXXXXX</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="col-md-4">
+                <div class="card border-0 card-hover h-100" style="background: linear-gradient(135deg, rgba(0, 109, 50, 0.05) 0%, rgba(0, 109, 50, 0.02) 100%);">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-box mx-auto mb-3" style="background: var(--success-bg);">
+                            <i class="fas fa-envelope text-emerald fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold text-almost-black mb-2">Email</h5>
+                        {% if company_info and company_info.email %}
+                        <a href="mailto:{{ company_info.email }}" class="text-primary text-decoration-none">{{ company_info.email }}</a>
+                        {% else %}
+                        <p class="text-dim-grey mb-0">info@example.com</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div class="col-md-4">
+                <div class="card border-0 card-hover h-100" style="background: linear-gradient(135deg, rgba(218, 37, 28, 0.05) 0%, rgba(0, 109, 50, 0.05) 100%);">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-box mx-auto mb-3" style="background: rgba(218, 37, 28, 0.08);">
+                            <i class="fas fa-map-marker-alt text-primary fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold text-almost-black mb-2">Address</h5>
+                        {% if company_info and company_info.city %}
+                        <p class="text-dim-grey mb-0">{{ company_info.city }}{% if company_info.country %}, {{ company_info.country }}{% endif %}</p>
+                        {% else %}
+                        <p class="text-dim-grey mb-0">Kathmandu, Nepal</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

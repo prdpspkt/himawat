@@ -36,22 +36,6 @@
     <div class="top-bar bg-off-white border-bottom">
         <div class="container">
             <div class="d-flex align-items-center justify-content-between">
-                <!-- Contact Links -->
-                <nav aria-label="Top navigation" class="d-flex align-items-center gap-4">
-                    {% if company_info and company_info.phone %}
-                    <a href="tel:{{ company_info.phone }}" class="top-nav-link d-flex align-items-center gap-2">
-                        <i class="fas fa-phone-alt"></i>
-                        <span class="d-none d-sm-inline">{{ company_info.phone }}</span>
-                    </a>
-                    {% endif %}
-                    {% if company_info and company_info.email %}
-                    <a href="mailto:{{ company_info.email }}" class="top-nav-link d-flex align-items-center gap-2">
-                        <i class="fas fa-envelope"></i>
-                        <span class="d-none d-lg-inline">{{ company_info.email }}</span>
-                    </a>
-                    {% endif %}
-                </nav>
-
                 <!-- Social Media & Quick Links -->
                 <nav aria-label="Social media links" class="d-flex align-items-center justify-content-between w-100">
                     <!-- Left side: User created menu -->
@@ -89,11 +73,11 @@
     </div>
 
     <!-- Logo/Brand Section -->
-    <div class="bg-off-white py-3">
+    <div class="bg-off-white pt-4 pb-4">
         <div class="container text-center">
             <a href="{% url 'pages:home' %}" class="d-inline-block">
                 {% if company_info and company_info.logo %}
-                <img src="{{ company_info.logo.url }}" alt="{{ company_info.company_name }}" style="height: 100px; width: auto; object-fit: contain;" class="logo-hover">
+                <img src="{{ company_info.logo.url }}" alt="{{ company_info.company_name }}" style="height: 80px; width: auto; object-fit: contain;" class="logo-hover">
                 {% else %}
                 <img src="{% static 'images/logo.jpg' %}" alt="Himwatkhanda Vastu" style="height: 70px; width: auto; object-fit: contain;" class="logo-hover">
                 {% endif %}
@@ -305,80 +289,6 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- CEO Section -->
-    {% if ceo_info and ceo_info.is_active %}
-    <div class="py-5 border-top">
-        <div class="container">
-            <div class="card border-0 shadow-none bg-transparent" style="border-radius: 0;">
-                <div class="card-body p-4">
-                    <div class="row align-items-center g-4">
-                        <!-- CEO Photo -->
-                        <div class="col-auto">
-                            {% if ceo_info.photo %}
-                            <img src="{{ ceo_info.photo.url }}" alt="{% firstof ceo_info.name 'CEO' %}" style="width: 120px; height: 120px; object-fit: cover;">
-                            {% else %}
-                            <img src="{% static 'images/ceo.png' %}" alt="{% firstof ceo_info.name 'CEO' %}" style="width: 120px; height: 120px; object-fit: cover;">
-                            {% endif %}
-                        </div>
-
-                        <!-- CEO Info -->
-                        <div class="col" style="font-size: 14px;">
-                            <h3 class="h4 fw-bold text-primary mb-1">{% firstof ceo_info.name 'CEO Name' %}</h3>
-                            <p class="text-dim-grey small mb-2">{% firstof ceo_info.title 'Founder & CEO' %}</p>
-                            {% if ceo_info.bio %}
-                            <p class="text-dim-grey-dark small mb-3">{{ ceo_info.bio }}</p>
-                            {% endif %}
-                            {% if ceo_info.message %}
-                            <p class="text-dim-grey-dark fst-italic small mb-0">"{{ ceo_info.message }}"</p>
-                            {% endif %}
-                        </div>
-
-                        <!-- CEO Contact -->
-                        <div class="col-auto">
-                            <div class="d-flex flex-row gap-3 align-items-center">
-                                {% if ceo_info.email %}
-                                <a href="mailto:{{ ceo_info.email }}" class="text-primary hover:text-danger transition-colors" title="Email">
-                                    <i class="fas fa-envelope fa-lg"></i>
-                                </a>
-                                {% endif %}
-                                {% if ceo_info.phone %}
-                                <a href="tel:{{ ceo_info.phone|cut:'+' }}" class="text-primary hover:text-danger transition-colors" title="Phone">
-                                    <i class="fas fa-phone fa-lg"></i>
-                                </a>
-                                {% endif %}
-                                {% if company_info.facebook %}
-                                <a href="{{ company_info.facebook }}" target="_blank" class="text-primary hover:text-danger transition-colors" title="Facebook">
-                                    <i class="fab fa-facebook fa-lg"></i>
-                                </a>
-                                {% endif %}
-                                {% if company_info.instagram %}
-                                <a href="{{ company_info.instagram }}" target="_blank" class="text-primary hover:text-danger transition-colors" title="Instagram">
-                                    <i class="fab fa-instagram fa-lg"></i>
-                                </a>
-                                {% endif %}
-                                {% if company_info.twitter %}
-                                <a href="{{ company_info.twitter }}" target="_blank" class="text-primary hover:text-danger transition-colors" title="Twitter">
-                                    <i class="fab fa-twitter fa-lg"></i>
-                                </a>
-                                {% endif %}
-                                {% if company_info.linkedin %}
-                                <a href="{{ company_info.linkedin }}" target="_blank" class="text-primary hover:text-danger transition-colors" title="LinkedIn">
-                                    <i class="fab fa-linkedin fa-lg"></i>
-                                </a>
-                                {% endif %}
-                                {% if company_info.youtube %}
-                                <a href="{{ company_info.youtube }}" target="_blank" class="text-primary hover:text-danger transition-colors" title="YouTube">
-                                    <i class="fab fa-youtube fa-lg"></i>
-                                </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 
     <!-- Footer -->
     <footer class="mt-auto bg-off-white text-primary border-top">

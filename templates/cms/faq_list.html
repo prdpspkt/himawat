@@ -6,7 +6,7 @@
 
 {% block content %}
 <!-- Hero Section -->
-<div class="py-16 bg-gradient-primary" style="background: linear-gradient(135deg, rgba(218, 37, 28, 0.05) 0%, rgba(0, 109, 50, 0.05) 100%);">
+<div class="pt-3 border-top">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
@@ -14,40 +14,13 @@
                 <p class="fs-5 text-dim-grey-dark mb-5">
                     Find answers to commonly asked questions about our services, courses, and expertise
                 </p>
-
-                <!-- Quick Stats -->
-                {% if total_vastu or total_engineering %}
-                <div class="row g-4 mt-4">
-                    {% if total_vastu %}
-                    <div class="col-6">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body text-center p-4">
-                                <div class="display-6 fw-bold text-primary mb-2">{{ total_vastu }}</div>
-                                <div class="text-dim-grey">Vastu FAQs</div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                    {% if total_engineering %}
-                    <div class="col-6">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body text-center p-4">
-                                <div class="display-6 fw-bold text-success mb-2">{{ total_engineering }}</div>
-                                <div class="text-dim-grey">Engineering FAQs</div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<!-- FAQ Categories Tabs -->
 {% if vastu_faqs or engineering_faqs %}
-<div class="py-12">
+<div class="py-12 border-top">
     <div class="container">
         <div class="row justify-content-center mb-5">
             <div class="col-auto">
@@ -120,20 +93,16 @@
 {% endif %}
 
 <!-- CTA Section -->
-<div class="py-16" style="background: linear-gradient(135deg, var(--primary-scarlet) 0%, var(--primary-scarlet-dark) 100%);">
+<div class="py-16 border-top">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
-                <h2 class="display-5 fw-bold text-white mb-4">Still Have Questions?</h2>
-                <p class="text-white-90 mb-5 fs-5">Can't find the answer you're looking for? Please reach out to our team.</p>
+                <h2 class="display-5 fw-bold text-primary mb-4">Still Have Questions?</h2>
+                <p class="text-gray mb-5 fs-5">Can't find the answer you're looking for? Please reach out to our team.</p>
                 <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                    <a href="{% url 'pages:consultation' %}" class="btn btn-light btn-lg px-5">
+                    <a href="{% url 'pages:consultation' %}" class="btn btn-primary btn-lg px-5">
                         <i class="fas fa-calendar-check me-2"></i>
-                        Get Consultation
-                    </a>
-                    <a href="{% url 'pages:page_detail' 'contact' %}" class="btn btn-outline-light btn-lg px-5">
-                        <i class="fas fa-envelope me-2"></i>
-                        Contact Us
+                        Appointment
                     </a>
                 </div>
             </div>
