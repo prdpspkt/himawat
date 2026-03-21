@@ -89,11 +89,11 @@
     </div>
 
     <!-- Logo/Brand Section -->
-    <div class="bg-off-white py-4">
+    <div class="bg-off-white py-3">
         <div class="container text-center">
             <a href="{% url 'pages:home' %}" class="d-inline-block">
                 {% if company_info and company_info.logo %}
-                <img src="{{ company_info.logo.url }}" alt="{{ company_info.company_name }}" style="height: 70px; width: auto; object-fit: contain;" class="logo-hover">
+                <img src="{{ company_info.logo.url }}" alt="{{ company_info.company_name }}" style="height: 100px; width: auto; object-fit: contain;" class="logo-hover">
                 {% else %}
                 <img src="{% static 'images/logo.jpg' %}" alt="Himwatkhanda Vastu" style="height: 70px; width: auto; object-fit: contain;" class="logo-hover">
                 {% endif %}

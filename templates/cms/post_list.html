@@ -1,103 +1,145 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Blog - {% if company_info %}{{ company_info.company_name }}{% else %}Thelix{% endif %}{% endblock %}
+{% block title %}Blog - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <div class="text-center mb-12">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">Blog</h1>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">Latest news, insights, and updates from our team</p>
-    </div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <!-- Posts Grid -->
-        <div class="md:col-span-2">
-            {% if posts %}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {% for post in posts %}
-                <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    {% if post.featured_image %}
-                    <a href="{{ post.get_absolute_url }}">
-                        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-48 object-cover">
-                    </a>
-                    {% endif %}
-                    <div class="p-6">
-                        {% if post.category %}
-                        <a href="{% url 'pages:post_category' post.category.slug %}" class="text-sm text-primary font-medium">{{ post.category.name }}</a>
-                        {% endif %}
-                        <h2 class="text-xl font-bold text-gray-900 mt-2 mb-2">
-                            <a href="{{ post.get_absolute_url }}" class="hover:text-primary">{{ post.title }}</a>
-                        </h2>
-                        <p class="text-gray-600 text-sm mb-4">{{ post.excerpt|truncatewords:20 }}</p>
-                        <div class="flex items-center text-sm text-gray-500">
-                            <span>{{ post.author.name }}</span>
-                            <span class="mx-2">•</span>
-                            <span>{{ post.published_at|date:"M d, Y" }}</span>
-                        </div>
-                    </div>
-                </article>
-                {% endfor %}
-            </div>
-            
-            <!-- Pagination -->
-            {% if is_paginated %}
-            <div class="mt-8 flex justify-center space-x-2">
-                {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Previous</a>
-                {% endif %}
-                <span class="px-4 py-2 bg-primary text-white rounded-lg">{{ page_obj.number }}</span>
-                {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Next</a>
-                {% endif %}
-            </div>
-            {% endif %}
-            {% else %}
-            <div class="text-center py-12">
-                <p class="text-gray-500">No posts found.</p>
-            </div>
-            {% endif %}
-        </div>
-        
-        <!-- Sidebar -->
-        <div class="space-y-8">
-            <!-- Search -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="font-bold text-gray-900 mb-4">Search</h3>
-                <form method="get" action="{% url 'pages:post_list' %}">
-                    <input type="text" name="search" placeholder="Search posts..." 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-                </form>
-            </div>
-            
-            <!-- Categories -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="font-bold text-gray-900 mb-4">Categories</h3>
-                <ul class="space-y-2">
-                    {% for category in categories %}
-                    <li>
-                        <a href="{% url 'pages:post_category' category.slug %}" class="text-gray-600 hover:text-primary flex justify-between">
-                            <span>{{ category.name }}</span>
-                            <span class="text-gray-400">({{ category.posts.count }})</span>
-                        </a>
-                    </li>
-                    {% empty %}
-                    <li class="text-gray-500">No categories</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            
-            <!-- Tags -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="font-bold text-gray-900 mb-4">Tags</h3>
-                <div class="flex flex-wrap gap-2">
-                    {% for tag in tags %}
-                    <a href="{% url 'pages:post_tag' tag.slug %}" class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-primary hover:text-white transition-colors">{{ tag.name }}</a>
-                    {% empty %}
-                    <span class="text-gray-500">No tags</span>
-                    {% endfor %}
-                </div>
+<!-- Page Header -->
+<div class="border-top pt-5 pb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-5 fw-bold text-primary mb-4">Blog</h1>
+                <p class="fs-5 text-dim-grey-dark">Latest insights, articles, and updates on Vastu Shastra and Engineering Design</p>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Category Filter -->
+{% if categories %}
+<div class="py-4 border-top bg-off-white">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="{% url 'pages:post_list' %}" class="btn {% if not current_category and not current_tag %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                All Posts
+            </a>
+            {% for category in categories %}
+            <a href="{% url 'pages:post_category' category.slug %}" class="btn {% if current_category.slug == category.slug %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                {{ category.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Blog Posts Grid -->
+{% if posts %}
+<div class="py-12 border-top">
+    <div class="container">
+        <div class="row g-4">
+            {% for post in posts %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 card-hover h-100" style="background: linear-gradient(135deg, rgba(218, 37, 28, 0.05) 0%, rgba(218, 37, 28, 0.02) 100%);">
+                    <!-- Featured Image -->
+                    <a href="{{ post.get_absolute_url }}" class="text-decoration-none">
+                        {% if post.featured_image %}
+                        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="card-img-top" style="height: 250px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 250px;">
+                            <i class="fas fa-newspaper text-dim-grey" style="font-size: 4rem;"></i>
+                        </div>
+                        {% endif %}
+                    </a>
+
+                    <div class="card-body">
+                        {% if post.category %}
+                        <div class="small text-primary fw-bold text-uppercase mb-2" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <a href="{% url 'pages:post_category' post.category.slug %}" class="text-decoration-none text-primary">
+                                {{ post.category.name }}
+                            </a>
+                        </div>
+                        {% endif %}
+                        <h5 class="fw-bold text-almost-black mb-3">
+                            <a href="{{ post.get_absolute_url }}" class="text-decoration-none text-almost-black hover:text-primary">
+                                {{ post.title }}
+                            </a>
+                        </h5>
+                        <p class="text-dim-grey-dark small mb-4" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ post.excerpt|truncatewords:15 }}
+                        </p>
+                        <div class="d-flex align-items-center text-dim-grey small mb-3">
+                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold me-2" style="width: 32px; height: 32px; font-size: 12px;">
+                                {{ post.author.name|first }}
+                            </div>
+                            <div>
+                                <span class="fw-semibold text-almost-black">{{ post.author.name }}</span>
+                                <span class="mx-2">•</span>
+                                <span>{{ post.published_at|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                        <a href="{{ post.get_absolute_url }}" class="btn btn-outline-primary btn-sm w-100 text-decoration-none">
+                            <i class="fas fa-book-open me-2"></i>Read More
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<div class="py-4 border-top">
+    <div class="container">
+        <div class="d-flex justify-content-center gap-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category.slug }}{% endif %}{% if current_tag %}&tag={{ current_tag.slug }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="btn btn-outline-secondary">
+                <i class="fas fa-chevron-left me-1"></i>Previous
+            </a>
+            {% endif %}
+            <span class="btn btn-primary">{{ page_obj.number }}</span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category.slug }}{% endif %}{% if current_tag %}&tag={{ current_tag.slug }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="btn btn-outline-secondary">
+                Next<i class="fas fa-chevron-right ms-1"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% else %}
+<div class="py-16 border-top">
+    <div class="container text-center">
+        <i class="fas fa-newspaper text-dim-grey mb-4" style="font-size: 4rem;"></i>
+        <p class="text-dim-grey fs-5">No blog posts found.</p>
+        {% if current_category or current_tag %}
+        <a href="{% url 'pages:post_list' %}" class="btn btn-primary mt-3">
+            <i class="fas fa-th-large me-2"></i>View All Posts
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Tags Section -->
+{% if tags %}
+<div class="py-8 border-top bg-off-white">
+    <div class="container">
+        <div class="text-center">
+            <h4 class="fw-bold text-almost-black mb-4">Explore by Tags</h4>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                {% for tag in tags %}
+                <a href="{% url 'pages:post_tag' tag.slug %}" class="btn btn-outline-secondary btn-sm text-decoration-none">
+                    #{{ tag.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

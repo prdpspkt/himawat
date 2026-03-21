@@ -128,6 +128,9 @@ class PostDetailView(DetailView):
         return obj
 
     def get_context_data(self, **kwargs):
+        from django.db.models import Count
+        from dashboard.models import Category
+
         context = super().get_context_data(**kwargs)
         post = self.object
 
@@ -136,6 +139,34 @@ class PostDetailView(DetailView):
             status='published',
             category=post.category
         ).exclude(id=post.id).select_related('category')[:3]
+
+        # Categories with post count
+        context['categories'] = Category.objects.filter(
+            status='active'
+        ).annotate(post_count=Count('posts')).filter(post_count__gt=0)
+
+        # Popular posts (by view count)
+        context['popular_posts'] = Post.objects.filter(
+            status='published',
+            published_at__lte=timezone.now()
+        ).exclude(id=post.id).order_by('-view_count')[:5]
+
+        # Recent posts
+        context['recent_posts'] = Post.objects.filter(
+            status='published',
+            published_at__lte=timezone.now()
+        ).exclude(id=post.id).order_by('-published_at')[:5]
+
+        # Archive (posts grouped by month/year)
+        from django.db.models.functions import TruncMonth
+        posts_by_month = Post.objects.filter(
+            status='published',
+            published_at__lte=timezone.now()
+        ).annotate(month=TruncMonth('published_at')).values('month').annotate(
+            count=Count('id')
+        ).order_by('-month')
+
+        context['archive_months'] = posts_by_month
 
         return context
 
