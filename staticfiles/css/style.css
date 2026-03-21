@@ -209,18 +209,22 @@
 
 /* Top Navigation Links */
 .top-nav-link {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 400;
     color: #DA251C;
     text-decoration: none !important;
     transition: opacity 0.2s ease;
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
+    padding-left: 1rem;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .top-nav-link i {
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .top-nav-link:hover {
@@ -249,7 +253,7 @@
 
 /* Main Navigation Links */
 .main-nav-link {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
     color: #DA251C;
     text-decoration: none;
@@ -1089,11 +1093,13 @@ p {
     padding: 0.625rem 1rem;
     border-radius: 0.375rem;
     transition: all 0.2s ease;
+    text-decoration: none !important;
 }
 
 .dropdown-item:hover {
     background-color: var(--primary-scarlet-light);
     color: var(--primary-scarlet);
+    text-decoration: none !important;
 }
 
 /* ============================================================
