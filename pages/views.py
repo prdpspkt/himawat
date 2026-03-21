@@ -33,16 +33,16 @@ class HomeView(TemplateView):
             featured=True
         ).order_by('order')[:3]
         
-        # FAQs grouped by category
+        # FAQs grouped by category (limited to 5 per category)
         context['vastu_faqs'] = FAQ.objects.filter(
-            category='vastu', 
+            category='vastu',
             status='active'
-        ).order_by('sort_order')
-        
+        ).order_by('sort_order')[:5]
+
         context['engineering_faqs'] = FAQ.objects.filter(
-            category='engineering', 
+            category='engineering',
             status='active'
-        ).order_by('sort_order')
+        ).order_by('sort_order')[:5]
         
         return context
 
