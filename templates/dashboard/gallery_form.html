@@ -45,7 +45,7 @@
         background: #f3f4f6;
     }
     .upload-zone {
-        border: 2px dashed #d1d5db;
+        border: 2px dashed #dee2e6;
         border-radius: 0.5rem;
         padding: 2rem;
         text-align: center;
@@ -59,131 +59,135 @@
 {% endblock %}
 
 {% block dashboard_content %}
-<div class="space-y-6">
+<div class="row g-4">
     <!-- Gallery Details Form -->
-    <div class="bg-white rounded-lg shadow">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900">Gallery Details</h3>
-        </div>
-        
-        <form method="post" enctype="multipart/form-data" class="p-6">
-            {% csrf_token %}
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Gallery Details</h5>
+            </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-                        <input type="text" name="name" value="{{ form.name.value|default:'' }}" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+            <form method="post" enctype="multipart/form-data" class="card-body">
+                {% csrf_token %}
+                
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Name *</label>
+                            <input type="text" name="name" value="{{ form.name.value|default:'' }}" required
+                                   class="form-control">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Slug</label>
+                            <input type="text" name="slug" value="{{ form.slug.value|default:'' }}"
+                                   class="form-control">
+                        </div>
+                        
+                        <div class="mb-0">
+                            <label class="form-label fw-medium">Description</label>
+                            <textarea name="description" rows="3"
+                                      class="form-control">{{ form.description.value|default:'' }}</textarea>
+                        </div>
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-                        <input type="text" name="slug" value="{{ form.slug.value|default:'' }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                        <textarea name="description" rows="3"
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">{{ form.description.value|default:'' }}</textarea>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Cover Image</label>
+                            {% if object and object.cover_image %}
+                            <img src="{{ object.cover_image.url }}" class="w-100 object-fit-cover rounded mb-2" style="height: 128px;">
+                            {% endif %}
+                            <input type="file" name="cover_image" accept="image/*"
+                                   class="form-control form-control-sm">
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label fw-medium">Sort Order</label>
+                                <input type="number" name="sort_order" value="{{ form.sort_order.value|default:0 }}" min="0"
+                                       class="form-control">
+                            </div>
+                            
+                            <div class="col-6">
+                                <label class="form-label fw-medium">Status</label>
+                                <select name="status" class="form-select">
+                                    {% for value, label in form.fields.status.choices %}
+                                    <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
-                        {% if object and object.cover_image %}
-                        <img src="{{ object.cover_image.url }}" class="w-48 h-32 object-cover rounded mb-2">
-                        {% endif %}
-                        <input type="file" name="cover_image" accept="image/*"
-                               class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-red-700">
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
-                            <input type="number" name="sort_order" value="{{ form.sort_order.value|default:0 }}" min="0"
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                            <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-                                {% for value, label in form.fields.status.choices %}
-                                <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
+                <div class="mt-4 d-flex gap-3">
+                    <button type="submit" class="btn btn-primary">
+                        Save Gallery
+                    </button>
+                    <a href="{% url 'dashboard:gallery_list' %}" class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
                 </div>
-            </div>
-            
-            <div class="mt-6 flex space-x-4">
-                <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors">
-                    Save Gallery
-                </button>
-                <a href="{% url 'dashboard:gallery_list' %}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
-                    Cancel
-                </a>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
     
     <!-- Gallery Images Section (Only for existing galleries) -->
     {% if object %}
-    <div class="bg-white rounded-lg shadow">
-        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900">Gallery Images</h3>
-                <p class="text-sm text-gray-500 mt-1">Drag to reorder images. Click edit to add titles and descriptions.</p>
-            </div>
-            <span class="text-sm text-gray-500" id="image-count">{{ object.images.count }} images</span>
-        </div>
-        
-        <!-- Upload Zone -->
-        <div class="p-6 border-b border-gray-200">
-            <div class="upload-zone" id="upload-zone">
-                <svg class="w-12 h-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                </svg>
-                <p class="text-gray-600 font-medium">Click to upload or drag and drop</p>
-                <p class="text-sm text-gray-500 mt-1">Multiple images allowed (PNG, JPG, GIF)</p>
-                <input type="file" id="image-upload" multiple accept="image/*" class="hidden">
-            </div>
-        </div>
-        
-        <!-- Images Grid -->
-        <div class="p-6">
-            <div id="gallery-images" class="gallery-grid">
-                {% for image in object.images.all %}
-                <div class="gallery-item" data-id="{{ image.id }}" data-order="{{ image.sort_order }}">
-                    <div class="gallery-item-actions">
-                        <button type="button" onclick="editImage({{ image.id }})" class="p-1.5 bg-white rounded shadow hover:bg-gray-100" title="Edit">
-                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                            </svg>
-                        </button>
-                        <button type="button" onclick="deleteImage({{ image.id }})" class="p-1.5 bg-white rounded shadow hover:bg-red-50" title="Delete">
-                            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <img src="{{ image.image.url }}" alt="{{ image.title|default:'' }}" loading="lazy">
-                    <div class="gallery-item-info">
-                        <p class="text-sm font-medium text-gray-900 truncate">{{ image.title|default:'Untitled' }}</p>
-                        <p class="text-xs text-gray-500">{{ image.image.name|truncatechars:20 }}</p>
-                    </div>
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <div>
+                    <h5 class="mb-0">Gallery Images</h5>
+                    <p class="text-muted small mb-0">Drag to reorder images. Click edit to add titles and descriptions.</p>
                 </div>
-                {% empty %}
-                <div class="col-span-full text-center py-12 text-gray-500" id="empty-message">
-                    <svg class="w-16 h-16 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                <span class="badge bg-secondary" id="image-count">{{ object.images.count }} images</span>
+            </div>
+            
+            <!-- Upload Zone -->
+            <div class="card-body border-bottom">
+                <div class="upload-zone" id="upload-zone">
+                    <svg class="mx-auto mb-3 text-muted" style="width: 48px; height: 48px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                     </svg>
-                    <p>No images yet. Upload some images above.</p>
+                    <p class="fw-medium text-dark mb-1">Click to upload or drag and drop</p>
+                    <p class="text-muted small mb-0">Multiple images allowed (PNG, JPG, GIF)</p>
+                    <input type="file" id="image-upload" multiple accept="image/*" class="d-none">
                 </div>
-                {% endfor %}
+            </div>
+            
+            <!-- Images Grid -->
+            <div class="card-body">
+                <div id="gallery-images" class="gallery-grid">
+                    {% for image in object.images.all %}
+                    <div class="gallery-item" data-id="{{ image.id }}" data-order="{{ image.sort_order }}">
+                        <div class="gallery-item-actions">
+                            <button type="button" onclick="editImage({{ image.id }})" class="btn btn-sm btn-light" title="Edit">
+                                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                            </button>
+                            <button type="button" onclick="deleteImage({{ image.id }})" class="btn btn-sm btn-light text-danger" title="Delete">
+                                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <img src="{{ image.image.url }}" alt="{{ image.title|default:'' }}" loading="lazy">
+                        <div class="gallery-item-info">
+                            <p class="fw-medium text-truncate small mb-0">{{ image.title|default:'Untitled' }}</p>
+                            <p class="text-muted small mb-0">{{ image.image.name|truncatechars:20 }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5 text-muted" id="empty-message">
+                        <svg class="mx-auto mb-3 text-muted" style="width: 64px; height: 64px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <p class="mb-0">No images yet. Upload some images above.</p>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
@@ -191,34 +195,34 @@
 </div>
 
 <!-- Image Edit Modal -->
-<div id="image-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <h3 class="text-lg font-semibold text-gray-900">Edit Image</h3>
-            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<div id="image-modal" class="position-fixed top-0 start-0 w-100 h-100 d-none align-items-center justify-content-center" style="background: rgba(0,0,0,0.5); z-index: 1050;">
+    <div class="card shadow" style="max-width: 450px; width: 100%; margin: 1rem;">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Edit Image</h6>
+            <button onclick="closeModal()" class="btn btn-sm btn-link text-muted text-decoration-none">
+                <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
         </div>
-        <div class="p-6">
+        <div class="card-body">
             <input type="hidden" id="edit-image-id">
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                <input type="text" id="edit-image-title" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+            <div class="mb-3">
+                <label class="form-label small">Title</label>
+                <input type="text" id="edit-image-title" class="form-control form-control-sm">
             </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea id="edit-image-description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"></textarea>
+            <div class="mb-3">
+                <label class="form-label small">Description</label>
+                <textarea id="edit-image-description" rows="3" class="form-control form-control-sm"></textarea>
             </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Alt Text</label>
-                <input type="text" id="edit-image-alt" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+            <div class="mb-0">
+                <label class="form-label small">Alt Text</label>
+                <input type="text" id="edit-image-alt" class="form-control form-control-sm">
             </div>
         </div>
-        <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
-            <button onclick="closeModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
-            <button onclick="saveImageEdit()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-red-700">Save Changes</button>
+        <div class="card-footer d-flex justify-content-end gap-2">
+            <button onclick="closeModal()" class="btn btn-outline-secondary btn-sm">Cancel</button>
+            <button onclick="saveImageEdit()" class="btn btn-primary btn-sm">Save Changes</button>
         </div>
     </div>
 </div>
@@ -355,7 +359,8 @@ function editImage(imageId) {
             document.getElementById('edit-image-title').value = data.image.title || '';
             document.getElementById('edit-image-description').value = data.image.description || '';
             document.getElementById('edit-image-alt').value = data.image.alt_text || '';
-            document.getElementById('image-modal').classList.remove('hidden');
+            document.getElementById('image-modal').classList.remove('d-none');
+            document.getElementById('image-modal').classList.add('d-flex');
         }
     });
 }
@@ -388,14 +393,15 @@ function saveImageEdit() {
 }
 
 function closeModal() {
-    document.getElementById('image-modal').classList.add('hidden');
+    document.getElementById('image-modal').classList.add('d-none');
+    document.getElementById('image-modal').classList.remove('d-flex');
 }
 
 function updateImageCount() {
     const count = document.querySelectorAll('.gallery-item').length;
     document.getElementById('image-count').textContent = count + ' images';
     if (count === 0) {
-        document.getElementById('empty-message').classList.remove('hidden');
+        document.getElementById('empty-message').classList.remove('d-none');
     }
 }
 

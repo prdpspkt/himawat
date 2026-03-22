@@ -1,26 +1,30 @@
 {# Bulk Actions Snippet #}
 {# Usage: {% include 'dashboard/bulk_actions.html' with model_name='post' %} #}
 
-<div class="mb-4 bg-white rounded-lg shadow p-4">
-    <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-            <div class="flex items-center">
-                <input type="checkbox" id="select-all" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                       onchange="toggleAllCheckboxes(this)">
-                <label for="select-all" class="ml-2 text-sm text-gray-700">Select All</label>
+<div class="card mb-4">
+    <div class="card-body py-3">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-6">
+                <div class="d-flex gap-3 align-items-center">
+                    <div class="form-check">
+                        <input type="checkbox" id="select-all" class="form-check-input"
+                               onchange="toggleAllCheckboxes(this)">
+                        <label for="select-all" class="form-check-label">Select All</label>
+                    </div>
+                    <span id="selected-count" class="text-muted small">0 selected</span>
+                </div>
             </div>
-            <span id="selected-count" class="text-sm text-gray-500">0 selected</span>
-        </div>
-
-        <div class="flex items-center space-x-3">
-            <select id="bulk-action" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm" disabled>
-                <option value="">Bulk Actions</option>
-                <option value="delete">Delete Selected</option>
-            </select>
-
-            <button type="button" id="apply-bulk-action" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                Apply
-            </button>
+            <div class="col-md-6">
+                <div class="d-flex gap-2 justify-content-md-end">
+                    <select id="bulk-action" class="form-select form-select-sm" style="max-width: 150px;" disabled>
+                        <option value="">Bulk Actions</option>
+                        <option value="delete">Delete Selected</option>
+                    </select>
+                    <button type="button" id="apply-bulk-action" class="btn btn-danger btn-sm" disabled>
+                        Apply
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

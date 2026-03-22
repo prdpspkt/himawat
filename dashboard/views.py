@@ -339,8 +339,10 @@ def gallery_image_upload(request):
             'images': created_images,
             'count': len(created_images)
         })
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        return JsonResponse({'success': False, 'error': 'Invalid request data'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': False, 'error': 'An error occurred'})
 
 
 @staff_member_required
@@ -357,8 +359,10 @@ def gallery_image_reorder(request):
             )
         
         return JsonResponse({'success': True})
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        return JsonResponse({'success': False, 'error': 'Invalid request data'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': False, 'error': 'An error occurred'})
 
 
 @staff_member_required
@@ -369,8 +373,10 @@ def gallery_image_delete(request, pk):
         image = get_object_or_404(GalleryImage, pk=pk)
         image.delete()
         return JsonResponse({'success': True})
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        return JsonResponse({'success': False, 'error': 'Invalid request data'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': False, 'error': 'An error occurred'})
 
 
 @staff_member_required
@@ -388,8 +394,10 @@ def gallery_image_detail(request, pk):
                 'url': image.image.url
             }
         })
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        return JsonResponse({'success': False, 'error': 'Invalid request data'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': False, 'error': 'An error occurred'})
 
 
 @staff_member_required
@@ -406,8 +414,10 @@ def gallery_image_update(request, pk):
         image.save()
         
         return JsonResponse({'success': True})
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        return JsonResponse({'success': False, 'error': 'Invalid request data'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': False, 'error': 'An error occurred'})
 
 
 # Product Image Management
@@ -442,8 +452,10 @@ def product_image_upload(request):
             'images': created_images,
             'count': len(created_images)
         })
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        return JsonResponse({'success': False, 'error': 'Invalid request data'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': False, 'error': 'An error occurred'})
 
 
 @staff_member_required
@@ -460,8 +472,10 @@ def product_image_reorder(request):
             )
 
         return JsonResponse({'success': True})
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        return JsonResponse({'success': False, 'error': 'Invalid request data'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': False, 'error': 'An error occurred'})
 
 
 @staff_member_required
@@ -472,8 +486,10 @@ def product_image_delete(request, pk):
         image = get_object_or_404(ProductImage, pk=pk)
         image.delete()
         return JsonResponse({'success': True})
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        return JsonResponse({'success': False, 'error': 'Invalid request data'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': False, 'error': 'An error occurred'})
 
 
 @staff_member_required
@@ -491,8 +507,10 @@ def product_image_detail(request, pk):
                 'url': image.image.url
             }
         })
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        return JsonResponse({'success': False, 'error': 'Invalid request data'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': False, 'error': 'An error occurred'})
 
 
 @staff_member_required
@@ -509,8 +527,10 @@ def product_image_update(request, pk):
         image.save()
 
         return JsonResponse({'success': True})
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        return JsonResponse({'success': False, 'error': 'Invalid request data'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': False, 'error': 'An error occurred'})
 
 
 # Testimonial Views
@@ -556,7 +576,7 @@ class ProductListView(BaseListView):
 class ProductCreateView(BaseCreateView):
     model = Product
     template_name = 'dashboard/product_form.html'
-    fields = ['name', 'slug', 'description', 'excerpt', 'image', 'icon', 'category', 'price', 'featured', 'sort_order', 'status']
+    fields = ['name', 'slug', 'description', 'image', 'category', 'featured', 'sort_order', 'status']
     success_url = reverse_lazy('dashboard:product_list')
     
     def form_valid(self, form):
@@ -567,7 +587,7 @@ class ProductCreateView(BaseCreateView):
 class ProductUpdateView(BaseUpdateView):
     model = Product
     template_name = 'dashboard/product_form.html'
-    fields = ['name', 'slug', 'description', 'excerpt', 'image', 'icon', 'category', 'price', 'featured', 'sort_order', 'status']
+    fields = ['name', 'slug', 'description', 'image', 'category', 'featured', 'sort_order', 'status']
     success_url = reverse_lazy('dashboard:product_list')
 
 
@@ -943,24 +963,6 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-# User Profile View
-class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
-    """User profile update view - users can only edit their own profile"""
-    model = User
-    template_name = 'dashboard/profile_form.html'
-    fields = ['first_name', 'last_name', 'email', 'phone', 'avatar', 'bio']
-    
-    def get_object(self):
-        return self.request.user
-    
-    def get_success_url(self):
-        return reverse_lazy('dashboard:user_profile')
-    
-    def form_valid(self, form):
-        messages.success(self.request, 'Profile updated successfully!')
-        return super().form_valid(form)
-
-
 # User Management Views
 class UserListView(BaseListView):
     model = User
@@ -1010,8 +1012,10 @@ def category_create_ajax(request):
                 'parent_id': category.parent_id
             }
         })
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        return JsonResponse({'success': False, 'error': 'Invalid request data'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': False, 'error': 'An error occurred'})
 
 
 # Video Views
@@ -1081,8 +1085,10 @@ def tag_create_ajax(request):
                 'slug': tag.slug
             }
         })
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        return JsonResponse({'success': False, 'error': 'Invalid request data'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': False, 'error': 'An error occurred'})
 
 
 # Revision Management Views
@@ -1127,8 +1133,10 @@ def restore_page_revision(request, revision_id):
         revision.restore()
         messages.success(request, f'Page restored to revision {revision.revision_number} successfully!')
         return JsonResponse({'success': True, 'redirect_url': reverse_lazy('dashboard:page_list')})
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        return JsonResponse({'success': False, 'error': 'Invalid request data'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': False, 'error': 'An error occurred'})
 
 
 @staff_member_required
@@ -1140,8 +1148,10 @@ def restore_post_revision(request, revision_id):
         revision.restore()
         messages.success(request, f'Post restored to revision {revision.revision_number} successfully!')
         return JsonResponse({'success': True, 'redirect_url': reverse_lazy('dashboard:post_list')})
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        return JsonResponse({'success': False, 'error': 'Invalid request data'})
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': False, 'error': 'An error occurred'})
 
 
 # AI Configuration Views

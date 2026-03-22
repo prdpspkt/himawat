@@ -6,63 +6,61 @@
 {% block dashboard_content %}
 {% include 'dashboard/bulk_actions.html' with model_name='carousel' %}
 
-<div class="bg-white rounded-lg shadow">
-    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-gray-900">All Carousel Slides</h3>
-        <a href="{% url 'dashboard:carousel_create' %}" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors">
+<div class="card dashboard-card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title mb-0">All Carousel Slides</h3>
+        <a href="{% url 'dashboard:carousel_create' %}" class="btn btn-primary">
             Add New
         </a>
     </div>
     
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+    <div class="table-responsive">
+        <table class="table table-hover dashboard-table mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
-                        <input type="checkbox" class="sr-only" aria-label="Select all">
+                    <th class="text-nowrap w-12">
+                        <input type="checkbox" class="form-check-input" aria-label="Select all">
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th class="text-nowrap">Image</th>
+                    <th class="text-nowrap">Title</th>
+                    <th class="text-nowrap">Order</th>
+                    <th class="text-nowrap">Status</th>
+                    <th class="text-nowrap">Actions</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody>
                 {% for carousel in carousels %}
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4">
-                        <input type="checkbox" class="item-checkbox h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" value="{{ carousel.pk }}">
+                <tr>
+                    <td class="text-nowrap">
+                        <input type="checkbox" class="item-checkbox form-check-input" value="{{ carousel.pk }}">
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="text-nowrap">
                         {% if carousel.image %}
-                        <img class="h-16 w-24 object-cover rounded" src="{{ carousel.image.url }}" alt="">
+                        <img class="img-thumbnail" style="height: 64px; width: 96px; object-fit: cover;" src="{{ carousel.image.url }}" alt="">
                         {% else %}
-                        <span class="text-gray-400">No image</span>
+                        <span class="text-muted">No image</span>
                         {% endif %}
                     </td>
-                    <td class="px-6 py-4">
-                        <div class="text-sm font-medium text-gray-900">{{ carousel.title }}</div>
+                    <td class="text-nowrap">
+                        <div class="fw-medium text-dark">{{ carousel.title }}</div>
                         {% if carousel.caption %}
-                        <div class="text-xs text-gray-500">{{ carousel.caption|truncatewords:8 }}</div>
+                        <div class="small text-muted">{{ carousel.caption|truncatewords:8 }}</div>
                         {% endif %}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ carousel.sort_order }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            {% if carousel.status == 'active' %}bg-green-100 text-green-800
-                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    <td class="text-nowrap text-muted">{{ carousel.sort_order }}</td>
+                    <td class="text-nowrap">
+                        <span class="badge {% if carousel.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
                             {{ carousel.get_status_display }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="{% url 'dashboard:carousel_edit' carousel.pk %}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                        <a href="{% url 'dashboard:carousel_delete' carousel.pk %}" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure?')">Delete</a>
+                    <td class="text-nowrap">
+                        <a href="{% url 'dashboard:carousel_edit' carousel.pk %}" class="text-primary text-decoration-none me-2">Edit</a>
+                        <a href="{% url 'dashboard:carousel_delete' carousel.pk %}" class="text-danger text-decoration-none" onclick="return confirm('Are you sure?')">Delete</a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">No carousel slides found.</td>
+                    <td colspan="6" class="text-center text-muted py-4">No carousel slides found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -6,105 +6,105 @@
 {% block dashboard_content %}
 {% include 'dashboard/bulk_actions.html' with model_name='category' %}
 
-<div class="bg-white rounded-lg shadow">
-    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-gray-900">All Categories</h3>
-        <a href="{% url 'dashboard:category_create' %}" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors">
+<div class="card shadow">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">All Categories</h5>
+        <a href="{% url 'dashboard:category_create' %}" class="btn btn-primary">
             Create New
         </a>
     </div>
     
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
-                        <input type="checkbox" class="sr-only" aria-label="Select all">
+                    <th style="width: 50px;">
+                        <input type="checkbox" class="visually-hidden" aria-label="Select all">
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applies To</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parent</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th>Category</th>
+                    <th>Applies To</th>
+                    <th>Parent</th>
+                    <th>Items</th>
+                    <th>Order</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody>
                 {% for category in categories %}
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4">
-                        <input type="checkbox" class="item-checkbox h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" value="{{ category.pk }}">
+                <tr>
+                    <td class="px-4 py-3">
+                        <input type="checkbox" class="item-checkbox form-check-input" value="{{ category.pk }}">
                     </td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center">
+                    <td class="px-4 py-3">
+                        <div class="d-flex align-items-center">
                             {% if category.image %}
-                            <img class="h-10 w-10 rounded object-cover mr-3" src="{{ category.image.url }}" alt="">
+                            <img class="rounded object-fit-cover me-3" src="{{ category.image.url }}" alt="" style="width: 40px; height: 40px;">
                             {% else %}
-                            <div class="h-10 w-10 rounded bg-gray-200 flex items-center justify-center mr-3">
-                                <span class="text-gray-500 text-lg">{{ category.name|first }}</span>
+                            <div class="rounded bg-secondary d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                <span class="text-white fs-5">{{ category.name|first }}</span>
                             </div>
                             {% endif %}
                             <div>
-                                <div class="text-sm font-medium text-gray-900">{{ category.name }}</div>
-                                <div class="text-xs text-gray-500">/{{ category.slug }}/</div>
+                                <div class="fw-medium">{{ category.name }}</div>
+                                <div class="small text-muted">/{{ category.slug }}/</div>
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-500">
+                    <td class="text-muted">
                         {% if category.applies_to.exists %}
-                        <div class="flex flex-wrap gap-1">
+                        <div class="d-flex flex-wrap gap-1">
                             {% for ct in category.applies_to.all %}
-                            <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs capitalize">{{ ct.model }}</span>
+                            <span class="badge bg-primary text-capitalize">{{ ct.model }}</span>
                             {% endfor %}
                         </div>
                         {% else %}
-                        <span class="text-gray-400">—</span>
+                        <span class="text-muted">—</span>
                         {% endif %}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td class="text-nowrap text-muted">
                         {% if category.parent %}
                         {{ category.parent.name }}
                         {% else %}
-                        <span class="text-gray-400">—</span>
+                        <span class="text-muted">—</span>
                         {% endif %}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div class="flex gap-1">
+                    <td class="text-nowrap text-muted">
+                        <div class="d-flex gap-1">
                             {% if category.applies_to.exists %}
                                 {% if 'post' in category.get_applies_to_display %}
-                                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs" title="Posts">P: {{ category.posts.count }}</span>
+                                <span class="badge bg-info" title="Posts">P: {{ category.posts.count }}</span>
                                 {% endif %}
                                 {% if 'page' in category.get_applies_to_display %}
-                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs" title="Pages">Pg: {{ category.pages.count }}</span>
+                                <span class="badge bg-success" title="Pages">Pg: {{ category.pages.count }}</span>
                                 {% endif %}
                                 {% if 'service' in category.get_applies_to_display %}
-                                <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs" title="Services">S: {{ category.services.count }}</span>
+                                <span class="badge" style="background-color: #6f42c1;" title="Services">S: {{ category.services.count }}</span>
                                 {% endif %}
                                 {% if 'training' in category.get_applies_to_display %}
-                                <span class="px-2 py-1 bg-orange-100 text-orange-800 rounded text-xs" title="Trainings">T: {{ category.trainings.count }}</span>
+                                <span class="badge bg-warning text-dark" title="Trainings">T: {{ category.trainings.count }}</span>
                                 {% endif %}
                             {% else %}
-                            <span class="text-gray-400">—</span>
+                            <span class="text-muted">—</span>
                             {% endif %}
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ category.sort_order }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            {% if category.status == 'active' %}bg-green-100 text-green-800
-                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    <td class="text-nowrap text-muted">{{ category.sort_order }}</td>
+                    <td class="text-nowrap">
+                        <span class="badge 
+                            {% if category.status == 'active' %}bg-success
+                            {% else %}bg-secondary{% endif %}">
                             {{ category.get_status_display }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="{% url 'dashboard:category_edit' category.pk %}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                        <a href="{% url 'dashboard:category_delete' category.pk %}" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure?')">Delete</a>
+                    <td class="text-nowrap text-end">
+                        <a href="{% url 'dashboard:category_edit' category.pk %}" class="text-primary text-decoration-none me-2">Edit</a>
+                        <a href="{% url 'dashboard:category_delete' category.pk %}" class="text-danger text-decoration-none" onclick="return confirm('Are you sure?')">Delete</a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="8" class="px-6 py-4 text-center text-gray-500">No categories found.</td>
+                    <td colspan="8" class="text-center text-muted py-4">No categories found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

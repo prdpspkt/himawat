@@ -1,8 +1,9 @@
 # Django
-Django
+Django>=4.2,<5.0
 
 # Database
 psycopg2-binary
+# mysqlclient  # Uncomment for MySQL
 django-cleanup
 
 # Environment variables
@@ -16,3 +17,6 @@ whitenoise
 
 # Image processing
 Pillow
+
+# Additional utilities
+python-slugify

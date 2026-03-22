@@ -6,79 +6,77 @@
 {% block dashboard_content %}
 {% include 'dashboard/bulk_actions.html' with model_name='training' %}
 
-<div class="bg-white rounded-lg shadow">
-    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-gray-900">All Training Programs</h3>
-        <a href="{% url 'dashboard:training_create' %}" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors">
+<div class="card dashboard-card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title mb-0">All Training Programs</h3>
+        <a href="{% url 'dashboard:training_create' %}" class="btn btn-primary">
             Add New
         </a>
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+    <div class="table-responsive">
+        <table class="table table-hover dashboard-table mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+                    <th class="w-12">
                         <input type="checkbox" class="sr-only" aria-label="Select all">
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Training</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Featured</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th>Training</th>
+                    <th>Category</th>
+                    <th>Duration</th>
+                    <th>Price</th>
+                    <th>Featured</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody>
                 {% for training in trainings %}
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4">
-                        <input type="checkbox" class="item-checkbox h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" value="{{ training.pk }}">
+                <tr>
+                    <td class="p-4">
+                        <input type="checkbox" class="item-checkbox form-check-input" value="{{ training.pk }}">
                     </td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center">
+                    <td class="p-4">
+                        <div class="d-flex align-items-center">
                             {% if training.image %}
-                            <img class="h-10 w-10 rounded object-cover mr-3" src="{{ training.image.url }}" alt="">
+                            <img class="rounded object-cover me-3" style="width: 40px; height: 40px;" src="{{ training.image.url }}" alt="">
                             {% elif training.icon %}
-                            <div class="h-10 w-10 rounded bg-gray-100 flex items-center justify-center mr-3">
-                                <i class="{{ training.icon }} text-gray-600"></i>
+                            <div class="rounded bg-light d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                <i class="{{ training.icon }} text-secondary"></i>
                             </div>
                             {% endif %}
                             <div>
-                                <div class="text-sm font-medium text-gray-900">{{ training.name }}</div>
+                                <div class="fw-medium text-dark">{{ training.name }}</div>
                                 {% if training.duration %}
-                                <div class="text-xs text-gray-500">{{ training.duration }}</div>
+                                <div class="small text-muted">{{ training.duration }}</div>
                                 {% endif %}
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ training.get_category_display }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ training.duration|default:"-" }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ training.price|default:"-" }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="p-4 text-nowrap text-muted">{{ training.get_category_display }}</td>
+                    <td class="p-4 text-nowrap text-muted">{{ training.duration|default:"-" }}</td>
+                    <td class="p-4 text-nowrap text-muted">{{ training.price|default:"-" }}</td>
+                    <td class="p-4 text-nowrap">
                         {% if training.featured %}
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Yes</span>
+                        <span class="badge bg-warning">Yes</span>
                         {% else %}
-                        <span class="text-gray-400">-</span>
+                        <span class="text-muted">-</span>
                         {% endif %}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                            {% if training.status == 'active' %}bg-green-100 text-green-800
-                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    <td class="p-4 text-nowrap">
+                        <span class="badge {% if training.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
                             {{ training.get_status_display }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="{% url 'dashboard:training_edit' training.pk %}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                        <a href="{{ training.get_absolute_url }}" target="_blank" class="text-green-600 hover:text-green-900 mr-3">View</a>
-                        <a href="{% url 'dashboard:training_delete' training.pk %}" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure?')">Delete</a>
+                    <td class="p-4 text-nowrap">
+                        <a href="{% url 'dashboard:training_edit' training.pk %}" class="text-primary me-3">Edit</a>
+                        <a href="{{ training.get_absolute_url }}" target="_blank" class="text-success me-3">View</a>
+                        <a href="{% url 'dashboard:training_delete' training.pk %}" class="text-danger" onclick="return confirm('Are you sure?')">Delete</a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="8" class="px-6 py-4 text-center text-gray-500">No training programs found.</td>
+                    <td colspan="8" class="p-4 text-center text-muted">No training programs found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

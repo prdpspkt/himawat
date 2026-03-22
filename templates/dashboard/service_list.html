@@ -6,77 +6,77 @@
 {% block dashboard_content %}
 {% include 'dashboard/bulk_actions.html' with model_name='service' %}
 
-<div class="bg-white rounded-lg shadow">
-    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-gray-900">All Services</h3>
-        <a href="{% url 'dashboard:service_create' %}" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors">
+<div class="card shadow">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">All Services</h5>
+        <a href="{% url 'dashboard:service_create' %}" class="btn btn-primary">
             Add New
         </a>
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
-                        <input type="checkbox" class="sr-only" aria-label="Select all">
+                    <th style="width: 50px;">
+                        <input type="checkbox" class="visually-hidden" aria-label="Select all">
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Featured</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th>Service</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Featured</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody>
                 {% for service in services %}
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4">
-                        <input type="checkbox" class="item-checkbox h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" value="{{ service.pk }}">
+                <tr>
+                    <td class="px-4 py-3">
+                        <input type="checkbox" class="item-checkbox form-check-input" value="{{ service.pk }}">
                     </td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center">
+                    <td class="px-4 py-3">
+                        <div class="d-flex align-items-center">
                             {% if service.image %}
-                            <img class="h-10 w-10 rounded object-cover mr-3" src="{{ service.image.url }}" alt="">
+                            <img class="rounded object-fit-cover me-3" src="{{ service.image.url }}" alt="" style="width: 40px; height: 40px;">
                             {% elif service.icon %}
-                            <div class="h-10 w-10 rounded bg-gray-100 flex items-center justify-center mr-3">
-                                <i class="{{ service.icon }} text-gray-600"></i>
+                            <div class="rounded bg-light d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                <i class="{{ service.icon }} text-muted"></i>
                             </div>
                             {% endif %}
                             <div>
-                                <div class="text-sm font-medium text-gray-900">{{ service.name }}</div>
+                                <div class="fw-medium">{{ service.name }}</div>
                                 {% if service.price %}
-                                <div class="text-xs text-gray-500">NPR {{ service.price }}</div>
+                                <div class="small text-muted">NPR {{ service.price }}</div>
                                 {% endif %}
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ service.get_category_display }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ service.price|default:"-" }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="text-nowrap text-muted">{{ service.get_category_display }}</td>
+                    <td class="text-nowrap text-muted">{{ service.price|default:"-" }}</td>
+                    <td class="text-nowrap">
                         {% if service.featured %}
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Yes</span>
+                        <span class="badge bg-warning">Yes</span>
                         {% else %}
-                        <span class="text-gray-400">-</span>
+                        <span class="text-muted">-</span>
                         {% endif %}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                            {% if service.status == 'active' %}bg-green-100 text-green-800
-                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    <td class="text-nowrap">
+                        <span class="badge
+                            {% if service.status == 'active' %}bg-success
+                            {% else %}bg-secondary{% endif %}">
                             {{ service.get_status_display }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="{% url 'dashboard:service_edit' service.pk %}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                        <a href="{{ service.get_absolute_url }}" target="_blank" class="text-green-600 hover:text-green-900 mr-3">View</a>
-                        <a href="{% url 'dashboard:service_delete' service.pk %}" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure?')">Delete</a>
+                    <td class="text-nowrap">
+                        <a href="{% url 'dashboard:service_edit' service.pk %}" class="text-primary text-decoration-none me-2">Edit</a>
+                        <a href="{{ service.get_absolute_url }}" target="_blank" class="text-success text-decoration-none me-2">View</a>
+                        <a href="{% url 'dashboard:service_delete' service.pk %}" class="text-danger text-decoration-none" onclick="return confirm('Are you sure?')">Delete</a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">No services found.</td>
+                    <td colspan="7" class="text-center text-muted py-4">No services found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

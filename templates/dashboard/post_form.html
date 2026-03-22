@@ -10,31 +10,10 @@
 
 {% block extra_css %}
 <style>
-    .meta-box {
-        background: #fff;
-        border: 1px solid #c3c4c7;
-        box-shadow: 0 1px 1px rgba(0,0,0,.04);
-    }
-    
-    .meta-box-header {
-        border-bottom: 1px solid #c3c4c7;
-        padding: 8px 12px;
-        font-size: 14px;
-        font-weight: 600;
-        line-height: 1.4;
-        background: #f6f7f7;
-    }
-    
-    .meta-box-content {
-        padding: 12px;
-    }
-    
     /* Category Tree */
     .category-tree {
         max-height: 200px;
         overflow-y: auto;
-        margin: 0 -12px;
-        padding: 0 12px;
     }
     
     .category-item {
@@ -45,127 +24,62 @@
         display: flex;
         align-items: flex-start;
         cursor: pointer;
-        font-size: 13px;
-        line-height: 1.5;
+        font-size: 0.875rem;
     }
     
-    .category-item input[type="checkbox"] {
-        margin-right: 6px;
-        margin-top: 2px;
+    .category-item input[type="radio"] {
+        margin-right: 0.5rem;
+        margin-top: 0.125rem;
     }
     
     .category-item .children {
-        margin-left: 20px;
-        margin-top: 4px;
-    }
-    
-    .category-item .level-1 { margin-left: 0; }
-    .category-item .level-2 { margin-left: 20px; }
-    .category-item .level-3 { margin-left: 40px; }
-    .category-item .level-4 { margin-left: 60px; }
-    
-    /* Add New Category Toggle */
-    .add-new-category-toggle {
-        display: inline-block;
-        margin-top: 10px;
-        color: #2271b1;
-        font-size: 13px;
-        text-decoration: none;
-        cursor: pointer;
-    }
-    
-    .add-new-category-toggle:hover {
-        color: #135e96;
-        text-decoration: underline;
-    }
-    
-    .add-new-category-form {
-        display: none;
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px solid #c3c4c7;
-    }
-    
-    .add-new-category-form.visible {
-        display: block;
-    }
-    
-    .add-new-category-form input,
-    .add-new-category-form select {
-        width: 100%;
-        padding: 4px 8px;
-        font-size: 13px;
-        border: 1px solid #8c8f94;
-        border-radius: 3px;
-        margin-bottom: 8px;
-    }
-    
-    .add-new-category-form button {
-        font-size: 13px;
-        padding: 4px 12px;
-        background: #2271b1;
-        color: #fff;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-    }
-    
-    .add-new-category-form button:hover {
-        background: #135e96;
-    }
-    
-    .add-new-category-form .cancel-link {
-        font-size: 13px;
-        color: #b32d2e;
-        margin-left: 10px;
-        cursor: pointer;
+        margin-left: 1.25rem;
+        margin-top: 0.25rem;
     }
     
     /* Tags Input */
     .tags-input-container {
         position: relative;
-        border: 1px solid #8c8f94;
-        border-radius: 3px;
-        padding: 4px 6px;
-        min-height: 36px;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        padding: 0.375rem 0.5rem;
+        min-height: 38px;
         background: #fff;
     }
     
     .tags-input-container:focus-within {
-        border-color: #2271b1;
-        box-shadow: 0 0 0 1px #2271b1;
-        outline: 2px solid transparent;
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
     }
     
     .tags-list {
         display: flex;
         flex-wrap: wrap;
-        gap: 4px;
+        gap: 0.25rem;
         align-items: center;
     }
     
     .tag-item {
         display: inline-flex;
         align-items: center;
-        background: #f0f0f1;
-        border: 1px solid #c3c4c7;
-        border-radius: 3px;
-        padding: 2px 6px;
-        font-size: 13px;
-        color: #3c434a;
+        background: #e9ecef;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        padding: 0.125rem 0.5rem;
+        font-size: 0.875rem;
     }
     
     .tag-item .remove-tag {
-        margin-left: 6px;
+        margin-left: 0.375rem;
         cursor: pointer;
-        color: #787c82;
+        color: #6c757d;
         font-weight: bold;
-        font-size: 16px;
+        font-size: 1rem;
         line-height: 1;
     }
     
     .tag-item .remove-tag:hover {
-        color: #b32d2e;
+        color: #dc3545;
     }
     
     .tags-input {
@@ -173,14 +87,8 @@
         outline: none;
         flex: 1;
         min-width: 60px;
-        padding: 2px 4px;
-        font-size: 13px;
-    }
-    
-    .tags-hint {
-        font-size: 12px;
-        color: #646970;
-        margin-top: 6px;
+        padding: 0.125rem 0.25rem;
+        font-size: 0.875rem;
     }
     
     /* Suggestions Dropdown */
@@ -190,14 +98,14 @@
         left: 0;
         right: 0;
         background: #fff;
-        border: 1px solid #c3c4c7;
+        border: 1px solid #dee2e6;
         border-top: none;
-        border-radius: 0 0 3px 3px;
+        border-radius: 0 0 0.375rem 0.375rem;
         max-height: 150px;
         overflow-y: auto;
         z-index: 100;
         display: none;
-        box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,.1);
     }
     
     .tags-suggestions.visible {
@@ -205,386 +113,285 @@
     }
     
     .tags-suggestions .suggestion-item {
-        padding: 8px 12px;
+        padding: 0.5rem 0.75rem;
         cursor: pointer;
-        font-size: 13px;
+        font-size: 0.875rem;
     }
     
     .tags-suggestions .suggestion-item:hover,
     .tags-suggestions .suggestion-item.active {
-        background: #2271b1;
+        background: #0d6efd;
         color: #fff;
     }
     
-    /* Loading State */
-    .loading {
-        opacity: 0.6;
-        pointer-events: none;
+    /* Sidebar Meta Boxes */
+    .meta-box {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
     }
     
-    /* Message Toast */
+    .meta-box-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
+    
+    .meta-box-content {
+        padding: 1rem;
+    }
+    
+    /* Toast Message */
     .toast-message {
         position: fixed;
         bottom: 20px;
         right: 20px;
-        padding: 12px 20px;
-        border-radius: 4px;
-        font-size: 14px;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
         z-index: 9999;
         animation: slideIn 0.3s ease;
     }
     
     @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
     }
     
-    .toast-success {
-        background: #00a32a;
-        color: #fff;
-    }
-    
-    .toast-error {
-        background: #b32d2e;
-        color: #fff;
-    }
+    .toast-success { background: #198754; color: #fff; }
+    .toast-error { background: #dc3545; color: #fff; }
 </style>
 {% endblock %}
 
 {% block dashboard_content %}
-<div class="max-w-7xl mx-auto">
-    <form method="post" enctype="multipart/form-data" id="post-form">
-        {% csrf_token %}
-        
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Main Content - Left Side -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Title -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                        <input type="text" name="title" value="{{ form.title.value|default:'' }}" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-lg">
-                    </div>
-                </div>
-                
-                <!-- Content Editor -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
-                        {{ form.content }}
-                    </div>
-                </div>
-                
-                <!-- Excerpt -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Excerpt</label>
-                        <textarea name="excerpt" rows="3"
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">{{ form.excerpt.value|default:'' }}</textarea>
-                        <p class="text-xs text-gray-500 mt-1">Excerpts are optional hand-crafted summaries of your content.</p>
-                    </div>
-                </div>
-                
-                <!-- Slug -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Permalink</label>
-                        <div class="flex items-center">
-                            <span class="text-gray-500 text-sm mr-2">{{ request.scheme }}://{{ request.get_host }}/blog/</span>
-                            <input type="text" name="slug" value="{{ form.slug.value|default:'' }}"
-                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
-                        </div>
-                    </div>
+<form method="post" enctype="multipart/form-data" id="post-form">
+    {% csrf_token %}
+    
+    <div class="row g-4">
+        <!-- Main Content - Left Side -->
+        <div class="col-lg-8">
+            <!-- Title -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <label class="form-label fw-medium">Title</label>
+                    <input type="text" name="title" value="{{ form.title.value|default:'' }}" required
+                           class="form-control form-control-lg">
                 </div>
             </div>
-
-            <!-- Sidebar - Right Side -->
-            <div class="space-y-4">
-                <!-- Publish Meta Box -->
-                <div class="meta-box">
-                    <div class="meta-box-header">Publish</div>
-                    <div class="meta-box-content">
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                            <select name="status" id="id_status" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-primary focus:border-primary text-sm">
-                                {% for value, label in form.fields.status.choices %}
-                                <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Publish Date</label>
-                            <input type="datetime-local" name="published_at" value="{{ form.published_at.value|default:'' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-primary focus:border-primary text-sm">
-                        </div>
-                        
-                        <div class="flex items-center mb-4">
-                            <input type="checkbox" name="allow_comments" id="id_allow_comments" {% if form.allow_comments.value %}checked{% endif %}
-                                   class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
-                            <label for="id_allow_comments" class="ml-2 block text-sm text-gray-700">Allow Comments</label>
-                        </div>
-                        
-                        <div class="flex justify-end">
-                            <button type="submit" class="px-6 py-2 bg-primary text-white rounded hover:bg-red-700 transition-colors text-sm font-medium">
-                                {% if object %}{% if form.status.value == 'published' %}Update{% else %}Publish{% endif %}{% else %}Publish{% endif %}
-                            </button>
-                        </div>
-                    </div>
+            
+            <!-- Content Editor -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <label class="form-label fw-medium">Content</label>
+                    {{ form.content }}
                 </div>
-                
-                <!-- Categories Meta Box -->
-                <div class="meta-box">
-                    <div class="meta-box-header">Categories</div>
-                    <div class="meta-box-content">
-                        <div class="category-tree" id="category-tree">
-                            {% for category in all_categories %}
-                                {% if not category.parent_id %}
-                                <div class="category-item">
-                                    <label class="level-1">
-                                        <input type="radio" name="category" value="{{ category.id }}" 
-                                               {% if form.category.value|default:'' == category.id|stringformat:"s" %}checked{% endif %}>
-                                        <span>{{ category.name }}</span>
-                                    </label>
-                                    {% if category.children.all %}
-                                    <div class="children">
-                                        {% for child in category.children.all %}
-                                        <div class="category-item">
-                                            <label class="level-2">
-                                                <input type="radio" name="category" value="{{ child.id }}" 
-                                                       {% if form.category.value|default:'' == child.id|stringformat:"s" %}checked{% endif %}>
-                                                <span>{{ child.name }}</span>
-                                            </label>
-                                            {% if child.children.all %}
-                                            <div class="children">
-                                                {% for grandchild in child.children.all %}
-                                                <div class="category-item">
-                                                    <label class="level-3">
-                                                        <input type="radio" name="category" value="{{ grandchild.id }}" 
-                                                               {% if form.category.value|default:'' == grandchild.id|stringformat:"s" %}checked{% endif %}>
-                                                        <span>{{ grandchild.name }}</span>
-                                                    </label>
-                                                </div>
-                                                {% endfor %}
-                                            </div>
-                                            {% endif %}
-                                        </div>
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        
-                        <a href="#" class="add-new-category-toggle" id="add-new-category-toggle">+ Add New Category</a>
-                        
-                        <div class="add-new-category-form" id="add-new-category-form">
-                            <input type="text" id="new-category-name" placeholder="Category Name">
-                            <select id="new-category-parent">
-                                <option value="">— Parent Category —</option>
-                                {% for category in all_categories %}
-                                <option value="{{ category.id }}">{{ category.name }}</option>
-                                {% endfor %}
-                            </select>
-                            <div>
-                                <button type="button" id="add-category-btn">Add New Category</button>
-                                <a href="#" class="cancel-link" id="cancel-add-category">Cancel</a>
-                            </div>
-                        </div>
-                    </div>
+            </div>
+            
+            <!-- Excerpt -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <label class="form-label fw-medium">Excerpt</label>
+                    <textarea name="excerpt" rows="3" class="form-control">{{ form.excerpt.value|default:'' }}</textarea>
+                    <div class="form-text">Excerpts are optional hand-crafted summaries of your content.</div>
                 </div>
-                
-                <!-- Tags Meta Box -->
-                <div class="meta-box">
-                    <div class="meta-box-header">Tags</div>
-                    <div class="meta-box-content">
-                        <div class="tags-input-container" id="tags-container">
-                            <div class="tags-list" id="tags-list">
-                                {% if object %}
-                                    {% for tag in object.tags.all %}
-                                    <span class="tag-item" data-tag-id="{{ tag.id }}" data-tag-name="{{ tag.name }}">
-                                        {{ tag.name }}
-                                        <span class="remove-tag">&times;</span>
-                                    </span>
-                                    {% endfor %}
-                                {% endif %}
-                                <input type="text" class="tags-input" id="tags-input" placeholder="Add a tag" autocomplete="off">
-                            </div>
-                            <div class="tags-suggestions" id="tags-suggestions"></div>
-                        </div>
-                        <p class="tags-hint">Separate tags with commas or press Enter</p>
-                        
-                        <!-- Hidden input to store selected tag IDs -->
-                        <input type="hidden" name="tags" id="tags-hidden-input" value="{% if object %}{{ object.tags.all|join:',' }}{% endif %}">
-                        
-                        <!-- Available tags data for JavaScript -->
-                        <script>
-                            window.availableTags = [
-                                {% for tag in all_tags %}
-                                { id: {{ tag.id }}, name: "{{ tag.name|escapejs }}" }{% if not forloop.last %},{% endif %}
-                                {% endfor %}
-                            ];
-                            window.selectedTags = [
-                                {% if object %}
-                                    {% for tag in object.tags.all %}
-                                    { id: {{ tag.id }}, name: "{{ tag.name|escapejs }}" }{% if not forloop.last %},{% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                            ];
-                        </script>
-                    </div>
-                </div>
-                
-                <!-- Featured Image Meta Box -->
-                <div class="meta-box">
-                    <div class="meta-box-header">Featured Image</div>
-                    <div class="meta-box-content">
-                        <div id="featured-image-preview">
-                            {% if object and object.featured_image %}
-                            <img src="{{ object.featured_image.url }}" class="w-full h-40 object-cover rounded mb-3">
-                            {% else %}
-                            <div class="w-full h-32 bg-gray-100 rounded flex items-center justify-center mb-3 border-2 border-dashed border-gray-300">
-                                <span class="text-gray-400 text-sm">No featured image</span>
-                            </div>
-                            {% endif %}
-                        </div>
-                        <input type="file" name="featured_image" id="featured_image" accept="image/*"
-                               class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+            </div>
+            
+            <!-- Slug -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <label class="form-label fw-medium">Permalink</label>
+                    <div class="input-group">
+                        <span class="input-group-text text-muted">{{ request.scheme }}://{{ request.get_host }}/blog/</span>
+                        <input type="text" name="slug" value="{{ form.slug.value|default:'' }}" class="form-control">
                     </div>
                 </div>
             </div>
         </div>
-    </form>
-</div>
+
+        <!-- Sidebar - Right Side -->
+        <div class="col-lg-4">
+            <!-- Publish Meta Box -->
+            <div class="meta-box">
+                <div class="meta-box-header">Publish</div>
+                <div class="meta-box-content">
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" id="id_status" class="form-select form-select-sm">
+                            {% for value, label in form.fields.status.choices %}
+                            <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Publish Date</label>
+                        <input type="datetime-local" name="published_at" value="{{ form.published_at.value|default:'' }}"
+                               class="form-control form-control-sm">
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input type="checkbox" name="allow_comments" id="id_allow_comments" {% if form.allow_comments.value %}checked{% endif %} class="form-check-input">
+                        <label for="id_allow_comments" class="form-check-label">Allow Comments</label>
+                    </div>
+                    
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            {% if object %}{% if form.status.value == 'published' %}Update{% else %}Publish{% endif %}{% else %}Publish{% endif %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Categories Meta Box -->
+            <div class="meta-box">
+                <div class="meta-box-header">Categories</div>
+                <div class="meta-box-content">
+                    <div class="category-tree" id="category-tree">
+                        {% for category in all_categories %}
+                            {% if not category.parent_id %}
+                            <div class="category-item">
+                                <label class="level-1">
+                                    <input type="radio" name="category" value="{{ category.id }}" 
+                                           {% if form.category.value|default:'' == category.id|stringformat:"s" %}checked{% endif %}>
+                                    <span>{{ category.name }}</span>
+                                </label>
+                                {% if category.children.all %}
+                                <div class="children">
+                                    {% for child in category.children.all %}
+                                    <div class="category-item">
+                                        <label class="level-2">
+                                            <input type="radio" name="category" value="{{ child.id }}" 
+                                                   {% if form.category.value|default:'' == child.id|stringformat:"s" %}checked{% endif %}>
+                                            <span>{{ child.name }}</span>
+                                        </label>
+                                        {% if child.children.all %}
+                                        <div class="children">
+                                            {% for grandchild in child.children.all %}
+                                            <div class="category-item">
+                                                <label class="level-3">
+                                                    <input type="radio" name="category" value="{{ grandchild.id }}" 
+                                                           {% if form.category.value|default:'' == grandchild.id|stringformat:"s" %}checked{% endif %}>
+                                                    <span>{{ grandchild.name }}</span>
+                                                </label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    
+                    <a href="#" class="btn btn-link btn-sm p-0" id="add-new-category-toggle">+ Add New Category</a>
+                    
+                    <div id="add-new-category-form" style="display: none;" class="mt-3 pt-3 border-top">
+                        <input type="text" id="new-category-name" placeholder="Category Name" class="form-control form-control-sm mb-2">
+                        <select id="new-category-parent" class="form-select form-select-sm mb-2">
+                            <option value="">— Parent Category —</option>
+                            {% for category in all_categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="d-flex gap-2">
+                            <button type="button" id="add-category-btn" class="btn btn-primary btn-sm">Add</button>
+                            <button type="button" id="cancel-add-category" class="btn btn-outline-secondary btn-sm">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tags Meta Box -->
+            <div class="meta-box">
+                <div class="meta-box-header">Tags</div>
+                <div class="meta-box-content">
+                    <div class="tags-input-container" id="tags-container">
+                        <div class="tags-list" id="tags-list">
+                            {% if object %}
+                                {% for tag in object.tags.all %}
+                                <span class="tag-item" data-tag-id="{{ tag.id }}" data-tag-name="{{ tag.name }}">
+                                    {{ tag.name }}
+                                    <span class="remove-tag">&times;</span>
+                                </span>
+                                {% endfor %}
+                            {% endif %}
+                            <input type="text" class="tags-input" id="tags-input" placeholder="Add a tag" autocomplete="off">
+                        </div>
+                        <div class="tags-suggestions" id="tags-suggestions"></div>
+                    </div>
+                    <div class="form-text">Separate tags with commas or press Enter</div>
+                    
+                    <input type="hidden" name="tags" id="tags-hidden-input" value="{% if object %}{{ object.tags.all|join:',' }}{% endif %}">
+                    
+                    <script>
+                        window.availableTags = [
+                            {% for tag in all_tags %}
+                            { id: {{ tag.id }}, name: "{{ tag.name|escapejs }}" }{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        ];
+                        window.selectedTags = [
+                            {% if object %}
+                                {% for tag in object.tags.all %}
+                                { id: {{ tag.id }}, name: "{{ tag.name|escapejs }}" }{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        ];
+                    </script>
+                </div>
+            </div>
+            
+            <!-- Featured Image Meta Box -->
+            <div class="meta-box">
+                <div class="meta-box-header">Featured Image</div>
+                <div class="meta-box-content">
+                    <div id="featured-image-preview" class="mb-3">
+                        {% if object and object.featured_image %}
+                        <img src="{{ object.featured_image.url }}" class="img-fluid rounded" style="max-height: 160px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center text-muted" style="height: 128px; border: 2px dashed #dee2e6;">
+                            <span>No featured image</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <input type="file" name="featured_image" id="featured_image" accept="image/*" class="form-control form-control-sm">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Dynamic Category and Tags functionality
+    // Category and Tags functionality
     (function() {
-        // Get CSRF token
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         
-        // ==================== ADD NEW CATEGORY ====================
+        // Add New Category
         const addCategoryToggle = document.getElementById('add-new-category-toggle');
         const addCategoryForm = document.getElementById('add-new-category-form');
         const cancelAddCategory = document.getElementById('cancel-add-category');
         const addCategoryBtn = document.getElementById('add-category-btn');
-        const newCategoryName = document.getElementById('new-category-name');
-        const newCategoryParent = document.getElementById('new-category-parent');
-        const categoryTree = document.getElementById('category-tree');
         
         addCategoryToggle.addEventListener('click', function(e) {
             e.preventDefault();
-            addCategoryForm.classList.add('visible');
-            newCategoryName.focus();
+            addCategoryForm.style.display = 'block';
+            document.getElementById('new-category-name').focus();
         });
         
-        cancelAddCategory.addEventListener('click', function(e) {
-            e.preventDefault();
-            addCategoryForm.classList.remove('visible');
-            newCategoryName.value = '';
-            newCategoryParent.value = '';
+        cancelAddCategory.addEventListener('click', function() {
+            addCategoryForm.style.display = 'none';
+            document.getElementById('new-category-name').value = '';
+            document.getElementById('new-category-parent').value = '';
         });
         
-        addCategoryBtn.addEventListener('click', function() {
-            const name = newCategoryName.value.trim();
-            const parentId = newCategoryParent.value;
-            
-            if (!name) {
-                showToast('Please enter a category name', 'error');
-                return;
-            }
-            
-            addCategoryBtn.classList.add('loading');
-            addCategoryBtn.textContent = 'Adding...';
-            
-            fetch('{% url "dashboard:category_create_ajax" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrfToken
-                },
-                body: `name=${encodeURIComponent(name)}&parent=${encodeURIComponent(parentId)}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                addCategoryBtn.classList.remove('loading');
-                addCategoryBtn.textContent = 'Add New Category';
-                
-                if (data.success) {
-                    // Add new category to the tree
-                    addCategoryToTree(data.category, parentId);
-                    
-                    // Add to parent dropdown
-                    const option = document.createElement('option');
-                    option.value = data.category.id;
-                    option.textContent = data.category.name;
-                    newCategoryParent.appendChild(option);
-                    
-                    // Select the new category
-                    const radio = document.querySelector(`input[name="category"][value="${data.category.id}"]`);
-                    if (radio) radio.checked = true;
-                    
-                    // Reset and hide form
-                    newCategoryName.value = '';
-                    newCategoryParent.value = '';
-                    addCategoryForm.classList.remove('visible');
-                    
-                    showToast('Category created successfully', 'success');
-                } else {
-                    showToast(data.error || 'Failed to create category', 'error');
-                }
-            })
-            .catch(error => {
-                addCategoryBtn.classList.remove('loading');
-                addCategoryBtn.textContent = 'Add New Category';
-                showToast('Error creating category', 'error');
-            });
-        });
-        
-        function addCategoryToTree(category, parentId) {
-            const item = document.createElement('div');
-            item.className = 'category-item';
-            
-            const level = parentId ? 'level-2' : 'level-1';
-            const indent = parentId ? 20 : 0;
-            
-            item.innerHTML = `
-                <label class="${level}" style="margin-left: ${indent}px">
-                    <input type="radio" name="category" value="${category.id}" checked>
-                    <span>${category.name}</span>
-                </label>
-            `;
-            
-            if (parentId) {
-                // Find parent and add to its children
-                const parentRadio = document.querySelector(`input[name="category"][value="${parentId}"]`);
-                if (parentRadio) {
-                    let childrenContainer = parentRadio.closest('.category-item').querySelector('.children');
-                    if (!childrenContainer) {
-                        childrenContainer = document.createElement('div');
-                        childrenContainer.className = 'children';
-                        parentRadio.closest('label').parentElement.appendChild(childrenContainer);
-                    }
-                    childrenContainer.appendChild(item);
-                } else {
-                    categoryTree.appendChild(item);
-                }
-            } else {
-                categoryTree.appendChild(item);
-            }
-        }
-        
-        // ==================== TAGS INPUT ====================
+        // Tags functionality
         const tagsContainer = document.getElementById('tags-container');
         const tagsList = document.getElementById('tags-list');
         const tagsInput = document.getElementById('tags-input');
@@ -593,15 +400,12 @@
         
         let selectedTags = window.selectedTags || [];
         let availableTags = window.availableTags || [];
-        let activeSuggestionIndex = -1;
         
-        // Update hidden input with selected tag IDs
         function updateHiddenTagsInput() {
             const tagIds = selectedTags.map(t => t.id);
             tagsHiddenInput.value = tagIds.join(',');
         }
         
-        // Create tag element
         function createTagElement(tag) {
             const span = document.createElement('span');
             span.className = 'tag-item';
@@ -616,20 +420,13 @@
             return span;
         }
         
-        // Add a tag
         function addTag(tag) {
-            // Check if already selected
-            if (selectedTags.some(t => t.id === tag.id)) {
-                return;
-            }
-            
+            if (selectedTags.some(t => t.id === tag.id)) return;
             selectedTags.push(tag);
-            const tagEl = createTagElement(tag);
-            tagsList.insertBefore(tagEl, tagsInput);
+            tagsList.insertBefore(createTagElement(tag), tagsInput);
             updateHiddenTagsInput();
         }
         
-        // Remove a tag
         function removeTag(tagId) {
             selectedTags = selectedTags.filter(t => t.id !== tagId);
             const tagEl = tagsList.querySelector(`[data-tag-id="${tagId}"]`);
@@ -637,164 +434,30 @@
             updateHiddenTagsInput();
         }
         
-        // Create new tag via AJAX
-        function createNewTag(name) {
-            return fetch('{% url "dashboard:tag_create_ajax" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrfToken
-                },
-                body: `name=${encodeURIComponent(name)}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    availableTags.push(data.tag);
-                    return data.tag;
-                } else {
-                    throw new Error(data.error || 'Failed to create tag');
-                }
-            });
-        }
-        
-        // Show suggestions
-        function showSuggestions(query) {
-            const filtered = availableTags.filter(tag => 
-                tag.name.toLowerCase().includes(query.toLowerCase()) &&
-                !selectedTags.some(st => st.id === tag.id)
-            );
-            
-            if (filtered.length === 0) {
-                tagsSuggestions.classList.remove('visible');
-                return;
-            }
-            
-            tagsSuggestions.innerHTML = filtered.map((tag, index) => 
-                `<div class="suggestion-item" data-index="${index}" data-tag-id="${tag.id}">${tag.name}</div>`
-            ).join('');
-            
-            tagsSuggestions.classList.add('visible');
-            activeSuggestionIndex = -1;
-            
-            // Add click handlers
-            tagsSuggestions.querySelectorAll('.suggestion-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const tagId = parseInt(this.dataset.tagId);
-                    const tag = availableTags.find(t => t.id === tagId);
-                    if (tag) {
-                        addTag(tag);
-                        tagsInput.value = '';
-                        tagsSuggestions.classList.remove('visible');
-                    }
-                });
-            });
-        }
-        
-        // Tags input event handlers
-        tagsInput.addEventListener('input', function() {
-            const value = this.value.trim();
-            if (value.length > 0) {
-                showSuggestions(value);
-            } else {
-                tagsSuggestions.classList.remove('visible');
-            }
-        });
-        
         tagsInput.addEventListener('keydown', function(e) {
             const value = this.value.trim();
             
-            if (e.key === 'Enter' || e.key === ',') {
+            if ((e.key === 'Enter' || e.key === ',') && value) {
                 e.preventDefault();
                 
-                if (activeSuggestionIndex >= 0) {
-                    // Select highlighted suggestion
-                    const items = tagsSuggestions.querySelectorAll('.suggestion-item');
-                    if (items[activeSuggestionIndex]) {
-                        items[activeSuggestionIndex].click();
-                        return;
-                    }
-                }
-                
-                if (value) {
-                    // Check if tag exists
-                    const existingTag = availableTags.find(t => t.name.toLowerCase() === value.toLowerCase());
-                    
-                    if (existingTag) {
-                        addTag(existingTag);
-                        this.value = '';
-                        tagsSuggestions.classList.remove('visible');
-                    } else {
-                        // Create new tag
-                        createNewTag(value).then(tag => {
-                            addTag(tag);
-                            this.value = '';
-                            tagsSuggestions.classList.remove('visible');
-                            showToast(`Tag "${tag.name}" created`, 'success');
-                        }).catch(err => {
-                            showToast(err.message, 'error');
-                        });
-                    }
+                const existingTag = availableTags.find(t => t.name.toLowerCase() === value.toLowerCase());
+                if (existingTag) {
+                    addTag(existingTag);
+                    this.value = '';
                 }
             } else if (e.key === 'Backspace' && !value && selectedTags.length > 0) {
-                // Remove last tag on backspace if input is empty
-                const lastTag = selectedTags[selectedTags.length - 1];
-                removeTag(lastTag.id);
-            } else if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                const items = tagsSuggestions.querySelectorAll('.suggestion-item');
-                if (items.length > 0) {
-                    activeSuggestionIndex = Math.min(activeSuggestionIndex + 1, items.length - 1);
-                    items.forEach((item, i) => {
-                        item.classList.toggle('active', i === activeSuggestionIndex);
-                    });
-                }
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                const items = tagsSuggestions.querySelectorAll('.suggestion-item');
-                if (items.length > 0) {
-                    activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
-                    items.forEach((item, i) => {
-                        item.classList.toggle('active', i === activeSuggestionIndex);
-                    });
-                }
-            } else if (e.key === 'Escape') {
-                tagsSuggestions.classList.remove('visible');
+                removeTag(selectedTags[selectedTags.length - 1].id);
             }
         });
         
-        // Close suggestions when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!tagsContainer.contains(e.target)) {
-                tagsSuggestions.classList.remove('visible');
-            }
-        });
-        
-        // Add remove handlers to existing tags
         tagsList.querySelectorAll('.tag-item .remove-tag').forEach(btn => {
             btn.addEventListener('click', function() {
-                const tagEl = this.closest('.tag-item');
-                const tagId = parseInt(tagEl.dataset.tagId);
+                const tagId = parseInt(this.closest('.tag-item').dataset.tagId);
                 removeTag(tagId);
             });
         });
         
-        // ==================== TOAST NOTIFICATIONS ====================
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = `toast-message toast-${type}`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                toast.style.transition = 'all 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-        
-        // ==================== FEATURED IMAGE PREVIEW ====================
+        // Featured Image Preview
         const featuredImageInput = document.getElementById('featured_image');
         const featuredImagePreview = document.getElementById('featured-image-preview');
         
@@ -803,7 +466,7 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    featuredImagePreview.innerHTML = `<img src="${e.target.result}" class="w-full h-40 object-cover rounded mb-3">`;
+                    featuredImagePreview.innerHTML = `<img src="${e.target.result}" class="img-fluid rounded" style="max-height: 160px; object-fit: cover;">`;
                 };
                 reader.readAsDataURL(file);
             }

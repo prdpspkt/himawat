@@ -1,31 +1,59 @@
 """
-Django settings for thelix project.
+Django settings for Himwatkhanda Vastu project.
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-SECRET_KEY = 'django-insecure-wnx+#tn3lti*sz@3un)lrl-i6d*ilfzkg##z1&ip@gpgmt8f$4'
+# =============================================================================
+# SECURITY SETTINGS
+# =============================================================================
 
-DEBUG = True
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'himawatkhandavastu.com', 'www.himawatkhandavastu.com', '*']
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    raise ValueError("DJANGO_SECRET_KEY environment variable is not set!")
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+
+# Allowed hosts - configured via environment variable
+ALLOWED_HOSTS_STR = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1')
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',') if host.strip()]
 
 # CSRF Trusted Origins
-CSRF_TRUSTED_ORIGINS = [
-    'https://himawatkhandavastu.com',
-    'https://www.himawatkhandavastu.com',
-    'http://himawatkhandavastu.com',
-    'http://www.himawatkhandavastu.com',
-    'http://localhost:8000',
-    'http://127.0.0.1:8000',
-]
+CSRF_TRUSTED_ORIGINS_STR = os.environ.get('CSRF_TRUSTED_ORIGINS', '')
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in CSRF_TRUSTED_ORIGINS_STR.split(',') if origin.strip()]
+if not CSRF_TRUSTED_ORIGINS and not DEBUG:
+    # Fallback for production if not explicitly set
+    CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS if not host.startswith(('localhost', '127.0.0.1', '*'))]
+
+# Security Headers (HTTPS only in production)
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+    
+    # If behind a proxy
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
-# Application definition
+# =============================================================================
+# APPLICATION DEFINITION
+# =============================================================================
 
 INSTALLED_APPS = [
     'django.contrib.auth',
@@ -42,24 +70,25 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # For static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # Add cache control middleware last (only active in DEBUG mode)
+    # Cache control middleware (only active in DEBUG mode)
     'himwat.middleware.DisableBrowserCachingMiddleware',
 ]
 
 ROOT_URLCONF = 'himwat.urls'
 
-# Do this if you aren't sure. It's the standard Django default.
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': DEBUG, 
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': DEBUG,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -77,96 +106,112 @@ TEMPLATES = [
 WSGI_APPLICATION = 'himwat.wsgi.application'
 
 
-if DEBUG:
-# Database
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+# =============================================================================
+# DATABASE
+# =============================================================================
+
+DATABASES = {
+    'default': {
+        'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.environ.get('DB_NAME', BASE_DIR / 'db.sqlite3'),
+        'USER': os.environ.get('DB_USER', ''),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', ''),
+        'PORT': os.environ.get('DB_PORT', ''),
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'negeobag_himawat',  # The name of the database you created in MySQL
-            'USER': 'negeobag_himawat',  # Your MySQL username (e.g., 'root')
-            'PASSWORD': '*HPKO@CrevmO84p7',  # Your MySQL password
-            'HOST': '127.0.0.1',  # Use 'localhost' or '127.0.0.1'
-            'PORT': '3306',  # Default MySQL port
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-                'charset': 'utf8mb4',
-            },
-        }
+}
+
+# PostgreSQL-specific options
+if os.environ.get('DB_ENGINE') == 'django.db.backends.postgresql':
+    DATABASES['default']['OPTIONS'] = {
+        'connect_timeout': 10,
+    }
+elif os.environ.get('DB_ENGINE') == 'django.db.backends.mysql':
+    DATABASES['default']['OPTIONS'] = {
+        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        'charset': 'utf8mb4',
     }
 
 
-# Password validation
+# =============================================================================
+# PASSWORD VALIDATION
+# =============================================================================
+
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 
-# Internationalization
+# =============================================================================
+# INTERNATIONALIZATION
+# =============================================================================
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kathmandu'
 USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+# =============================================================================
+# STATIC & MEDIA FILES
+# =============================================================================
+
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Media files
+# Whitenoise for static file serving in production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Default primary key field type
+
+# =============================================================================
+# DEFAULT PRIMARY KEY FIELD TYPE
+# =============================================================================
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Custom user model
+
+# =============================================================================
+# CUSTOM USER MODEL
+# =============================================================================
+
 AUTH_USER_MODEL = 'accounts.User'
 
-# Login settings
+
+# =============================================================================
+# LOGIN SETTINGS
+# =============================================================================
+
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Site settings
-SITE_NAME = 'Himwatkhanda Vastu Pvt. Ltd.'
-SITE_DESCRIPTION = 'Your Blueprint for Harmony, Structure, and Expertise'
-SITE_URL = 'https://himawatkhandavastu.com'
 
-# Email configuration - will be loaded from database
-# Default fallback settings
+# =============================================================================
+# SITE SETTINGS
+# =============================================================================
+
+SITE_NAME = os.environ.get('SITE_NAME', 'Himwatkhanda Vastu Pvt. Ltd.')
+SITE_DESCRIPTION = os.environ.get('SITE_DESCRIPTION', 'Your Blueprint for Harmony, Structure, and Expertise')
+SITE_URL = os.environ.get('SITE_URL', 'https://himawatkhandavastu.com')
+
+
+# =============================================================================
+# EMAIL CONFIGURATION
+# =============================================================================
+
+# Default to console backend for development
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'noreply@localhost'
-SERVER_EMAIL = 'server@localhost'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-
-# Email settings
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@localhost')
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL', 'server@localhost')
 EMAIL_SUBJECT_PREFIX = '[Himwatkhanda Vastu] '
-ADMINS = [('Admin', 'admin@localhost')]
+ADMINS = [('Admin', os.environ.get('ADMIN_EMAIL', 'admin@localhost'))]
 
 # Load email configuration from database if available
 def load_email_config():
@@ -178,17 +223,17 @@ def load_email_config():
             settings_dict = config.apply_to_settings()
             for key, value in settings_dict.items():
                 globals()[key] = value
-            # Update ADMINS with admin email from config
             globals()['ADMINS'] = [('Admin', config.admin_email)]
     except Exception:
-        # If database is not ready or table doesn't exist yet, use defaults
         pass
 
-# Load email config after models are available
 load_email_config()
 
 
-# Cache settings - Disabled in development
+# =============================================================================
+# CACHE SETTINGS
+# =============================================================================
+
 if DEBUG:
     CACHES = {
         'default': {
@@ -199,11 +244,11 @@ else:
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
         }
     }
 
 # Template caching - Disabled in development
-# When DEBUG is False, cached loaders will be used for better performance
 if not DEBUG:
     TEMPLATES[0]['OPTIONS']['loaders'] = [
         ('django.template.loaders.cached.Loader', (
@@ -212,10 +257,11 @@ if not DEBUG:
         ))
     ]
 
-# Logging Configuration
-import os
 
-# Ensure logs directory exists
+# =============================================================================
+# LOGGING CONFIGURATION
+# =============================================================================
+
 LOGS_DIR = BASE_DIR / 'logs'
 os.makedirs(LOGS_DIR, exist_ok=True)
 
@@ -248,7 +294,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console', 'file'],
-            'level': 'INFO',
+            'level': 'INFO' if DEBUG else 'WARNING',
             'propagate': True,
         },
         'django.request': {
@@ -258,13 +304,38 @@ LOGGING = {
         },
         'dashboard': {
             'handlers': ['console', 'file'],
-            'level': 'DEBUG',
+            'level': 'DEBUG' if DEBUG else 'INFO',
             'propagate': False,
         },
     },
     'root': {
         'handlers': ['console', 'file'],
-        'level': 'INFO',
+        'level': 'INFO' if DEBUG else 'WARNING',
     },
 }
 
+
+# =============================================================================
+# FILE UPLOAD SETTINGS
+# =============================================================================
+
+# Maximum upload size (10MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+
+# Allowed file types for uploads
+ALLOWED_UPLOAD_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.doc', '.docx', '.mp3', '.mp4']
+
+
+# =============================================================================
+# SESSION & COOKIE SETTINGS
+# =============================================================================
+
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = 'Strict'
+    CSRF_COOKIE_SAMESITE = 'Strict'

@@ -5,10 +5,10 @@
 
 {% block content %}
 <!-- Hero Section: Carousel & CEO Info Side by Side -->
-<div class="border-top pt-5 pb-5">
+<div class="border-top pt-4 pt-md-5 pb-4 pb-md-5">
     <div class="container">
         <div class="row g-4">
-            <!-- Carousel (2/3 width) -->
+            <!-- Carousel (2/3 width on large screens) -->
             <div class="col-lg-8">
                 {% if carousel_slides %}
                 <div id="mainCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="hover">
@@ -20,7 +20,7 @@
                     </div>
 
                     <!-- Slides -->
-                    <div class="carousel-inner overflow-hidden">
+                    <div class="carousel-inner rounded-3 overflow-hidden">
                         {% for slide in carousel_slides %}
                         {% if slide.image %}
                         <div class="carousel-item {% if forloop.first %}active{% endif %}">
@@ -28,12 +28,15 @@
                             <a href="{{ slide.link_url }}" class="text-decoration-none">
                             {% endif %}
 
-                            <img src="{{ slide.image.url }}" alt="{{ slide.title }}" class="d-block w-100 carousel-image">
+                            <img src="{{ slide.image.url }}" 
+                                 alt="{{ slide.title|default:'Slide image' }}" 
+                                 class="d-block w-100 carousel-image"
+                                 loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
 
                             {% if slide.title or slide.caption %}
                             <div class="carousel-caption d-none d-md-block">
                                 {% if slide.title %}
-                                <h2 class="display-6 fw-bold mb-3">{{ slide.title }}</h2>
+                                <h2 class="display-6 fw-bold mb-2">{{ slide.title }}</h2>
                                 {% endif %}
                                 {% if slide.caption %}
                                 <p class="fs-5 mb-0">{{ slide.caption }}</p>
@@ -50,11 +53,11 @@
                     </div>
 
                     <!-- Controls -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+                    <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev" aria-label="Previous slide">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Previous</span>
                     </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
+                    <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next" aria-label="Next slide">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Next</span>
                     </button>
@@ -66,21 +69,30 @@
                 {% endif %}
             </div>
 
-            <!-- CEO Profile Card (1/3 width) -->
+            <!-- CEO Profile Card (1/3 width on large screens) -->
             <div class="col-lg-4">
-                <div class="card border-0 bg-off-white shadow-none h-100" style="border-radius: 0;">
+                <div class="card border-0 bg-off-white shadow-none h-100">
                     {% if ceo_info and ceo_info.photo %}
-                    <img src="{{ ceo_info.photo.url }}" alt="CEO of Himawatkhand Vastu" class="card-img-top" style="height: 250px; object-fit: cover;">
+                    <img src="{{ ceo_info.photo.url }}" 
+                         alt="{% firstof ceo_info.name 'CEO' %} - {% firstof ceo_info.title 'Founder & CEO' %}" 
+                         class="card-img-top object-fit-cover"
+                         style="height: clamp(200px, 30vw, 250px);"
+                         loading="lazy">
                     {% else %}
-                    <img src="{% static 'images/ceo.png' %}" alt="CEO of Himawatkhand Vastu" class="card-img-top" style="height: 250px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x250?text=CEO'">
+                    <img src="{% static 'images/ceo.png' %}" 
+                         alt="CEO of Himwatkhanda Vastu" 
+                         class="card-img-top object-fit-cover"
+                         style="height: clamp(200px, 30vw, 250px);"
+                         onerror="this.src='https://via.placeholder.com/400x250?text=CEO'"
+                         loading="lazy">
                     {% endif %}
                     <div class="card-body text-center">
                         <h3 class="h4 fw-bold text-almost-black mb-1">{% firstof ceo_info.name 'Laxmi Prasad Soti' %}</h3>
                         <p class="text-primary fw-semibold mb-3">{% firstof ceo_info.title 'Founder & CEO' %}</p>
                         {% if ceo_info and ceo_info.bio %}
-                        <p class="text-dim-grey-dark small mb-4">{{ ceo_info.bio }}</p>
+                        <p class="text-dim-grey-dark small mb-0">{{ ceo_info.bio|truncatewords:20 }}</p>
                         {% else %}
-                        <p class="text-dim-grey-dark small mb-4">Vedic Architecture, Vastu Shastra, Sustainable Design, Environmental Planning</p>
+                        <p class="text-dim-grey-dark small mb-0">Vedic Architecture, Vastu Shastra, Sustainable Design, Environmental Planning</p>
                         {% endif %}
                     </div>
                 </div>
@@ -90,21 +102,23 @@
 </div>
 
 <!-- Intro Section -->
-<div class="py-12 border-top">
+<div class="py-5 py-md-6 border-top">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
                 <h2 class="display-5 fw-bold text-primary mb-4">
                     Welcome to Himwatkhanda Vastu
                 </h2>
-                <p class="fs-5 text-dim-grey-dark mb-5">
+                <p class="fs-5 text-dim-grey-dark mb-4">
                     Your trusted partner for Vedic Architecture, Vastu Shastra consultation, Engineering Design, and Sustainable Construction. We combine ancient wisdom with modern engineering to create harmonious living and working spaces.
                 </p>
 
                 <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                    <a href="{% url 'pages:consultation' %}" class="btn btn-primary btn-lg px-5">
-                        <i class="fas fa-calendar-check me-2"></i>
-                        Book Appointment
+                    <a href="{% url 'pages:consultation' %}" class="btn btn-primary btn-lg px-4 px-md-5">
+                        <i class="fas fa-calendar-check me-2"></i>Book Appointment
+                    </a>
+                    <a href="{% url 'pages:service_list' %}" class="btn btn-outline-primary btn-lg px-4 px-md-5">
+                        <i class="fas fa-concierge-bell me-2"></i>Our Services
                     </a>
                 </div>
             </div>
@@ -114,21 +128,21 @@
 
 <!-- Testimonials Section -->
 {% if featured_testimonials %}
-<div class="py-12 border-top">
+<div class="py-5 py-md-6 border-top">
     <div class="container">
-        <div class="text-center mb-5">
+        <div class="text-center mb-4 mb-md-5">
             <h2 class="display-6 fw-bold text-almost-black mb-3">What Our Clients Say</h2>
             <p class="text-dim-grey">Trusted by organizations and professionals worldwide</p>
         </div>
         <div class="row g-4">
             {% for testimonial in featured_testimonials %}
-            <div class="col-md-4">
+            <div class="col-md-6 col-lg-4">
                 <div class="card card-hover h-100 border-0" style="background: linear-gradient(135deg, rgba(218, 37, 28, 0.05) 0%, rgba(0, 109, 50, 0.05) 100%);">
                     <div class="card-body">
-                        <div class="d-flex align-items-center mb-4">
+                        <div class="d-flex align-items-center mb-3">
                             {% if testimonial.avatar %}
                             <div class="flex-shrink-0 me-3">
-                                <img src="{{ testimonial.avatar.url }}" alt="{{ testimonial.name }}" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                                <img src="{{ testimonial.avatar.url }}" alt="{{ testimonial.name }}" class="rounded-circle object-fit-cover" style="width: 50px; height: 50px;" loading="lazy">
                             </div>
                             {% else %}
                             <div class="flex-shrink-0 me-3">
@@ -147,19 +161,19 @@
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="mb-3 text-warning">
+                        <div class="mb-3">
                             {% for i in "12345" %}
                             <i class="fas fa-star {% if forloop.counter <= testimonial.rating|floatformat:0 %}text-warning{% else %}text-muted{% endif %}"></i>
                             {% endfor %}
                             <span class="small text-dim-grey ms-2">({{ testimonial.rating }})</span>
                         </div>
-                        <p class="text-dim-grey-dark small">"{{ testimonial.testimonial }}"</p>
+                        <p class="text-dim-grey-dark small mb-0">"{{ testimonial.testimonial|truncatewords:25 }}"</p>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
-        <div class="text-center mt-5">
+        <div class="text-center mt-4 mt-md-5">
             <a href="{% url 'pages:testimonial_list' %}" class="btn btn-outline-primary">
                 View All Testimonials
             </a>
@@ -170,19 +184,19 @@
 
 <!-- FAQs Section -->
 {% if vastu_faqs or engineering_faqs %}
-<div class="py-16 bg-off-white border-top">
+<div class="py-5 py-md-6 bg-off-white border-top">
     <div class="container">
-        <div class="text-center mb-5">
+        <div class="text-center mb-4 mb-md-5">
             <h2 class="display-6 fw-bold text-almost-black mb-3">Frequently Asked Questions</h2>
             <p class="text-dim-grey fs-5">Find answers to commonly asked questions about our services</p>
         </div>
 
-        <div class="row g-4 mb-5">
+        <div class="row g-4 mb-4 mb-md-5">
             <!-- Vastu FAQs Column -->
             {% if vastu_faqs %}
             <div class="col-lg-6">
                 <div class="d-flex align-items-center mb-4">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 50px; height: 50px;">
                         <i class="fas fa-om text-white fs-5"></i>
                     </div>
                     <h3 class="h4 fw-bold text-almost-black mb-0">Vastu Shastra</h3>
@@ -190,15 +204,15 @@
 
                 <div class="accordion" id="vastuFaqAccordion">
                     {% for faq in vastu_faqs %}
-                    <div class="accordion-item border-0 mb-3">
+                    <div class="accordion-item border-0 mb-3 shadow-sm">
                         <h2 class="accordion-header">
-                            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#vastuCollapse{{ faq.id }}">
-                                <span class="badge bg-primary me-2 rounded-circle" style="width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 14px;">{{ forloop.counter }}</span>
-                                {{ faq.question }}
+                            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#vastuCollapse{{ faq.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+                                <span class="badge bg-primary me-2 rounded-circle flex-shrink-0" style="width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 14px;">{{ forloop.counter }}</span>
+                                <span>{{ faq.question }}</span>
                             </button>
                         </h2>
                         <div id="vastuCollapse{{ faq.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#vastuFaqAccordion">
-                            <div class="accordion-body bg-white border border-top-0">
+                            <div class="accordion-body bg-white">
                                 {{ faq.answer|safe }}
                             </div>
                         </div>
@@ -212,7 +226,7 @@
             {% if engineering_faqs %}
             <div class="col-lg-6">
                 <div class="d-flex align-items-center mb-4">
-                    <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                    <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 50px; height: 50px;">
                         <i class="fas fa-hard-hat text-white fs-5"></i>
                     </div>
                     <h3 class="h4 fw-bold text-almost-black mb-0">Engineering Design</h3>
@@ -220,15 +234,15 @@
 
                 <div class="accordion" id="engineeringFaqAccordion">
                     {% for faq in engineering_faqs %}
-                    <div class="accordion-item border-0 mb-3">
+                    <div class="accordion-item border-0 mb-3 shadow-sm">
                         <h2 class="accordion-header">
-                            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#engineeringCollapse{{ faq.id }}">
-                                <span class="badge bg-success me-2 rounded-circle" style="width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 14px;">{{ forloop.counter }}</span>
-                                {{ faq.question }}
+                            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#engineeringCollapse{{ faq.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+                                <span class="badge bg-success me-2 rounded-circle flex-shrink-0" style="width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 14px;">{{ forloop.counter }}</span>
+                                <span>{{ faq.question }}</span>
                             </button>
                         </h2>
                         <div id="engineeringCollapse{{ faq.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#engineeringFaqAccordion">
-                            <div class="accordion-body bg-white border border-top-0">
+                            <div class="accordion-body bg-white">
                                 {{ faq.answer|safe }}
                             </div>
                         </div>

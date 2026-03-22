@@ -4,164 +4,164 @@
 {% block page_title %}Company Information{% endblock %}
 
 {% block dashboard_content %}
-<div class="bg-white rounded-lg shadow">
-    <div class="px-6 py-4 border-b border-gray-200">
-        <h3 class="text-lg font-semibold text-gray-900">Company Settings</h3>
+<div class="card dashboard-card shadow-sm">
+    <div class="card-header">
+        <h3 class="card-title mb-0">Company Settings</h3>
     </div>
     
-    <form method="post" enctype="multipart/form-data" class="p-6">
+    <form method="post" enctype="multipart/form-data" class="card-body p-4">
         {% csrf_token %}
         
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="row g-4">
             <!-- Company Details -->
-            <div class="space-y-6">
-                <h4 class="font-medium text-gray-900 border-b pb-2">Company Details</h4>
+            <div class="col-12 col-lg-6">
+                <h4 class="h5 mb-3 pb-2 border-bottom">Company Details</h4>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                <div class="mb-3">
+                    <label class="form-label">Company Name</label>
                     <input type="text" name="company_name" value="{{ form.company_name.value|default:'' }}" required
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                           class="form-control">
                 </div>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
                     <textarea name="description" rows="4"
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">{{ form.description.value|default:'' }}</textarea>
+                              class="form-control">{{ form.description.value|default:'' }}</textarea>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Logo</label>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Logo</label>
                         {% if object and object.logo %}
-                        <img src="{{ object.logo.url }}" class="w-20 h-20 object-contain mb-2">
+                        <img src="{{ object.logo.url }}" class="d-block mb-2" style="max-width: 80px; max-height: 80px; object-fit: contain;">
                         {% endif %}
                         <input type="file" name="logo" accept="image/*"
-                               class="w-full text-sm text-gray-500">
+                               class="form-control">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Favicon</label>
+                    <div class="col-md-6">
+                        <label class="form-label">Favicon</label>
                         {% if object and object.favicon %}
-                        <img src="{{ object.favicon.url }}" class="w-10 h-10 object-contain mb-2">
+                        <img src="{{ object.favicon.url }}" class="d-block mb-2" style="max-width: 40px; max-height: 40px; object-fit: contain;">
                         {% endif %}
                         <input type="file" name="favicon" accept="image/*"
-                               class="w-full text-sm text-gray-500">
+                               class="form-control">
                     </div>
                 </div>
             </div>
             
             <!-- Contact Information -->
-            <div class="space-y-6">
-                <h4 class="font-medium text-gray-900 border-b pb-2">Contact Information</h4>
+            <div class="col-12 col-lg-6">
+                <h4 class="h5 mb-3 pb-2 border-bottom">Contact Information</h4>
                 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
                         <input type="email" name="email" value="{{ form.email.value|default:'' }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                               class="form-control">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone</label>
                         <input type="text" name="phone" value="{{ form.phone.value|default:'' }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                               class="form-control">
                     </div>
                 </div>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <div class="mb-3 mt-3">
+                    <label class="form-label">Address</label>
                     <textarea name="address" rows="2"
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">{{ form.address.value|default:'' }}</textarea>
+                              class="form-control">{{ form.address.value|default:'' }}</textarea>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">City</label>
                         <input type="text" name="city" value="{{ form.city.value|default:'' }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                               class="form-control">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                    <div class="col-md-6">
+                        <label class="form-label">State</label>
                         <input type="text" name="state" value="{{ form.state.value|default:'' }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                               class="form-control">
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+                <div class="row g-3 mt-0">
+                    <div class="col-md-6">
+                        <label class="form-label">Postal Code</label>
                         <input type="text" name="postal_code" value="{{ form.postal_code.value|default:'' }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                               class="form-control">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                    <div class="col-md-6">
+                        <label class="form-label">Country</label>
                         <input type="text" name="country" value="{{ form.country.value|default:'Nepal' }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                               class="form-control">
                     </div>
                 </div>
             </div>
             
             <!-- Social Media -->
-            <div class="space-y-6">
-                <h4 class="font-medium text-gray-900 border-b pb-2">Social Media</h4>
+            <div class="col-12 col-lg-6">
+                <h4 class="h5 mb-3 pb-2 border-bottom">Social Media</h4>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Facebook</label>
+                <div class="mb-3">
+                    <label class="form-label">Facebook</label>
                     <input type="url" name="facebook" value="{{ form.facebook.value|default:'' }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                           class="form-control">
                 </div>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Twitter</label>
+                <div class="mb-3">
+                    <label class="form-label">Twitter</label>
                     <input type="url" name="twitter" value="{{ form.twitter.value|default:'' }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                           class="form-control">
                 </div>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Instagram</label>
+                <div class="mb-3">
+                    <label class="form-label">Instagram</label>
                     <input type="url" name="instagram" value="{{ form.instagram.value|default:'' }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                           class="form-control">
                 </div>
             </div>
             
             <!-- More Social Media -->
-            <div class="space-y-6">
-                <h4 class="font-medium text-gray-900 border-b pb-2">More Links</h4>
+            <div class="col-12 col-lg-6">
+                <h4 class="h5 mb-3 pb-2 border-bottom">More Links</h4>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
+                <div class="mb-3">
+                    <label class="form-label">LinkedIn</label>
                     <input type="url" name="linkedin" value="{{ form.linkedin.value|default:'' }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                           class="form-control">
                 </div>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">YouTube</label>
+                <div class="mb-3">
+                    <label class="form-label">YouTube</label>
                     <input type="url" name="youtube" value="{{ form.youtube.value|default:'' }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                           class="form-control">
                 </div>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">WhatsApp Number</label>
+                <div class="mb-3">
+                    <label class="form-label">WhatsApp Number</label>
                     <input type="text" name="whatsapp" value="{{ form.whatsapp.value|default:'' }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-                    <p class="text-xs text-gray-500 mt-1">Include country code, e.g., 97798XXXXXXXX</p>
+                           class="form-control">
+                    <p class="form-text">Include country code, e.g., 97798XXXXXXXX</p>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-bold text-gray-900 mb-1">VASTU ANTHEM (MP3)</label>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">VASTU ANTHEM (MP3)</label>
                     {% if object and object.anthem %}
-                    <div class="flex items-center gap-2 mb-2">
-                        <audio controls src="{{ object.anthem.url }}" class="h-8" style="width: 200px;"></audio>
-                        <span class="text-xs text-gray-500">Current file</span>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <audio controls src="{{ object.anthem.url }}" style="height: 32px; width: 200px;"></audio>
+                        <span class="form-text">Current file</span>
                     </div>
                     {% endif %}
                     <input type="file" name="anthem" accept="audio/mp3,audio/mpeg"
-                           class="w-full text-sm text-gray-500">
-                    <p class="text-xs text-gray-500 mt-1">Upload MP3 file (max 10MB recommended)</p>
+                           class="form-control">
+                    <p class="form-text">Upload MP3 file (max 10MB recommended)</p>
                 </div>
             </div>
         </div>
         
-        <div class="mt-8 flex justify-end">
-            <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors">
+        <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-primary">
                 Save Changes
             </button>
         </div>

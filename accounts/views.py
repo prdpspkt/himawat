@@ -4,7 +4,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 
 from .forms import UserRegistrationForm, UserProfileForm
@@ -28,7 +28,7 @@ class RegisterView(CreateView):
     
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('cms:home')
+            return redirect('pages:home')
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -49,7 +49,7 @@ class CustomLoginView(LoginView):
     def get_success_url(self):
         # Redirect admin users to dashboard
         if self.request.user.is_admin:
-            return '/dashboard/'
+            return reverse_lazy('dashboard:index')
         return super().get_success_url()
 
 

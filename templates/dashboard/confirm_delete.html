@@ -4,25 +4,25 @@
 {% block page_title %}Confirm Delete{% endblock %}
 
 {% block dashboard_content %}
-<div class="bg-white rounded-lg shadow max-w-lg mx-auto">
-    <div class="p-6">
-        <div class="flex items-center justify-center mb-6">
-            <div class="bg-red-100 rounded-full p-3">
-                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+<div class="card shadow mx-auto" style="max-width: 500px;">
+    <div class="card-body text-center p-4">
+        <div class="d-flex align-items-center justify-content-center mb-4">
+            <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                <svg class="text-danger" style="width: 32px; height: 32px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
             </div>
         </div>
         
-        <h3 class="text-lg font-medium text-gray-900 text-center mb-2">Are you sure?</h3>
-        <p class="text-gray-500 text-center mb-6">
+        <h5 class="mb-2">Are you sure?</h5>
+        <p class="text-muted mb-4">
             Are you sure you want to delete "{{ object }}"? This action cannot be undone.
         </p>
         
-        <form method="post" class="flex justify-center space-x-4">
+        <form method="post" class="d-flex justify-content-center gap-3">
             {% csrf_token %}
-            <a href="{{ request.META.HTTP_REFERER }}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-secondary">
                 Cancel
             </a>
-            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+            <button type="submit" class="btn btn-danger">
                 Delete
             </button>
         </form>

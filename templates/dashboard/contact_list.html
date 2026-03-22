@@ -4,67 +4,67 @@
 {% block page_title %}Contacts{% endblock %}
 
 {% block dashboard_content %}
-<div class="bg-white rounded-lg shadow">
-    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-            <h3 class="text-lg font-semibold text-gray-900">All Contacts</h3>
-            <div class="flex space-x-2">
-                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{{ new_count }} New</span>
-                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">{{ read_count }} Read</span>
-                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">{{ replied_count }} Replied</span>
+<div class="card dashboard-card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+            <h3 class="card-title mb-0">All Contacts</h3>
+            <div class="d-flex gap-2">
+                <span class="badge bg-info">{{ new_count }} New</span>
+                <span class="badge bg-warning">{{ read_count }} Read</span>
+                <span class="badge bg-success">{{ replied_count }} Replied</span>
             </div>
         </div>
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+    <div class="table-responsive">
+        <table class="table table-hover dashboard-table mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th class="p-3 text-start text-uppercase small fw-medium text-muted">Subject</th>
+                    <th class="p-3 text-start text-uppercase small fw-medium text-muted">Name</th>
+                    <th class="p-3 text-start text-uppercase small fw-medium text-muted">Email</th>
+                    <th class="p-3 text-start text-uppercase small fw-medium text-muted">Phone</th>
+                    <th class="p-3 text-start text-uppercase small fw-medium text-muted">Status</th>
+                    <th class="p-3 text-start text-uppercase small fw-medium text-muted">Date</th>
+                    <th class="p-3 text-start text-uppercase small fw-medium text-muted">Actions</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody>
                 {% for contact in contacts %}
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4">
-                        <div class="text-sm font-medium text-gray-900">{{ contact.subject }}</div>
+                <tr>
+                    <td class="p-3">
+                        <div class="fw-medium text-dark">{{ contact.subject }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ contact.name }}</div>
+                    <td class="p-3 text-nowrap">
+                        <div class="text-dark">{{ contact.name }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">
-                            <a href="mailto:{{ contact.email }}" class="text-indigo-600 hover:text-indigo-900">{{ contact.email }}</a>
+                    <td class="p-3 text-nowrap">
+                        <div class="text-dark">
+                            <a href="mailto:{{ contact.email }}" class="text-primary text-decoration-none">{{ contact.email }}</a>
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td class="p-3 text-nowrap text-muted">
                         {{ contact.phone|default:"—" }}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                            {% if contact.status == 'new' %}bg-blue-100 text-blue-800
-                            {% elif contact.status == 'read' %}bg-yellow-100 text-yellow-800
-                            {% elif contact.status == 'replied' %}bg-green-100 text-green-800
-                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    <td class="p-3 text-nowrap">
+                        <span class="badge
+                            {% if contact.status == 'new' %}bg-info
+                            {% elif contact.status == 'read' %}bg-warning
+                            {% elif contact.status == 'replied' %}bg-success
+                            {% else %}bg-secondary{% endif %}">
                             {{ contact.get_status_display }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td class="p-3 text-nowrap text-muted">
                         {{ contact.created_at|date:"M d, Y" }}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="{% url 'dashboard:contact_detail' contact.pk %}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                    <td class="p-3 text-nowrap fw-medium">
+                        <a href="{% url 'dashboard:contact_detail' contact.pk %}" class="text-primary text-decoration-none">View</a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">No contacts found.</td>
+                    <td colspan="7" class="text-center text-muted py-4">No contacts found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -72,17 +72,17 @@
     </div>
 
     {% if is_paginated %}
-    <div class="px-6 py-4 border-t border-gray-200">
-        <div class="flex items-center justify-between">
-            <div class="text-sm text-gray-500">
+    <div class="card-footer">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="small text-muted">
                 Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ paginator.count }} results
             </div>
-            <div class="flex space-x-2">
+            <div class="d-flex gap-2">
                 {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">Previous</a>
+                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-secondary btn-sm">Previous</a>
                 {% endif %}
                 {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">Next</a>
+                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-secondary btn-sm">Next</a>
                 {% endif %}
             </div>
         </div>
