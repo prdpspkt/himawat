@@ -2,8 +2,8 @@
 Django>=4.2,<5.0
 
 # Database
-psycopg2-binary
-# mysqlclient  # Uncomment for MySQL
+mysqlclient
+# psycopg2-binary  # Uncomment for PostgreSQL
 django-cleanup
 
 # Environment variables
