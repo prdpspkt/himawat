@@ -268,9 +268,11 @@ class DownloadListView(ListView):
     paginate_by = 12
     
     def get_queryset(self):
+        from django.db.models import Q
         return Download.objects.filter(
-            status='published',
-            published_at__lte=timezone.now()
+            status='published'
+        ).filter(
+            Q(published_at__lte=timezone.now()) | Q(published_at__isnull=True)
         ).order_by('-published_at')
 
 

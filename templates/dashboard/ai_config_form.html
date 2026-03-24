@@ -4,96 +4,107 @@
 {% block page_title %}{% if form.instance.pk %}Edit AI Configuration{% else %}Add AI Configuration{% endif %}{% endblock %}
 
 {% block dashboard_content %}
-<div class="max-w-4xl mx-auto">
-    <form method="post" enctype="multipart/form-data" class="space-y-6">
-        {% csrf_token %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
 
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">AI Configuration</h3>
-                <p class="text-sm text-gray-500 mt-1">Configure your AI API settings for content generation</p>
-            </div>
-            <div class="px-6 py-4 space-y-4">
-                <div>
-                    <label for="id_name" class="block text-sm font-medium text-gray-700">Configuration Name</label>
-                    <input type="text" name="name" id="id_name" value="{{ form.name.value|default:'' }}" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
-                    {% if form.name.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.name.errors }}</p>
-                    {% endif %}
-                    <p class="mt-1 text-xs text-gray-500">A friendly name to identify this configuration (e.g., "Main AI")</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="id_model_name" class="block text-sm font-medium text-gray-700">Model Name</label>
-                        <input type="text" name="model_name" id="id_model_name" value="{{ form.model_name.value|default:'glm-4.5' }}" required
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                               placeholder="e.g., glm-4.5, deepseek-chat, gpt-4">
-                        {% if form.model_name.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ form.model_name.errors }}</p>
-                        {% endif %}
-                        <p class="mt-1 text-xs text-gray-500">The model identifier for your AI provider</p>
+                <!-- AI Configuration Card -->
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">AI Configuration</h5>
+                        <p class="text-muted small mb-0">Configure your AI API settings for content generation</p>
                     </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="id_name" class="form-label fw-medium">Configuration Name</label>
+                            <input type="text" name="name" id="id_name" value="{{ form.name.value|default:'' }}" required
+                                   class="form-control">
+                            {% if form.name.errors %}
+                            <div class="text-danger small mt-1">{{ form.name.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">A friendly name to identify this configuration (e.g., "Main AI")</div>
+                        </div>
 
-                    <div>
-                        <label for="id_api_endpoint" class="block text-sm font-medium text-gray-700">API Endpoint</label>
-                        <input type="url" name="api_endpoint" id="id_api_endpoint" value="{{ form.api_endpoint.value|default:'https://api.z.ai/api/paas/v4/' }}" required
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                               placeholder="https://api.example.com/v1/">
-                        {% if form.api_endpoint.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ form.api_endpoint.errors }}</p>
-                        {% endif %}
-                        <p class="mt-1 text-xs text-gray-500">Base URL for the API endpoint</p>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_model_name" class="form-label fw-medium">Model Name</label>
+                                    <input type="text" name="model_name" id="id_model_name" value="{{ form.model_name.value|default:'glm-4.5' }}" required
+                                           class="form-control"
+                                           placeholder="e.g., glm-4.5, deepseek-chat, gpt-4">
+                                    {% if form.model_name.errors %}
+                                    <div class="text-danger small mt-1">{{ form.model_name.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">The model identifier for your AI provider</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_api_endpoint" class="form-label fw-medium">API Endpoint</label>
+                                    <input type="url" name="api_endpoint" id="id_api_endpoint" value="{{ form.api_endpoint.value|default:'https://api.z.ai/api/paas/v4/' }}" required
+                                           class="form-control"
+                                           placeholder="https://api.example.com/v1/">
+                                    {% if form.api_endpoint.errors %}
+                                    <div class="text-danger small mt-1">{{ form.api_endpoint.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Base URL for the API endpoint</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label for="id_api_key" class="form-label fw-medium">API Key</label>
+                            <input type="password" name="api_key" id="id_api_key" value="{{ form.api_key.value|default:'' }}" required
+                                   class="form-control">
+                            {% if form.api_key.errors %}
+                            <div class="text-danger small mt-1">{{ form.api_key.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">Your API key for the AI service</div>
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <label for="id_api_key" class="block text-sm font-medium text-gray-700">API Key</label>
-                    <input type="password" name="api_key" id="id_api_key" value="{{ form.api_key.value|default:'' }}" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
-                    {% if form.api_key.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.api_key.errors }}</p>
-                    {% endif %}
-                    <p class="mt-1 text-xs text-gray-500">Your API key for the AI service</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">System Prompt</h3>
-                <p class="text-sm text-gray-500 mt-1">Define the AI's behavior and guidelines</p>
-            </div>
-            <div class="px-6 py-4 space-y-4">
-                <div>
-                    <label for="id_system_prompt" class="block text-sm font-medium text-gray-700">System Prompt</label>
-                    <textarea name="system_prompt" id="id_system_prompt" rows="6"
-                              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">{{ form.system_prompt.value|default:'' }}</textarea>
-                    {% if form.system_prompt.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.system_prompt.errors }}</p>
-                    {% endif %}
-                    <p class="mt-1 text-xs text-gray-500">Define the AI's persona, behavior, and guidelines. This will be prepended to all user prompts.</p>
-                    <div class="mt-2 p-3 bg-gray-50 rounded-md">
-                        <p class="text-xs text-gray-600 mb-2"><strong>Example:</strong></p>
-                        <pre class="text-xs text-gray-700 whitespace-pre-wrap">You are a professional content writer specializing in web content. Your writing should be:
+                <!-- System Prompt Card -->
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">System Prompt</h5>
+                        <p class="text-muted small mb-0">Define the AI's behavior and guidelines</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="id_system_prompt" class="form-label fw-medium">System Prompt</label>
+                            <textarea name="system_prompt" id="id_system_prompt" rows="6"
+                                      class="form-control">{{ form.system_prompt.value|default:'' }}</textarea>
+                            {% if form.system_prompt.errors %}
+                            <div class="text-danger small mt-1">{{ form.system_prompt.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">Define the AI's persona, behavior, and guidelines. This will be prepended to all user prompts.</div>
+                        </div>
+                        <div class="alert alert-light border">
+                            <p class="small fw-bold mb-2">Example:</p>
+                            <pre class="small mb-0">You are a professional content writer specializing in web content. Your writing should be:
 - Clear, concise, and engaging
 - SEO-friendly with proper keyword usage
 - Formatted with HTML headings, paragraphs, and lists
 - Professional but accessible tone</pre>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="flex justify-end gap-3">
-            <a href="{% url 'dashboard:ai_config_list' %}" class="px-6 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                Cancel
-            </a>
-            <button type="submit" class="px-6 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                {% if form.instance.pk %}Update Configuration{% else %}Create Configuration{% endif %}
-            </button>
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'dashboard:ai_config_list' %}" class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        {% if form.instance.pk %}Update Configuration{% else %}Create Configuration{% endif %}
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 {% endblock %}

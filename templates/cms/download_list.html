@@ -1,63 +1,100 @@
 {% extends 'base.html' %}
 
-{% block title %}Downloads - {% if company_info %}{{ company_info.company_name }}{% else %}Thelix{% endif %}{% endblock %}
+{% block title %}Downloads - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-12">
-    <div class="text-center mb-12">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">Downloads</h1>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">Download resources, documents, and software</p>
-    </div>
-    
-    {% if downloads %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for download in downloads %}
-        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div class="flex items-start">
-                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ download.title }}</h3>
-                    {% if download.description %}
-                    <p class="text-sm text-gray-600 mb-2">{{ download.description|truncatewords:15 }}</p>
-                    {% endif %}
-                    <div class="flex items-center text-sm text-gray-500 mb-3">
-                        <span class="uppercase font-medium">{{ download.file_type }}</span>
-                        <span class="mx-2">•</span>
-                        <span>{{ download.file_size|filesizeformat }}</span>
-                        <span class="mx-2">•</span>
-                        <span>{{ download.download_count }} downloads</span>
-                    </div>
-                    <a href="{% url 'pages:download_file' download.slug %}" class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors text-sm">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                        </svg>
-                        Download
-                    </a>
-                </div>
+<!-- Page Header -->
+<div class="border-top pt-5 pb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-5 fw-bold text-primary mb-4">Downloads</h1>
+                <p class="fs-5 text-dim-grey-dark">Download resources, documents, and software</p>
             </div>
         </div>
-        {% endfor %}
     </div>
-    
-    {% if is_paginated %}
-    <div class="mt-12 flex justify-center space-x-2">
-        {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Previous</a>
-        {% endif %}
-        <span class="px-4 py-2 bg-primary text-white rounded-lg">{{ page_obj.number }}</span>
-        {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Next</a>
-        {% endif %}
+</div>
+
+<!-- Downloads List -->
+{% if downloads %}
+<div class="py-12 border-top">
+    <div class="container">
+        <div class="row g-4">
+            {% for download in downloads %}
+            <div class="col-12">
+                <div class="card border-0 shadow-sm card-hover">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <!-- File Icon -->
+                            <div class="flex-shrink-0 bg-primary bg-opacity-10 rounded d-flex align-items-center justify-content-center me-4" style="width: 64px; height: 64px;">
+                                <i class="fas fa-file-download text-primary fs-3"></i>
+                            </div>
+                            
+                            <!-- Content -->
+                            <div class="flex-grow-1">
+                                <h5 class="card-title fw-bold text-almost-black mb-1">{{ download.title }}</h5>
+                                {% if download.description %}
+                                <p class="card-text text-dim-grey mb-2">{{ download.description|truncatewords:20 }}</p>
+                                {% endif %}
+                                <div class="d-flex align-items-center text-muted small">
+                                    <span class="badge bg-secondary me-2">{{ download.file_type|upper }}</span>
+                                    <span class="me-3">{{ download.file_size|filesizeformat }}</span>
+                                    <span><i class="fas fa-download me-1"></i>{{ download.download_count }} downloads</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Download Button -->
+                            <div class="flex-shrink-0 ms-4">
+                                <a href="{% url 'pages:download_file' download.slug %}" class="btn btn-primary">
+                                    <i class="fas fa-download me-2"></i>Download
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-    {% endif %}
-    {% else %}
-    <div class="text-center py-12">
-        <p class="text-gray-500">No downloads available.</p>
+</div>
+
+{% if is_paginated %}
+<div class="pt-5 pb-5">
+    <div class="container">
+        <div class="d-flex justify-content-center gap-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-secondary">
+                <i class="fas fa-chevron-left me-1"></i>Previous
+            </a>
+            {% endif %}
+            <span class="btn btn-primary">{{ page_obj.number }}</span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-secondary">
+                Next<i class="fas fa-chevron-right ms-1"></i>
+            </a>
+            {% endif %}
+        </div>
     </div>
-    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="py-16 border-top">
+    <div class="container text-center">
+        <i class="fas fa-file-download text-dim-grey mb-4" style="font-size: 4rem;"></i>
+        <p class="text-dim-grey fs-5">No downloads available.</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- CTA Section -->
+<div class="pt-5 pb-5 mt-5 border-top bg-off-white">
+    <div class="container text-center">
+        <h2 class="display-6 fw-bold text-primary mb-3">Need Expert Guidance?</h2>
+        <p class="text-dim-grey-dark mb-4 fs-5">Get personalized Vastu consultation and engineering design services from our experts.</p>
+        <a href="{% url 'pages:consultation' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-calendar-check me-2"></i>Book Consultation
+        </a>
+    </div>
 </div>
 {% endblock %}

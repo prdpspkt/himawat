@@ -1,51 +1,87 @@
 {% extends 'base.html' %}
 
-{% block title %}Galleries - {% if company_info %}{{ company_info.company_name }}{% else %}Thelix{% endif %}{% endblock %}
+{% block title %}Galleries - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-12">
-    <div class="text-center mb-12">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">Photo Galleries</h1>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">Explore our collection of images</p>
-    </div>
-    
-    {% if galleries %}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {% for gallery in galleries %}
-        <a href="{{ gallery.get_absolute_url }}" class="group">
-            <div class="relative overflow-hidden rounded-lg shadow-md">
-                {% if gallery.cover_image %}
-                <img src="{{ gallery.cover_image.url }}" alt="{{ gallery.name }}" class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300">
-                {% else %}
-                <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
-                    <span class="text-gray-400">No image</span>
-                </div>
-                {% endif %}
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                <div class="absolute bottom-0 left-0 right-0 p-6">
-                    <h2 class="text-xl font-bold text-white">{{ gallery.name }}</h2>
-                    <p class="text-white/80 text-sm">{{ gallery.image_count }} images</p>
-                </div>
+<!-- Page Header -->
+<div class="border-top pt-5 pb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-5 fw-bold text-primary mb-4">Photo Galleries</h1>
+                <p class="fs-5 text-dim-grey-dark">Explore our collection of images showcasing our Vastu and engineering projects</p>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Galleries Grid -->
+{% if galleries %}
+<div class="py-12 border-top">
+    <div class="container">
+        <div class="row g-4">
+            {% for gallery in galleries %}
+            <div class="col-md-6 col-lg-4">
+                <a href="{{ gallery.get_absolute_url }}" class="text-decoration-none">
+                    <div class="card border-0 shadow-sm h-100 card-hover">
+                        {% if gallery.cover_image %}
+                        <img src="{{ gallery.cover_image.url }}" alt="{{ gallery.name }}" class="card-img-top" style="height: 250px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                            <i class="fas fa-images text-dim-grey fa-3x"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-almost-black">{{ gallery.name }}</h5>
+                            <p class="card-text text-dim-grey small">
+                                <i class="fas fa-image me-1"></i>{{ gallery.image_count }} images
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% if is_paginated %}
+<div class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-center gap-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-secondary">
+                <i class="fas fa-chevron-left me-1"></i>Previous
+            </a>
+            {% endif %}
+            <span class="btn btn-primary">{{ page_obj.number }}</span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-secondary">
+                Next<i class="fas fa-chevron-right ms-1"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% else %}
+<div class="py-16 border-top pt-4">
+    <div class="container text-center">
+        <i class="fas fa-images text-dim-grey mb-4" style="font-size: 4rem;"></i>
+        <p class="text-dim-grey fs-5">No galleries found.</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- CTA Section -->
+<div class="border-top mt-5 pt-5 pb-5 bg-off-white">
+    <div class="container text-center">
+        <h2 class="display-6 fw-bold text-primary mb-3">Need Expert Guidance?</h2>
+        <p class="text-dim-grey-dark mb-4 fs-5">Get personalized Vastu consultation and engineering design services from our experts.</p>
+        <a href="{% url 'pages:consultation' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-calendar-check me-2"></i>Book Consultation
         </a>
-        {% endfor %}
     </div>
-    
-    {% if is_paginated %}
-    <div class="mt-12 flex justify-center space-x-2">
-        {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Previous</a>
-        {% endif %}
-        <span class="px-4 py-2 bg-primary text-white rounded-lg">{{ page_obj.number }}</span>
-        {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Next</a>
-        {% endif %}
-    </div>
-    {% endif %}
-    {% else %}
-    <div class="text-center py-12">
-        <p class="text-gray-500">No galleries found.</p>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

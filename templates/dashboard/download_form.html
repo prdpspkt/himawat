@@ -6,7 +6,7 @@
 {% block extra_css %}
 <style>
     .file-drop-zone {
-        border: 2px dashed #d1d5db;
+        border: 2px dashed #dee2e6;
         border-radius: 0.5rem;
         padding: 2rem;
         text-align: center;
@@ -14,202 +14,190 @@
         cursor: pointer;
     }
     .file-drop-zone:hover, .file-drop-zone.dragover {
-        border-color: #D62828;
+        border-color: #DA251C;
         background: #fef2f2;
     }
     .file-preview {
         display: flex;
         align-items: center;
         padding: 1rem;
-        background: #f9fafb;
+        background: #f8f9fa;
         border-radius: 0.5rem;
-        border: 1px solid #e5e7eb;
+        border: 1px solid #dee2e6;
     }
 </style>
 {% endblock %}
 
 {% block dashboard_content %}
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Main Form -->
-    <div class="lg:col-span-2">
-        <div class="bg-white rounded-lg shadow">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">{% if object %}Edit File{% else %}File Details{% endif %}</h3>
+<div class="container-fluid">
+    <div class="row g-4">
+        <!-- Main Form -->
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0">{% if object %}Edit File{% else %}File Details{% endif %}</h5>
+                </div>
+                
+                <form method="post" enctype="multipart/form-data" id="download-form">
+                    {% csrf_token %}
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">
+                                Title <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="title" value="{{ form.title.value|default:'' }}" required
+                                   class="form-control form-control-lg"
+                                   placeholder="Enter file title">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Slug</label>
+                            <div class="input-group">
+                                <span class="input-group-text">/downloads/</span>
+                                <input type="text" name="slug" value="{{ form.slug.value|default:'' }}"
+                                       class="form-control"
+                                       placeholder="auto-generated-if-empty">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Description</label>
+                            <textarea name="description" rows="3" class="form-control"
+                                      placeholder="Brief description of the file">{{ form.description.value|default:'' }}</textarea>
+                        </div>
+                        
+                        <!-- File Upload -->
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">
+                                File <span class="text-danger">*</span>
+                                {% if object %}<span class="text-muted fw-normal">(Leave empty to keep current file)</span>{% endif %}
+                            </label>
+                            
+                            {% if object and object.file %}
+                            <!-- Current File Info -->
+                            <div class="file-preview mb-3">
+                                <div class="flex-shrink-0 bg-primary bg-opacity-10 rounded d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                    <i class="fas fa-file text-primary fs-5"></i>
+                                </div>
+                                <div class="flex-grow-1 text-truncate">
+                                    <p class="mb-0 fw-medium text-truncate">{{ object.file.name }}</p>
+                                    <p class="mb-0 small text-muted">
+                                        {{ object.file_size|filesizeformat }} • {{ object.file_type|upper }}
+                                    </p>
+                                </div>
+                                <a href="{{ object.file.url }}" target="_blank" class="btn btn-sm btn-link text-decoration-none">
+                                    Download
+                                </a>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Upload Zone -->
+                            <div class="file-drop-zone" id="file-drop-zone" onclick="document.getElementById('file-input').click()">
+                                <i class="fas fa-cloud-upload-alt text-muted fs-1 mb-2"></i>
+                                <p class="fw-medium mb-1">Click to upload or drag and drop</p>
+                                <p class="small text-muted mb-0">PDF, DOC, XLS, ZIP, images, videos (max 50MB)</p>
+                                <input type="file" id="file-input" name="file" {% if not object %}required{% endif %} class="d-none" onchange="handleFileSelect(this)">
+                            </div>
+                            
+                            <!-- Selected File Preview -->
+                            <div id="selected-file" class="d-none mt-3 alert alert-success mb-0">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <span class="small" id="selected-file-name"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-0">
+                            <label class="form-label fw-medium">Version</label>
+                            <input type="text" name="version" value="{{ form.version.value|default:'' }}"
+                                   class="form-control"
+                                   placeholder="e.g., 1.0, 2.5">
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            {% if object %}Update File{% else %}Upload File{% endif %}
+                        </button>
+                        <a href="{% url 'dashboard:download_list' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Settings Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">Settings</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-medium small">Status</label>
+                        <select name="status" form="download-form" class="form-select form-select-sm">
+                            {% for value, label in form.fields.status.choices %}
+                            <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-0">
+                        <label class="form-label fw-medium small">Published At</label>
+                        <input type="datetime-local" name="published_at" form="download-form" value="{{ form.published_at.value|default:'' }}"
+                               class="form-control form-control-sm">
+                        <div class="form-text">Schedule when this file becomes available</div>
+                    </div>
+                </div>
             </div>
             
-            <form method="post" enctype="multipart/form-data" class="p-6" id="download-form">
-                {% csrf_token %}
-                
-                <div class="space-y-6">
-                    <!-- Title -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Title <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" name="title" value="{{ form.title.value|default:'' }}" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                               placeholder="Enter file title">
+            <!-- Featured Image Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">Featured Image</h6>
+                </div>
+                <div class="card-body">
+                    {% if object and object.featured_image %}
+                    <div class="mb-3">
+                        <img src="{{ object.featured_image.url }}" alt="Featured image" class="img-fluid rounded" style="max-height: 128px; object-fit: cover;">
                     </div>
-                    
-                    <!-- Slug -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-                        <div class="flex items-center">
-                            <span class="px-3 py-2 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg text-gray-500 text-sm">/downloads/</span>
-                            <input type="text" name="slug" value="{{ form.slug.value|default:'' }}"
-                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                                   placeholder="auto-generated-if-empty">
-                        </div>
+                    {% endif %}
+                    <input type="file" name="featured_image" form="download-form" accept="image/*"
+                           class="form-control form-control-sm">
+                    <div class="form-text">Optional. Used as thumbnail in download listings.</div>
+                </div>
+            </div>
+            
+            <!-- Stats Card (for existing) -->
+            {% if object %}
+            <div class="card shadow">
+                <div class="card-header">
+                    <h6 class="mb-0">Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="small text-muted">Download Count</span>
+                        <span class="fw-bold text-primary">{{ object.download_count }}</span>
                     </div>
-                    
-                    <!-- Description -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                        <textarea name="description" rows="3"
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                                  placeholder="Brief description of the file">{{ form.description.value|default:'' }}</textarea>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="small text-muted">File Type</span>
+                        <span class="small fw-medium">{{ object.file_type|upper|default:'Unknown' }}</span>
                     </div>
-                    
-                    <!-- File Upload -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            File <span class="text-red-500">*</span>
-                            {% if object %}<span class="text-gray-400 font-normal">(Leave empty to keep current file)</span>{% endif %}
-                        </label>
-                        
-                        {% if object and object.file %}
-                        <!-- Current File Info -->
-                        <div class="file-preview mb-4">
-                            <div class="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4">
-                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900 truncate">{{ object.file.name }}</p>
-                                <p class="text-xs text-gray-500">
-                                    {{ object.file_size|filesizeformat }} • {{ object.file_type|upper }}
-                                </p>
-                            </div>
-                            <a href="{{ object.file.url }}" target="_blank" class="ml-4 text-primary hover:text-red-700 text-sm font-medium">
-                                Download
-                            </a>
-                        </div>
-                        {% endif %}
-                        
-                        <!-- Upload Zone -->
-                        <div class="file-drop-zone" id="file-drop-zone" onclick="document.getElementById('file-input').click()">
-                            <svg class="w-12 h-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                            </svg>
-                            <p class="text-gray-600 font-medium">Click to upload or drag and drop</p>
-                            <p class="text-sm text-gray-500 mt-1">PDF, DOC, XLS, ZIP, images, videos (max 50MB)</p>
-                            <input type="file" id="file-input" name="file" {% if not object %}required{% endif %} class="hidden" onchange="handleFileSelect(this)">
-                        </div>
-                        
-                        <!-- Selected File Preview -->
-                        <div id="selected-file" class="hidden mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                                <span class="text-sm text-green-800" id="selected-file-name"></span>
-                            </div>
-                        </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="small text-muted">File Size</span>
+                        <span class="small fw-medium">{{ object.file_size|filesizeformat }}</span>
                     </div>
-                    
-                    <!-- Version -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Version</label>
-                        <input type="text" name="version" value="{{ form.version.value|default:'' }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                               placeholder="e.g., 1.0, 2.5">
+                    <div class="d-flex justify-content-between py-2">
+                        <span class="small text-muted">Created</span>
+                        <span class="small fw-medium">{{ object.created_at|date:"M d, Y" }}</span>
                     </div>
                 </div>
-                
-                <div class="mt-8 flex space-x-4">
-                    <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors">
-                        {% if object %}Update File{% else %}Upload File{% endif %}
-                    </button>
-                    <a href="{% url 'dashboard:download_list' %}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                        Cancel
-                    </a>
-                </div>
-            </form>
+            </div>
+            {% endif %}
         </div>
-    </div>
-    
-    <!-- Sidebar -->
-    <div class="space-y-6">
-        <!-- Settings Card -->
-        <div class="bg-white rounded-lg shadow">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">Settings</h3>
-            </div>
-            <div class="p-6 space-y-4">
-                <!-- Status -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-                        {% for value, label in form.fields.status.choices %}
-                        <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <!-- Published At -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Published At</label>
-                    <input type="datetime-local" name="published_at" value="{{ form.published_at.value|default:'' }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-                    <p class="text-xs text-gray-500 mt-1">Schedule when this file becomes available</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Featured Image Card -->
-        <div class="bg-white rounded-lg shadow">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">Featured Image</h3>
-            </div>
-            <div class="p-6">
-                {% if object and object.featured_image %}
-                <div class="mb-4">
-                    <img src="{{ object.featured_image.url }}" alt="Featured image" class="w-full h-32 object-cover rounded-lg">
-                </div>
-                {% endif %}
-                <input type="file" name="featured_image" accept="image/*"
-                       class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-red-700">
-                <p class="text-xs text-gray-500 mt-2">Optional. Used as thumbnail in download listings.</p>
-            </div>
-        </div>
-        
-        <!-- Stats Card (for existing) -->
-        {% if object %}
-        <div class="bg-white rounded-lg shadow">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">Statistics</h3>
-            </div>
-            <div class="p-6">
-                <div class="flex items-center justify-between py-2 border-b border-gray-100">
-                    <span class="text-sm text-gray-600">Download Count</span>
-                    <span class="text-lg font-semibold text-primary">{{ object.download_count }}</span>
-                </div>
-                <div class="flex items-center justify-between py-2 border-b border-gray-100">
-                    <span class="text-sm text-gray-600">File Type</span>
-                    <span class="text-sm font-medium text-gray-900">{{ object.file_type|upper|default:'Unknown' }}</span>
-                </div>
-                <div class="flex items-center justify-between py-2 border-b border-gray-100">
-                    <span class="text-sm text-gray-600">File Size</span>
-                    <span class="text-sm font-medium text-gray-900">{{ object.file_size|filesizeformat }}</span>
-                </div>
-                <div class="flex items-center justify-between py-2">
-                    <span class="text-sm text-gray-600">Created</span>
-                    <span class="text-sm font-medium text-gray-900">{{ object.created_at|date:"M d, Y" }}</span>
-                </div>
-            </div>
-        </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}
@@ -249,7 +237,7 @@ function handleFileSelect(input) {
         const selectedFileName = document.getElementById('selected-file-name');
         
         selectedFileName.textContent = file.name + ' (' + formatFileSize(file.size) + ')';
-        selectedFileDiv.classList.remove('hidden');
+        selectedFileDiv.classList.remove('d-none');
     }
 }
 

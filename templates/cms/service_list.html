@@ -17,7 +17,7 @@
 </div>
 
 <!-- Category Filter -->
-<div class="py-4 border-top bg-off-white">
+<div class="pt-5 border-top bg-off-white">
     <div class="container">
         <div class="d-flex flex-wrap justify-content-center gap-3">
             <a href="{% url 'pages:service_list' %}" class="btn {% if not request.GET.category %}btn-primary{% else %}btn-outline-primary{% endif %}">
@@ -34,7 +34,7 @@
 
 <!-- Services Grid -->
 {% if services %}
-<div class="py-12 border-top">
+<div class="pt-5 pb-5 mt-5 border-top">
     <div class="container">
         <div class="row g-4">
             {% for service in services %}
@@ -86,7 +86,7 @@
 </div>
 
 {% if is_paginated %}
-<div class="py-4">
+<div class="pt-5 pb-5 mt-5 border-top bg-off-white">
     <div class="container">
         <div class="d-flex justify-content-center gap-2">
             {% if page_obj.has_previous %}
@@ -106,7 +106,7 @@
 {% endif %}
 
 {% else %}
-<div class="py-16 border-top">
+<div class="pt-5 mt-5 pb-5 border-top">
     <div class="container text-center">
         <i class="fas fa-concierge-bell text-dim-grey mb-4" style="font-size: 4rem;"></i>
         <p class="text-dim-grey fs-5">No services found in this category.</p>

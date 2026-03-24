@@ -4,90 +4,95 @@
 {% block page_title %}{% if object %}Edit Testimonial{% else %}New Testimonial{% endif %}{% endblock %}
 
 {% block dashboard_content %}
-<div class="bg-white rounded-lg shadow">
-    <div class="px-6 py-4 border-b border-gray-200">
-        <h3 class="text-lg font-semibold text-gray-900">{% if object %}Edit Testimonial{% else %}Create New Testimonial{% endif %}</h3>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0">{% if object %}Edit Testimonial{% else %}Create New Testimonial{% endif %}</h5>
+                </div>
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Name</label>
+                            <input type="text" name="name" value="{{ form.name.value|default:'' }}" required
+                                   class="form-control">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Slug</label>
+                            <input type="text" name="slug" value="{{ form.slug.value|default:'' }}"
+                                   class="form-control">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Position</label>
+                            <input type="text" name="position" value="{{ form.position.value|default:'' }}"
+                                   class="form-control">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Company</label>
+                            <input type="text" name="company" value="{{ form.company.value|default:'' }}"
+                                   class="form-control">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Avatar</label>
+                            {% if object and object.avatar %}
+                            <img src="{{ object.avatar.url }}" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% endif %}
+                            <input type="file" name="avatar" accept="image/*" class="form-control form-control-sm">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Testimonial <span class="text-danger">*</span></label>
+                            <textarea name="testimonial" rows="5" required class="form-control">{{ form.testimonial.value|default:'' }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Rating (1-5)</label>
+                            <input type="number" name="rating" value="{{ form.rating.value|default:5 }}" min="1" max="5" step="0.1"
+                                   class="form-control">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="featured" id="id_featured" {% if form.featured.value %}checked{% endif %}
+                                       class="form-check-input">
+                                <label for="id_featured" class="form-check-label">Featured</label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Order</label>
+                            <input type="number" name="order" value="{{ form.order.value|default:0 }}" min="0"
+                                   class="form-control">
+                        </div>
+                        
+                        <div class="mb-0">
+                            <label class="form-label fw-medium">Status</label>
+                            <select name="status" class="form-select">
+                                {% for value, label in form.fields.status.choices %}
+                                <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            {% if object %}Update{% else %}Create{% endif %}
+                        </button>
+                        <a href="{% url 'dashboard:testimonial_list' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    
-    <form method="post" enctype="multipart/form-data" class="p-6 max-w-2xl">
-        {% csrf_token %}
-        
-        <div class="space-y-6">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                <input type="text" name="name" value="{{ form.name.value|default:'' }}" required
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-                <input type="text" name="slug" value="{{ form.slug.value|default:'' }}"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Position</label>
-                <input type="text" name="position" value="{{ form.position.value|default:'' }}"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Company</label>
-                <input type="text" name="company" value="{{ form.company.value|default:'' }}"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Avatar</label>
-                {% if object and object.avatar %}
-                <img src="{{ object.avatar.url }}" class="w-20 h-20 rounded-full object-cover mb-2">
-                {% endif %}
-                <input type="file" name="avatar" accept="image/*"
-                       class="w-full text-sm text-gray-500">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Testimonial *</label>
-                <textarea name="testimonial" rows="5" required
-                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">{{ form.testimonial.value|default:'' }}</textarea>
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Rating (1-5)</label>
-                <input type="number" name="rating" value="{{ form.rating.value|default:5 }}" min="1" max="5" step="0.1"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-            </div>
-            
-            <div class="flex items-center">
-                <input type="checkbox" name="featured" id="id_featured" {% if form.featured.value %}checked{% endif %}
-                       class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
-                <label for="id_featured" class="ml-2 block text-sm text-gray-700">Featured</label>
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Order</label>
-                <input type="number" name="order" value="{{ form.order.value|default:0 }}" min="0"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-                    {% for value, label in form.fields.status.choices %}
-                    <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-        
-        <div class="mt-8 flex space-x-4">
-            <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors">
-                {% if object %}Update{% else %}Create{% endif %}
-            </button>
-            <a href="{% url 'dashboard:testimonial_list' %}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
-                Cancel
-            </a>
-        </div>
-    </form>
 </div>
 {% endblock %}
