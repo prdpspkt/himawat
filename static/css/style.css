@@ -13,6 +13,9 @@
     --primary-scarlet-dark: #b91c1c;
     --primary-scarlet-light: rgba(218, 37, 28, 0.08);
     --primary-scarlet-medium: rgba(218, 37, 28, 0.15);
+    --primary-purple: #7C3AED;
+    --primary-purple-dark: #6D28D9;
+    --primary-purple-light: rgba(124, 58, 237, 0.08);
 
     /* Secondary Colors - Emerald */
     --secondary-emerald: #006D32;
@@ -130,22 +133,9 @@ textarea:focus-visible,
     border-radius: var(--border-radius-sm);
 }
 
-/* Skip to main content link */
+/* Skip to main content link - Completely hidden */
 .skip-link {
-    position: absolute;
-    top: -40px;
-    left: 0;
-    background: var(--primary-scarlet);
-    color: white;
-    padding: 8px;
-    text-decoration: none;
-    z-index: 10000;
-    border-radius: 0 0 var(--border-radius) 0;
-}
-
-.skip-link:focus {
-    top: 0;
-    color: white;
+    display: none;
 }
 
 /* ============================================================
@@ -206,6 +196,84 @@ textarea:focus-visible,
 /* ============================================================
    Header & Navigation
    ============================================================ */
+
+/* Anthem Play Button - Ensure perfect circle on all devices */
+#playAnthemBtn {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0;
+    line-height: 1 !important;
+}
+
+#playAnthemBtn:hover {
+    background-color: var(--primary-purple) !important;
+    color: white !important;
+}
+
+#playAnthemBtn i {
+    position: relative;
+    line-height: 1;
+}
+
+/* Footer Social Buttons */
+footer .btn-outline-secondary {
+    transition: all 0.3s ease;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+footer .btn-outline-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+footer .btn-outline-secondary[href*="whatsapp"]:hover {
+    background-color: #25D366;
+    color: white !important;
+}
+
+footer .btn-outline-secondary[href*="facebook"]:hover {
+    background-color: #1877F2;
+    color: white !important;
+}
+
+footer .btn-outline-secondary[href*="twitter"]:hover {
+    background-color: #1DA1F2;
+    color: white !important;
+}
+
+footer .btn-outline-secondary[href*="instagram"]:hover {
+    background-color: #E4405F;
+    color: white !important;
+}
+
+footer .btn-outline-secondary[href*="youtube"]:hover {
+    background-color: #FF0000;
+    color: white !important;
+}
+
+/* Gallery Image Hover Effect */
+.card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card-hover:hover img {
+    transform: scale(1.05);
+}
 
 .top-bar {
     position: relative;
@@ -427,7 +495,7 @@ textarea:focus-visible,
 
 .social-sidebar a:hover {
     background: var(--primary-scarlet-light);
-    color: var(--primary-scarlet-dark);
+    transform: translateX(-4px);
 }
 
 .social-sidebar a:first-child {
@@ -438,19 +506,29 @@ textarea:focus-visible,
     border-radius: 0 0 0 var(--border-radius-lg);
 }
 
-/* Hide on mobile, show toggle instead */
+/* Mobile responsive - keep visible but adjust size */
 @media (max-width: 767.98px) {
     .social-sidebar {
-        transform: translateY(-50%) translateX(100%);
-        transition: transform 0.3s ease;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
+        box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1040;
     }
-    
-    .social-sidebar.show {
-        transform: translateY(-50%) translateX(0);
+
+    .social-sidebar a {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
     }
-    
-    .social-sidebar-toggle {
-        display: flex !important;
+
+    .social-sidebar a:first-child {
+        border-radius: var(--border-radius-lg) 0 0 0;
+    }
+
+    .social-sidebar a:last-child {
+        border-radius: 0 0 0 var(--border-radius-lg);
     }
 }
 
@@ -466,6 +544,28 @@ textarea:focus-visible,
     border-radius: var(--border-radius);
     transition: all 0.3s ease;
     font-size: 1rem;
+}
+
+/* Lighter placeholder text */
+.form-control::placeholder {
+    color: #9CA3AF;
+    opacity: 1;
+}
+
+.form-control::-webkit-input-placeholder {
+    color: #9CA3AF;
+}
+
+.form-control::-moz-placeholder {
+    color: #9CA3AF;
+}
+
+.form-control:-ms-input-placeholder {
+    color: #9CA3AF;
+}
+
+.form-control::-ms-input-placeholder {
+    color: #9CA3AF;
 }
 
 .form-control:focus,

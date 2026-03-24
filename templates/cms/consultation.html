@@ -43,7 +43,7 @@
 
                             <div class="row g-4 mb-4">
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold text-almost-black">Phone Number</label>
+                                    <label class="form-label fw-semibold text-almost-black">Phone/WhatsApp</label>
                                     <input type="tel" name="phone" class="form-control" placeholder="+977-XXXXXXXXXX">
                                 </div>
                                 <div class="col-md-6">
@@ -255,21 +255,29 @@
 
                             <div class="mb-4">
                                 <label class="form-label fw-semibold text-almost-black">Service Category *</label>
-                                <select name="subject" required class="form-control">
-                                    <option value="">Select Service Category</option>
-                                    <option value="Vastu Services">Vastu Services</option>
-                                    <option value="Construction Services">Construction Services</option>
-                                    <option value="Engineering Design">Engineering Design</option>
-                                    <option value="Trainings">Trainings</option>
-                                    <option value="Products">Products</option>
-                                    <option value="Architectural Design">Architectural Design</option>
-                                    <option value="Structural Design">Structural Design</option>
-                                    <option value="Interior Design">Interior Design</option>
-                                    <option value="Landscape Design">Landscape Design</option>
-                                    <option value="Project Management">Project Management</option>
-                                    <option value="Site Supervision">Site Supervision</option>
-                                    <option value="Other">Other</option>
-                                </select>
+                                <div class="row g-3">
+                                    {% for category in service_categories %}
+                                    <div class="col-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                   name="service_category"
+                                                   value="{{ category.name }}"
+                                                   id="category_{{ category.id }}">
+                                            <label class="form-check-label" for="category_{{ category.id }}">
+                                                {% if category.image %}
+                                                <img src="{{ category.image.url }}" alt="{{ category.name }}" class="me-2" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px;">
+                                                {% endif %}
+                                                {{ category.name }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="col-12">
+                                        <p class="text-dim-grey mb-0">No service categories available.</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <small class="text-dim-grey">You can select multiple categories</small>
                             </div>
 
                             <div class="mb-4">
@@ -298,7 +306,7 @@
 
                             <div class="mb-4">
                                 <label class="form-label fw-semibold text-almost-black">Attach Files (Optional)</label>
-                                <p class="small text-dim-grey mb-2">You can attach multiple files (images, PDFs, documents, CAD files, etc.)</p>
+                                <p class="small text-dim-grey mb-2">You can attach multiple files (images, PDFs, documents, CAD files, etc.) - Maximum file size: 10MB</p>
                                 <input type="file" name="files" multiple accept="image/*,.pdf,.doc,.docx,.txt,.xls,.xlsx,.dwg,.dxf,.dwf,.step,.stp,.iges,.igs" class="form-control">
                             </div>
 
@@ -313,66 +321,94 @@
     </div>
 </div>
 
-<!-- Contact Info Section -->
-<div class="py-12 border-top bg-off-white">
+<!-- Featured Galleries & Videos Section -->
+{% if featured_galleries or featured_videos %}
+<div class="py-5 py-md-6 border-top">
     <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="display-6 fw-bold text-almost-black mb-3">Get in Touch</h2>
-            <p class="text-dim-grey fs-5">Reach out to us directly through any of these channels</p>
+        <div class="text-center mb-4">
+            <h2 class="display-6 fw-bold text-primary mb-3">Gallery & Videos</h2>
+            <p class="text-dim-grey">Explore our latest work and video content</p>
         </div>
 
-        <div class="row g-4 justify-content-center">
-            <!-- Phone -->
-            <div class="col-md-4">
-                <div class="card border-0 card-hover h-100" style="background: linear-gradient(135deg, rgba(218, 37, 28, 0.05) 0%, rgba(218, 37, 28, 0.02) 100%);">
-                    <div class="card-body text-center p-4">
-                        <div class="icon-box mx-auto mb-3" style="background: var(--primary-scarlet-light);">
-                            <i class="fas fa-phone-alt text-primary fs-4"></i>
-                        </div>
-                        <h5 class="fw-bold text-almost-black mb-2">Phone</h5>
-                        {% if company_info and company_info.phone %}
-                        <a href="tel:{{ company_info.phone }}" class="text-primary text-decoration-none">{{ company_info.phone }}</a>
-                        {% else %}
-                        <p class="text-dim-grey mb-0">+977-XXXXXXXXXX</p>
-                        {% endif %}
+        <div class="row g-4">
+            <!-- Galleries Column -->
+            {% if featured_galleries %}
+            <div class="col-lg-6">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold text-almost-black mb-0">
+                        <i class="fas fa-images me-2 text-primary"></i>Photo Galleries
+                    </h4>
+                    <a href="{% url 'pages:gallery_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="row g-3">
+                    {% for gallery in featured_galleries %}
+                    <div class="col-6">
+                        <a href="{% url 'pages:gallery_detail' gallery.slug %}" class="text-decoration-none">
+                            <div class="card card-hover h-100 border-0">
+                                {% if gallery.cover_image %}
+                                <img src="{{ gallery.cover_image.url }}" alt="{{ gallery.name }}" class="card-img-top" style="height: 150px; object-fit: cover;" loading="lazy">
+                                {% elif gallery.images.first %}
+                                <img src="{{ gallery.images.first.image.url }}" alt="{{ gallery.name }}" class="card-img-top" style="height: 150px; object-fit: cover;" loading="lazy">
+                                {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 150px;">
+                                    <i class="fas fa-images text-dim-grey fs-1"></i>
+                                </div>
+                                {% endif %}
+                                <div class="card-body p-2">
+                                    <h6 class="fw-bold text-almost-black mb-1 small">{{ gallery.name }}</h6>
+                                    <p class="text-primary small mb-0"><i class="fas fa-images me-1" style="font-size: 0.75rem;"></i>{{ gallery.image_count }}</p>
+                                </div>
+                            </div>
+                        </a>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
+            {% endif %}
 
-            <!-- Email -->
-            <div class="col-md-4">
-                <div class="card border-0 card-hover h-100" style="background: linear-gradient(135deg, rgba(0, 109, 50, 0.05) 0%, rgba(0, 109, 50, 0.02) 100%);">
-                    <div class="card-body text-center p-4">
-                        <div class="icon-box mx-auto mb-3" style="background: var(--success-bg);">
-                            <i class="fas fa-envelope text-emerald fs-4"></i>
-                        </div>
-                        <h5 class="fw-bold text-almost-black mb-2">Email</h5>
-                        {% if company_info and company_info.email %}
-                        <a href="mailto:{{ company_info.email }}" class="text-primary text-decoration-none">{{ company_info.email }}</a>
-                        {% else %}
-                        <p class="text-dim-grey mb-0">info@example.com</p>
-                        {% endif %}
-                    </div>
-                </div>
+            <!-- Separator -->
+            {% if featured_galleries and featured_videos %}
+            <div class="col-lg-1 d-none d-lg-flex align-items-center justify-content-center">
+                <div class="vr" style="height: 100%; width: 2px; background-color: var(--silver-light);"></div>
             </div>
+            {% endif %}
 
-            <!-- Address -->
-            <div class="col-md-4">
-                <div class="card border-0 card-hover h-100" style="background: linear-gradient(135deg, rgba(218, 37, 28, 0.05) 0%, rgba(0, 109, 50, 0.05) 100%);">
-                    <div class="card-body text-center p-4">
-                        <div class="icon-box mx-auto mb-3" style="background: rgba(218, 37, 28, 0.08);">
-                            <i class="fas fa-map-marker-alt text-primary fs-4"></i>
-                        </div>
-                        <h5 class="fw-bold text-almost-black mb-2">Address</h5>
-                        {% if company_info and company_info.city %}
-                        <p class="text-dim-grey mb-0">{{ company_info.city }}{% if company_info.country %}, {{ company_info.country }}{% endif %}</p>
-                        {% else %}
-                        <p class="text-dim-grey mb-0">Kathmandu, Nepal</p>
-                        {% endif %}
+            <!-- Videos Column -->
+            {% if featured_videos %}
+            <div class="col-lg-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold text-almost-black mb-0">
+                        <i class="fas fa-video me-2 text-primary"></i>Videos
+                    </h4>
+                    <a href="{% url 'pages:video_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="row g-3">
+                    {% for video in featured_videos %}
+                    <div class="col-6">
+                        <a href="{% url 'pages:video_detail' video.slug %}" class="text-decoration-none">
+                            <div class="card card-hover h-100 border-0">
+                                {% if video.thumbnail %}
+                                <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="card-img-top" style="height: 150px; object-fit: cover;" loading="lazy">
+                                {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center position-relative" style="height: 150px;">
+                                    <i class="fas fa-play-circle text-primary fs-1"></i>
+                                </div>
+                                {% endif %}
+                                <div class="card-body p-2">
+                                    <h6 class="fw-bold text-almost-black mb-1 small">{{ video.title }}</h6>
+                                    {% if video.duration %}
+                                    <p class="text-dim-grey small mb-0"><i class="fas fa-clock me-1" style="font-size: 0.75rem;"></i>{{ video.duration }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </a>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
 </div>
+{% endif %}
 {% endblock %}

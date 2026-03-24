@@ -6,11 +6,38 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# =============================================================================
+# CONDITIONAL ENV FILE LOADING
+# =============================================================================
+
+# Determine which .env file to load based on DEBUG environment variable
+# If DEBUG is not set, default to True (development mode)
+debug_env_value = True
+
+# Load the appropriate .env file based on DEBUG setting
+if debug_env_value:
+    # Development mode - load .env-local
+    env_file = BASE_DIR / '.env-local'
+    if env_file.exists():
+        load_dotenv(env_file)
+        print(f"[DEBUG MODE] Loaded environment variables from .env-local")
+    else:
+        # Fallback to .env if .env-local doesn't exist
+        load_dotenv()
+        print(f"[DEBUG MODE] .env-local not found, using .env")
+else:
+    # Production mode - load .env
+    env_file = BASE_DIR / '.env'
+    if env_file.exists():
+        load_dotenv(env_file)
+        print(f"[PRODUCTION MODE] Loaded environment variables from .env")
+    else:
+        raise FileNotFoundError(
+            "Production .env file not found! Please create a .env file with production settings."
+        )
 
 
 # =============================================================================
@@ -23,7 +50,7 @@ if not SECRET_KEY:
     raise ValueError("DJANGO_SECRET_KEY environment variable is not set!")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False').lower() == False
+DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 'yes', 'on')
 
 # Allowed hosts - configured via environment variable
 ALLOWED_HOSTS_STR = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1')

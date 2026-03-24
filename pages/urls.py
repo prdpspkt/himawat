@@ -57,6 +57,9 @@ urlpatterns = [
     path('consultation/', views.ConsultationView.as_view(), name='consultation'),
     path('consultation/submit/', views.consultation_request, name='consultation_submit'),
 
+    # CEO Profile
+    path('ceo/', views.CEOProfileView.as_view(), name='ceo_profile'),
+
     # Contact
     path('contact/', views.ContactView.as_view(), name='contact'),
     path('contact/submit/', views.contact_submit, name='contact_submit'),

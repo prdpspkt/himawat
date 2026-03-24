@@ -88,9 +88,9 @@
                     <audio id="companyAnthem" preload="none">
                         <source src="{{ company_info.anthem.url }}" type="audio/mpeg">
                     </audio>
-                    <button id="playAnthemBtn" onclick="toggleAnthem()" class="btn btn-outline-primary btn-sm rounded-circle" style="width: 40px; height: 40px; padding: 0;" aria-label="Play company anthem" title="Play Vastu Anthem">
-                        <i class="fas fa-play" id="playIcon" style="font-size: 14px;"></i>
-                        <i class="fas fa-pause d-none" id="pauseIcon" style="font-size: 14px;"></i>
+                    <button id="playAnthemBtn" class="btn btn-sm" style="color: var(--primary-purple); border: 2px solid var(--primary-purple); background: transparent;" aria-label="Play company anthem" title="Play Vastu Anthem">
+                        <i class="fas fa-play" id="playIcon"></i>
+                        <i class="fas fa-pause d-none" id="pauseIcon"></i>
                     </button>
                     <span class="small fw-bold text-dim-grey d-none d-sm-inline">VASTU ANTHEM</span>
                 </div>
@@ -197,50 +197,37 @@
     </header>
 
     <!-- Floating Social Links Box -->
-    <div class="social-sidebar d-none d-md-block" role="complementary" aria-label="Social media links">
+    <div class="social-sidebar" role="complementary" aria-label="Social media links">
         <div class="d-flex flex-column">
             {% if company_info %}
+                {% if company_info.whatsapp %}
+                <a href="https://wa.me/{{ company_info.whatsapp }}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" style="color: #25D366;">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+                {% endif %}
                 {% if company_info.facebook %}
-                <a href="{{ company_info.facebook }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                <a href="{{ company_info.facebook }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color: #1877F2;">
                     <i class="fab fa-facebook-f"></i>
                 </a>
                 {% endif %}
                 {% if company_info.twitter %}
-                <a href="{{ company_info.twitter }}" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                <a href="{{ company_info.twitter }}" target="_blank" rel="noopener noreferrer" aria-label="Twitter" style="color: #1DA1F2;">
                     <i class="fab fa-twitter"></i>
                 </a>
                 {% endif %}
-                {% if company_info.linkedin %}
-                <a href="{{ company_info.linkedin }}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
-                {% endif %}
                 {% if company_info.instagram %}
-                <a href="{{ company_info.instagram }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <a href="{{ company_info.instagram }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color: #E4405F;">
                     <i class="fab fa-instagram"></i>
                 </a>
                 {% endif %}
                 {% if company_info.youtube %}
-                <a href="{{ company_info.youtube }}" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                <a href="{{ company_info.youtube }}" target="_blank" rel="noopener noreferrer" aria-label="YouTube" style="color: #FF0000;">
                     <i class="fab fa-youtube"></i>
-                </a>
-                {% endif %}
-                {% if company_info.whatsapp %}
-                <a href="https://wa.me/{{ company_info.whatsapp }}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" class="text-success">
-                    <i class="fab fa-whatsapp"></i>
                 </a>
                 {% endif %}
             {% endif %}
         </div>
     </div>
-
-    <!-- Mobile Social Toggle -->
-    <button class="social-sidebar-toggle btn btn-primary rounded-circle position-fixed d-md-none" 
-            style="right: 1rem; bottom: 5rem; width: 48px; height: 48px; z-index: 1030; display: none;"
-            onclick="document.querySelector('.social-sidebar').classList.toggle('show')"
-            aria-label="Toggle social links">
-        <i class="fas fa-share-alt"></i>
-    </button>
 
     <!-- Messages -->
     {% if messages %}
@@ -302,12 +289,43 @@
                             {% endif %}
 
                             {% if company_info and company_info.email %}
-                            <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center mb-3">
                                 <i class="fas fa-envelope text-primary me-2"></i>
                                 <a href="mailto:{{ company_info.email }}" class="text-decoration-none">{{ company_info.email }}</a>
                             </div>
                             {% endif %}
                         </address>
+
+                        <!-- Social Media Links -->
+                        {% if company_info %}
+                        <div class="d-flex flex-wrap gap-2">
+                            {% if company_info.whatsapp %}
+                            <a href="https://wa.me/{{ company_info.whatsapp }}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" class="btn btn-outline-secondary btn-sm" style="color: #25D366; border-color: #25D366;">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            {% endif %}
+                            {% if company_info.facebook %}
+                            <a href="{{ company_info.facebook }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="btn btn-outline-secondary btn-sm" style="color: #1877F2; border-color: #1877F2;">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            {% endif %}
+                            {% if company_info.twitter %}
+                            <a href="{{ company_info.twitter }}" target="_blank" rel="noopener noreferrer" aria-label="Twitter" class="btn btn-outline-secondary btn-sm" style="color: #1DA1F2; border-color: #1DA1F2;">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            {% endif %}
+                            {% if company_info.instagram %}
+                            <a href="{{ company_info.instagram }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="btn btn-outline-secondary btn-sm" style="color: #E4405F; border-color: #E4405F;">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            {% endif %}
+                            {% if company_info.youtube %}
+                            <a href="{{ company_info.youtube }}" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="btn btn-outline-secondary btn-sm" style="color: #FF0000; border-color: #FF0000;">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% endif %}
                     </div>
 
                     <!-- Footer Menu 1 -->

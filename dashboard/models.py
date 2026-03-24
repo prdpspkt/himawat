@@ -381,6 +381,7 @@ class Testimonial(TimestampModel):
     testimonial = models.TextField()
     rating = models.DecimalField(max_digits=2, decimal_places=1, default=5.0)
     video_url = models.URLField(blank=True)
+    video = models.FileField(upload_to='testimonials/videos/', null=True, blank=True, help_text="Upload a video file (MP4, WebM, etc.)")
     website = models.URLField(blank=True)
     featured = models.BooleanField(default=False)
     order = models.IntegerField(default=0)

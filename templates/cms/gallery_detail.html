@@ -1,86 +1,157 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ gallery.name }} - Gallery{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-12">
-    <div class="text-center mb-12">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ gallery.name }}</h1>
-        {% if gallery.description %}
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ gallery.description }}</p>
-        {% endif %}
-    </div>
-    
-    {% if gallery.images.all %}
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {% for image in gallery.images.all %}
-        <div class="group relative aspect-square overflow-hidden rounded-lg cursor-pointer" onclick="openLightbox({{ forloop.counter0 }})">
-            <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:image.title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-            {% if image.title %}
-            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                <span class="text-white text-sm">{{ image.title }}</span>
-            </div>
+<!-- Gallery Header -->
+<div class="border-top pt-5 pb-4">
+    <div class="container">
+        <div class="text-center">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-center mb-3">
+                    <li class="breadcrumb-item"><a href="{% url 'pages:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'pages:gallery_list' %}">Galleries</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ gallery.name }}</li>
+                </ol>
+            </nav>
+            <h1 class="display-5 fw-bold text-primary mb-3">{{ gallery.name }}</h1>
+            {% if gallery.description %}
+            <p class="lead text-dim-grey-dark">{{ gallery.description }}</p>
+            {% endif %}
+            {% if gallery.images.count %}
+            <p class="text-dim-grey mt-2"><i class="fas fa-images me-2"></i>{{ gallery.images.count }} photos</p>
             {% endif %}
         </div>
-        {% endfor %}
     </div>
-    {% else %}
-    <div class="text-center py-12">
-        <p class="text-gray-500">No images in this gallery.</p>
-    </div>
-    {% endif %}
 </div>
 
-<!-- Lightbox -->
-<div id="lightbox" class="fixed inset-0 bg-black/90 z-50 hidden">
-    <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white hover:text-gray-300">
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-    </button>
-    <button onclick="prevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300">
-        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-    </button>
-    <button onclick="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300">
-        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-    </button>
-    <div class="flex items-center justify-center h-full p-8">
-        <img id="lightbox-image" src="" alt="" class="max-w-full max-h-full object-contain">
+<!-- Gallery Images Grid -->
+{% if gallery.images.all %}
+<div class="py-5 border-top">
+    <div class="container">
+        <div class="row g-4">
+            {% for image in gallery.images.all %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card border-0 card-hover" onclick="openLightbox({{ forloop.counter0 }})" style="cursor: pointer;">
+                    <div class="position-relative" style="aspect-ratio: 1 / 1; overflow: hidden; border-radius: var(--border-radius);">
+                        {% if image.thumbnail %}
+                        <img src="{{ image.thumbnail.url }}" alt="{{ image.alt_text|default:image.title }}" class="img-fluid w-100 h-100 object-fit-cover" style="transition: transform 0.3s ease;" loading="lazy">
+                        {% else %}
+                        <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:image.title }}" class="img-fluid w-100 h-100 object-fit-cover" style="transition: transform 0.3s ease;" loading="lazy">
+                        {% endif %}
+                        {% if image.title %}
+                        <div class="position-absolute bottom-0 start-0 end-0 p-2" style="background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);">
+                            <span class="text-white small">{{ image.title }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="py-12 border-top">
+    <div class="container">
+        <div class="text-center">
+            <i class="fas fa-images text-dim-grey fs-1 mb-3"></i>
+            <p class="text-dim-grey">No images in this gallery.</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Lightbox Modal -->
+<div id="lightbox" class="modal fade" tabindex="-1" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-fullscreen-md-down">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close btn-close-white ms-auto" onclick="closeLightbox()" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-0">
+                <button type="button" class="btn btn-dark btn-lg position-absolute start-0 top-50 translate-middle-y ms-3" onclick="prevImage()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <img id="lightbox-image" src="" alt="" class="img-fluid rounded shadow-lg" style="max-height: 80vh;">
+                <button type="button" class="btn btn-dark btn-lg position-absolute end-0 top-50 translate-middle-y me-3" onclick="nextImage()">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="modal-footer border-0 bg-transparent">
+                {% for image in gallery.images.all %}
+                {% if image.title %}
+                <p id="lightbox-caption-{{ forloop.counter0 }}" class="text-white mb-0 d-none">{{ image.title }}</p>
+                {% endif %}
+                {% endfor %}
+                <p id="lightbox-counter" class="text-white small"></p>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-const images = [{% for image in gallery.images.all %}"{{ image.image.url }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+const images = [
+    {% for image in gallery.images.all %}
+    {
+        url: "{{ image.image.url }}",
+        title: "{{ image.title|default:''|escapejs }}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
 let currentIndex = 0;
 
 function openLightbox(index) {
     currentIndex = index;
-    document.getElementById('lightbox-image').src = images[currentIndex];
-    document.getElementById('lightbox').classList.remove('hidden');
+    updateLightbox();
+    const lightbox = document.getElementById('lightbox');
+    lightbox.style.display = 'block';
+    lightbox.classList.add('show');
     document.body.style.overflow = 'hidden';
 }
 
 function closeLightbox() {
-    document.getElementById('lightbox').classList.add('hidden');
+    const lightbox = document.getElementById('lightbox');
+    lightbox.classList.remove('show');
+    setTimeout(() => {
+        lightbox.style.display = 'none';
+    }, 150);
     document.body.style.overflow = 'auto';
 }
 
 function nextImage() {
     currentIndex = (currentIndex + 1) % images.length;
-    document.getElementById('lightbox-image').src = images[currentIndex];
+    updateLightbox();
 }
 
 function prevImage() {
     currentIndex = (currentIndex - 1 + images.length) % images.length;
-    document.getElementById('lightbox-image').src = images[currentIndex];
+    updateLightbox();
 }
 
+function updateLightbox() {
+    const img = document.getElementById('lightbox-image');
+    const counter = document.getElementById('lightbox-counter');
+    img.src = images[currentIndex].url;
+    img.alt = images[currentIndex].title || 'Gallery image';
+    counter.textContent = `${currentIndex + 1} / ${images.length}`;
+}
+
+// Close lightbox on background click
 document.getElementById('lightbox').addEventListener('click', function(e) {
-    if (e.target === this) closeLightbox();
+    if (e.target === this || e.target.classList.contains('modal-content')) {
+        closeLightbox();
+    }
 });
 
+// Keyboard navigation
 document.addEventListener('keydown', function(e) {
-    if (document.getElementById('lightbox').classList.contains('hidden')) return;
+    const lightbox = document.getElementById('lightbox');
+    if (lightbox.style.display === 'none') return;
+
     if (e.key === 'Escape') closeLightbox();
     if (e.key === 'ArrowRight') nextImage();
     if (e.key === 'ArrowLeft') prevImage();

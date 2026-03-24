@@ -11,7 +11,7 @@ from django.utils import timezone
 from dashboard.models import (
     Post, Page, Category, Tag, Download, Gallery,
     Testimonial, Carousel, FAQ, Product, ProductRequest, Consultation, Video,
-    Service, ServiceRequest, Training, TrainingRequest, Contact
+    Service, ServiceRequest, Training, TrainingRequest, Contact, CEOInfo
 )
 
 
@@ -442,15 +442,18 @@ def consultation_request(request):
     email = request.POST.get('email')
     phone = request.POST.get('phone', '')
     country = request.POST.get('country', '')
-    subject = request.POST.get('subject')
     message = request.POST.get('message')
     preferred_date = request.POST.get('preferred_date')
+
+    # Handle service_category checkboxes (can be multiple)
+    service_categories = request.POST.getlist('service_category')
+    subject = ','.join(service_categories) if service_categories else ''
 
     # Handle service_type checkboxes (can be multiple)
     service_types = request.POST.getlist('service_type')
     service_type = ','.join(service_types) if service_types else ''
 
-    if name and email and subject and message:
+    if name and email and service_categories and message:
         consultation = Consultation.objects.create(
             name=name,
             email=email,
@@ -481,6 +484,37 @@ def consultation_request(request):
 class ConsultationView(TemplateView):
     """Consultation page view"""
     template_name = 'cms/consultation.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from django.contrib.contenttypes.models import ContentType
+        from dashboard.models import Category, Service, Gallery, Video
+        from django.db.models import Q, Count
+
+        # Get service content type
+        serviceContentType = ContentType.objects.get_for_model(Service)
+
+        # Get categories that apply to services OR have services associated
+        # Use a broader query to catch all relevant categories
+        context['service_categories'] = Category.objects.filter(
+            status='active'
+        ).filter(
+            Q(applies_to=serviceContentType) | Q(services__isnull=False)
+        ).distinct().order_by('sort_order', 'name')
+
+        # Get featured galleries (up to 2)
+        context['featured_galleries'] = Gallery.objects.filter(
+            status='active'
+        ).annotate(
+            image_count=Count('images')
+        ).order_by('sort_order', 'name')[:2]
+
+        # Get featured videos (up to 2)
+        context['featured_videos'] = Video.objects.filter(
+            status='published'
+        ).order_by('sort_order', '-published_at')[:2]
+
+        return context
 
 
 class ContactView(TemplateView):
@@ -683,6 +717,17 @@ def training_request(request, slug):
         messages.error(request, 'Please fill in all required fields.')
 
     return redirect('pages:training_detail', slug=slug)
+
+
+class CEOProfileView(TemplateView):
+    """CEO public profile view"""
+    template_name = 'cms/ceo_profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Get CEO info
+        context['ceo_info'] = CEOInfo.get_instance()
+        return context
 
 
 def search(request):
