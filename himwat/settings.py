@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Determine which .env file to load based on DEBUG environment variable
 # If DEBUG is not set, default to True (development mode)
-debug_env_value = True
+debug_env_value = False
 
 # Load the appropriate .env file based on DEBUG setting
 if debug_env_value:
