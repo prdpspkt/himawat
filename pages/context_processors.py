@@ -1,4 +1,5 @@
-from dashboard.models import Menu, CompanyInfo, Carousel, Testimonial, FAQ, CEOInfo, Gallery, Product
+from dashboard.models import Menu, CompanyInfo, Carousel, Testimonial, FAQ, CEOInfo, Gallery, Product, Video
+from django.db.models import Count
 
 
 def site_context(request):
@@ -98,7 +99,25 @@ def home_context(request):
 def page_context(request):
     """Context processor for page templates with dynamic content"""
     context = {}
-    
+
+    # Featured galleries (up to 2)
+    try:
+        context['featured_galleries'] = Gallery.objects.filter(
+            status='active'
+        ).annotate(
+            image_count=Count('images')
+        ).order_by('sort_order', 'name')[:2]
+    except:
+        context['featured_galleries'] = []
+
+    # Featured videos (up to 2)
+    try:
+        context['featured_videos'] = Video.objects.filter(
+            status='published'
+        ).order_by('sort_order', '-published_at')[:2]
+    except:
+        context['featured_videos'] = []
+
     # Galleries for gallery page template
     try:
         context['galleries'] = Gallery.objects.filter(
@@ -106,18 +125,18 @@ def page_context(request):
         ).prefetch_related('images').order_by('sort_order')
     except:
         context['galleries'] = []
-    
+
     # Products for product page template
     try:
         products = Product.objects.filter(status='active').order_by('-featured', 'sort_order')
-        
+
         # Filter by category if specified
         category = request.GET.get('category')
         if category:
             products = products.filter(category=category)
-        
+
         context['products'] = products
     except:
         context['products'] = []
-    
+
     return context

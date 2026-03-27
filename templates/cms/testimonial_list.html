@@ -2,75 +2,231 @@
 
 {% block title %}Testimonials - {% if company_info %}{{ company_info.company_name }}{% else %}Thelix{% endif %}{% endblock %}
 
+{% block extra_css %}
+<style>
+.testimonials-hero {
+    background: linear-gradient(135deg, var(--primary-purple) 0%, #8B5CF6 100%);
+    padding: 4rem 0;
+    margin-bottom: 3rem;
+}
+.testimonial-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 12px;
+    height: 100%;
+}
+.testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
+}
+.testimonial-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.testimonial-avatar-placeholder {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-purple) 0%, #8B5CF6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.75rem;
+    font-weight: bold;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.testimonial-rating {
+    color: #FFC107;
+}
+.testimonial-quote {
+    position: relative;
+    padding-left: 1.5rem;
+}
+.testimonial-quote::before {
+    content: '"';
+    position: absolute;
+    left: 0;
+    top: -0.5rem;
+    font-size: 3rem;
+    line-height: 1;
+    color: var(--primary-purple);
+    opacity: 0.3;
+    font-family: Georgia, serif;
+}
+.rating-badge {
+    background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    display: inline-block;
+}
+.pagination .page-link {
+    color: var(--primary-purple);
+    border-color: #dee2e6;
+}
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-purple);
+    border-color: var(--primary-purple);
+}
+.pagination .page-link:hover {
+    background-color: #f8f9fa;
+}
+.empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+}
+.empty-state-icon {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 1.5rem;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-12">
-    <div class="text-center mb-12">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">Client Testimonials</h1>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">What our clients say about our services</p>
-        {% if average_rating %}
-        <div class="mt-4 flex items-center justify-center space-x-2">
-            <div class="flex text-yellow-400">
-                {% for i in "12345" %}
-                <svg class="w-6 h-6 {% if forloop.counter <= average_rating %}fill-current{% else %}text-gray-300{% endif %}" viewBox="0 0 20 20">
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                </svg>
-                {% endfor %}
-            </div>
-            <span class="text-2xl font-bold text-gray-900">{{ average_rating }}</span>
-            <span class="text-gray-500">({{ total_count }} reviews)</span>
-        </div>
-        {% endif %}
-    </div>
-    
-    {% if testimonials %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {% for testimonial in testimonials %}
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center mb-4">
-                {% if testimonial.avatar %}
-                <img src="{{ testimonial.avatar.url }}" alt="{{ testimonial.name }}" class="w-14 h-14 rounded-full object-cover mr-4">
-                {% else %}
-                <div class="w-14 h-14 bg-primary rounded-full flex items-center justify-center mr-4">
-                    <span class="text-2xl font-bold text-white">{{ testimonial.name|first }}</span>
+<!-- Hero Section -->
+<section class="testimonials-hero text-white">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-4 fw-bold mb-3">Client Testimonials</h1>
+                <p class="lead mb-4 opacity-90">Discover what our valued clients have to say about their experience with our services</p>
+                {% if average_rating %}
+                <div class="d-flex align-items-center justify-content-center gap-3 mt-4">
+                    <div class="rating-badge">
+                        <i class="fas fa-star me-1"></i>
+                        <span class="fw-bold">{{ average_rating }}</span>
+                    </div>
+                    <div class="text-start">
+                        <div class="testimonial-rating">
+                            {% for i in "12345" %}
+                            <i class="fas fa-star {% if forloop.counter <= average_rating %}text-warning{% else %}text-muted opacity-25{% endif %}"></i>
+                            {% endfor %}
+                        </div>
+                        <small class="opacity-75">Based on {{ total_count }} review{{ total_count|pluralize }}</small>
+                    </div>
                 </div>
                 {% endif %}
-                <div>
-                    <h3 class="font-bold text-gray-900">{{ testimonial.name }}</h3>
-                    {% if testimonial.position %}
-                    <p class="text-sm text-gray-500">{{ testimonial.position }}</p>
-                    {% endif %}
-                    {% if testimonial.company %}
-                    <p class="text-sm text-primary">{{ testimonial.company }}</p>
-                    {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Grid -->
+<div class="container mb-5">
+    {% if testimonials %}
+    <div class="row g-4">
+        {% for testimonial in testimonials %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card testimonial-card shadow-sm">
+                <div class="card-body p-4">
+                    <!-- Rating -->
+                    <div class="testimonial-rating mb-3">
+                        {% for i in "12345" %}
+                        <i class="fas fa-star {% if forloop.counter <= testimonial.rating %}text-warning{% else %}text-muted opacity-25{% endif %}"></i>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Testimonial Text -->
+                    <blockquote class="testimonial-quote text-muted mb-4">
+                        {{ testimonial.testimonial }}
+                    </blockquote>
+
+                    <!-- Author Info -->
+                    <div class="d-flex align-items-center mt-auto">
+                        {% if testimonial.avatar %}
+                        <img src="{{ testimonial.avatar.url }}" alt="{{ testimonial.name }}" class="testimonial-avatar me-3">
+                        {% else %}
+                        <div class="testimonial-avatar-placeholder me-3">
+                            {{ testimonial.name|first|upper }}
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h5 class="mb-0 fw-bold">{{ testimonial.name }}</h5>
+                            {% if testimonial.position %}
+                            <p class="mb-0 small text-muted">{{ testimonial.position }}</p>
+                            {% endif %}
+                            {% if testimonial.company %}
+                            <p class="mb-0 small fw-semibold" style="color: var(--primary-purple);">{{ testimonial.company }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="flex text-yellow-400 mb-3">
-                {% for i in "12345" %}
-                <svg class="w-5 h-5 {% if forloop.counter <= testimonial.rating %}fill-current{% else %}text-gray-300{% endif %}" viewBox="0 0 20 20">
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                </svg>
-                {% endfor %}
-            </div>
-            <p class="text-gray-700 italic">"{{ testimonial.testimonial }}"</p>
         </div>
         {% endfor %}
     </div>
-    
+
+    <!-- Pagination -->
     {% if is_paginated %}
-    <div class="mt-12 flex justify-center space-x-2">
-        {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Previous</a>
-        {% endif %}
-        <span class="px-4 py-2 bg-primary text-white rounded-lg">{{ page_obj.number }}</span>
-        {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Next</a>
-        {% endif %}
-    </div>
+    <nav aria-label="Testimonial pagination" class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
     {% endif %}
+
     {% else %}
-    <div class="text-center py-12">
-        <p class="text-gray-500">No testimonials yet.</p>
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i class="far fa-comments"></i>
+        </div>
+        <h3 class="h4 mb-3">No Testimonials Yet</h3>
+        <p class="text-muted mb-4">We haven't received any testimonials yet. Be the first to share your experience!</p>
+        <a href="{% url 'pages:contact' %}" class="btn btn-primary">
+            <i class="fas fa-paper-plane me-2"></i>Contact Us
+        </a>
     </div>
     {% endif %}
 </div>
+
+<!-- CTA Section -->
+{% if testimonials %}
+<section class="bg-light py-5 mt-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h3 class="h3 mb-3">Ready to Share Your Experience?</h3>
+                <p class="text-muted mb-4">We'd love to hear from you. Contact us to share your testimonial.</p>
+                <a href="{% url 'pages:contact' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-envelope me-2"></i>Get in Touch
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
 {% endblock %}

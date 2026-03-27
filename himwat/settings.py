@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Determine which .env file to load based on DEBUG environment variable
 # If DEBUG is not set, default to True (development mode)
-debug_env_value = False
+debug_env_value = True
 
 # Load the appropriate .env file based on DEBUG setting
 if debug_env_value:
@@ -120,6 +120,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.media',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'pages.context_processors.site_context',
