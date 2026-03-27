@@ -5,7 +5,7 @@
 
 {% block content %}
 <!-- Hero Section: Carousel & CEO Info Side by Side -->
-<div class="border-top pt-4 pt-md-5 pb-4 pb-md-5">
+<div class="pt-4 pt-md-5 pb-4 pb-md-5">
     <div class="container">
         <div class="row g-4">
             <!-- Carousel (wider on large screens) -->
@@ -150,13 +150,13 @@
         <!-- Testimonials Carousel -->
         {% if featured_testimonials|length > 1 %}
         <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="hover">
-            <!-- Indicators (calculated for groups of 3) -->
+            <!-- Indicators (calculated for groups of 6) -->
             <div class="carousel-indicators mb-0">
                 <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Testimonial slide 1"></button>
-                {% if featured_testimonials|length > 3 %}
+                {% if featured_testimonials|length > 6 %}
                 <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="1" aria-label="Testimonial slide 2"></button>
                 {% endif %}
-                {% if featured_testimonials|length > 6 %}
+                {% if featured_testimonials|length > 12 %}
                 <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="2" aria-label="Testimonial slide 3"></button>
                 {% endif %}
             </div>
@@ -164,7 +164,7 @@
             <!-- Slides -->
             <div class="carousel-inner">
                 {% for testimonial in featured_testimonials %}
-                {% if forloop.counter0|divisibleby:3 or forloop.first %}
+                {% if forloop.counter0|divisibleby:6 or forloop.first %}
                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
                     <div class="row g-4 justify-content-center">
                 {% endif %}
@@ -221,7 +221,7 @@
                                 </div>
                             </div>
                         </div>
-                {% if forloop.counter0|add:1|divisibleby:3 or forloop.last %}
+                {% if forloop.counter0|add:1|divisibleby:6 or forloop.last %}
                     </div>
                 </div>
                 {% endif %}
@@ -229,7 +229,7 @@
             </div>
 
             <!-- Controls -->
-            {% if featured_testimonials|length > 3 %}
+            {% if featured_testimonials|length > 6 %}
             <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true" style="width: 50px; height: 50px;"></span>
                 <span class="visually-hidden">Previous</span>

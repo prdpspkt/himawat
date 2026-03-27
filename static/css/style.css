@@ -154,6 +154,14 @@ textarea:focus-visible,
     border-color: var(--primary-scarlet) !important;
 }
 
+.border-top {
+    border-top: 1px solid var(--silver-light) !important;
+}
+
+.border-bottom {
+    border-bottom: 1px solid var(--silver-light) !important;
+}
+
 .text-success {
     color: var(--secondary-emerald) !important;
 }
@@ -280,7 +288,7 @@ footer .btn-outline-secondary[href*="youtube"]:hover {
     z-index: 1030;
     background-color: var(--off-white) !important;
     border-bottom: 1px solid var(--silver-light);
-    padding: 0.5rem 0;
+    padding: 0.1rem 0;
 }
 
 .top-nav-link {
@@ -325,6 +333,13 @@ footer .btn-outline-secondary[href*="youtube"]:hover {
 .navbar-toggler {
     border: none;
     padding: 0.5rem;
+}
+
+@media (min-width: 992px) {
+    .navbar-expand-lg .navbar-nav .nav-link {
+        padding-right: calc(var(--bs-navbar-nav-link-padding-x) + 3px) !important;
+        padding-left: calc(var(--bs-navbar-nav-link-padding-x) + 3px) !important;
+    }
 }
 
 .navbar-toggler:focus {

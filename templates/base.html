@@ -39,7 +39,7 @@
     <!-- Top Bar with Contact Info & Social Media -->
     <div class="top-bar border-bottom">
         <div class="container">
-            <div class="d-flex align-items-center justify-content-between py-2">
+            <div class="d-flex align-items-center justify-content-between">
                 <!-- Left side: Quick Links -->
                 <nav aria-label="Quick links" class="d-none d-md-flex align-items-center gap-3">
                     {% for item in top_menu %}
@@ -101,7 +101,7 @@
 
     <!-- Main Navigation -->
     <header class="sticky-top mb-2">
-        <nav class="navbar navbar-expand-lg bg-off-white py-2" aria-label="Main navigation">
+        <nav class="navbar navbar-expand-lg bg-off-white py-2 border-bottom" aria-label="Main navigation">
             <div class="container">
                 <!-- Mobile Menu Button -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -111,31 +111,6 @@
                 <!-- Navigation Links -->
                 <div class="collapse navbar-collapse" id="mainNavbar">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <!-- Services Dropdown -->
-                        {% if service_categories %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle main-nav-link" href="{% url 'pages:service_list' %}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-concierge-bell me-1"></i>Services
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-lg-start border-0 shadow">
-                                {% for category in service_categories %}
-                                <li>
-                                    <a class="dropdown-item py-2" href="{{ category.get_absolute_url }}">
-                                        {% if category.icon %}<i class="{{ category.icon }} me-2 text-primary"></i>{% endif %}
-                                        {{ category.name }}
-                                    </a>
-                                </li>
-                                {% endfor %}
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item py-2 fw-semibold" href="{% url 'pages:service_list' %}">
-                                        <i class="fas fa-th-large me-2 text-primary"></i>View All Services
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        {% endif %}
-
                         {% for item in main_menu %}
                             {% if item.children.exists %}
                                 <li class="nav-item dropdown">

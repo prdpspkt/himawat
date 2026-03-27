@@ -76,9 +76,9 @@ def home_context(request):
     # Featured testimonials
     try:
         context['featured_testimonials'] = Testimonial.objects.filter(
-            status='published', 
+            status='published',
             featured=True
-        ).order_by('order')[:3]
+        ).order_by('order')[:6]
     except:
         context['featured_testimonials'] = []
     
