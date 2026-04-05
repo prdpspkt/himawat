@@ -780,9 +780,16 @@ def tools_list(request):
     tools = [
         {
             'title': 'Measurement Converter',
-            'description': 'Convert between different units of measurement including length, weight, area, and more.',
+            'description': 'Convert between different units of measurement including length, weight, area, volume, and temperature.',
             'icon': 'fa-ruler',
             'url': 'pages:measurement_converter',
+            'category': 'Conversion'
+        },
+        {
+            'title': 'Area Converter',
+            'description': 'Convert between different area units including square meters, square feet, acres, hectares, and more.',
+            'icon': 'fa-vector-square',
+            'url': 'pages:area_converter',
             'category': 'Conversion'
         },
         {
@@ -799,3 +806,8 @@ def tools_list(request):
 def measurement_converter(request):
     """Measurement conversion tool page - static template-based"""
     return render(request, 'cms/pages/measurement_converter.html')
+
+
+def area_converter(request):
+    """Area conversion tool page - static template-based"""
+    return render(request, 'cms/pages/area_converter.html')

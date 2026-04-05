@@ -67,6 +67,7 @@ urlpatterns = [
     # Tools
     path('tools/', views.tools_list, name='tools'),
     path('tools/measurement-converter/', views.measurement_converter, name='measurement_converter'),
+    path('tools/area-converter/', views.area_converter, name='area_converter'),
 
     # Search
     path('search/', views.search, name='search'),

@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+
+{% block title %}Area Converter - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block meta_description %}Free online area converter tool. Convert between square meters, square feet, acres, hectares, and more.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .converter-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .converter-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: center;
+    }
+    @media (max-width: 768px) {
+        .converter-form {
+            grid-template-columns: 1fr;
+        }
+    }
+    .input-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .input-group label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    .input-group input, .input-group select {
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+    .input-group input:focus, .input-group select:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+    .swap-button {
+        background: #2563eb;
+        color: white;
+        border: none;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s, background 0.3s;
+        align-self: center;
+    }
+    .swap-button:hover {
+        background: #1d4ed8;
+        transform: rotate(180deg);
+    }
+    .result-display {
+        background: #f0f9ff;
+        border: 2px solid #0ea5e9;
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        margin-top: 2rem;
+    }
+    .result-display .value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #0369a1;
+    }
+    .result-display .unit {
+        font-size: 1.25rem;
+        color: #0284c7;
+        margin-left: 0.5rem;
+    }
+    .formula-display {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 1rem;
+        margin-top: 1rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        color: #92400e;
+    }
+    .common-conversions {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .conversion-item {
+        background: #f9fafb;
+        padding: 0.75rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        color: #4b5563;
+    }
+    .conversion-item strong {
+        color: #1f2937;
+    }
+    .area-info {
+        background: #eff6ff;
+        border-left: 4px solid #3b82f6;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        border-radius: 4px;
+    }
+    .area-info h4 {
+        color: #1e40af;
+        margin-bottom: 0.5rem;
+    }
+    .area-info p {
+        color: #1e3a8a;
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="relative bg-gradient-to-r from-green-600 to-green-800 overflow-hidden">
+    <div class="relative max-w-7xl mx-auto px-4 py-12 md:py-16 text-center">
+        <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">Area Converter</h1>
+        <p class="text-lg text-green-100 max-w-3xl mx-auto">
+            Convert between different area units quickly and accurately. Perfect for construction, real estate, and land measurement.
+        </p>
+        <a href="{% url 'pages:tools' %}" class="inline-flex items-center text-white hover:text-green-200 mt-4">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Tools
+        </a>
+    </div>
+</div>
+
+<!-- Converter Section -->
+<div class="max-w-4xl mx-auto px-4 py-12">
+    <div class="converter-card">
+        <!-- Area Information -->
+        <div class="area-info">
+            <h4><i class="fas fa-info-circle me-2"></i>Common Area Units</h4>
+            <p>
+                <strong>Square meters (m²)</strong>: Metric unit, commonly used worldwide<br>
+                <strong>Square feet (ft²)</strong>: Imperial unit, used in US, UK, India<br>
+                <strong>Square yards (yd²)</strong>): Imperial unit, used in construction<br>
+                <strong>Acres</strong>: Land measurement unit (43,560 ft²)<br>
+                <strong>Hectares</strong>: Metric land unit (10,000 m²)
+            </p>
+        </div>
+
+        <!-- Converter Form -->
+        <div class="converter-form">
+            <div class="input-group">
+                <label for="fromValue">From</label>
+                <input type="number" id="fromValue" value="1" min="0" step="any" placeholder="Enter value">
+                <select id="fromUnit" style="margin-top: 0.5rem;"></select>
+            </div>
+
+            <button class="swap-button" id="swapBtn" title="Swap units">
+                <i class="fas fa-exchange-alt"></i>
+            </button>
+
+            <div class="input-group">
+                <label for="toUnit">To</label>
+                <input type="number" id="toValue" readonly placeholder="Result">
+                <select id="toUnit" style="margin-top: 0.5rem;"></select>
+            </div>
+        </div>
+
+        <!-- Result Display -->
+        <div class="result-display">
+            <span class="value" id="resultValue">0</span>
+            <span class="unit" id="resultUnit"></span>
+        </div>
+
+        <!-- Formula Display -->
+        <div class="formula-display" id="formulaDisplay">
+            <strong>Conversion Formula:</strong> <span id="formulaText"></span>
+        </div>
+
+        <!-- Common Conversions -->
+        <div class="common-conversions" id="commonConversions"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Area conversion factors (all relative to square meter)
+const areaUnits = {
+    square_millimeter: { factor: 0.000001, symbol: 'mm²', name: 'Square Millimeter' },
+    square_centimeter: { factor: 0.0001, symbol: 'cm²', name: 'Square Centimeter' },
+    square_meter: { factor: 1, symbol: 'm²', name: 'Square Meter' },
+    square_kilometer: { factor: 1000000, symbol: 'km²', name: 'Square Kilometer' },
+    square_inch: { factor: 0.00064516, symbol: 'in²', name: 'Square Inch' },
+    square_foot: { factor: 0.092903, symbol: 'ft²', name: 'Square Foot' },
+    square_yard: { factor: 0.836127, symbol: 'yd²', name: 'Square Yard' },
+    square_mile: { factor: 2589988.11, symbol: 'mi²', name: 'Square Mile' },
+    acre: { factor: 4046.86, symbol: 'ac', name: 'Acre' },
+    hectare: { factor: 10000, symbol: 'ha', name: 'Hectare' },
+    are: { factor: 100, symbol: 'a', name: 'Are' },
+    decimal: { factor: 40.4686, symbol: 'decimal', name: 'Decimal' },
+    guntha: { factor: 101.17, symbol: 'guntha', name: 'Guntha' },
+    bigha: { factor: 2529.29, symbol: 'bigha', name: 'Bigha' },
+    kanal: { factor: 505.86, symbol: 'kanal', name: 'Kanal' },
+    marla: { factor: 25.29, symbol: 'marla', name: 'Marla' }
+};
+
+// Common area conversions
+const commonConversions = [
+    { from: 'square_foot', to: 'square_meter', value: 1 },
+    { from: 'square_foot', to: 'square_meter', value: 100 },
+    { from: 'square_meter', to: 'square_foot', value: 1 },
+    { from: 'acre', to: 'square_meter', value: 1 },
+    { from: 'acre', to: 'square_foot', value: 1 },
+    { from: 'hectare', to: 'acre', value: 1 },
+    { from: 'hectare', to: 'square_meter', value: 1 },
+    { from: 'square_yard', to: 'square_foot', value: 1 },
+    { from: 'bigha', to: 'square_meter', value: 1 },
+    { from: 'kanal', to: 'square_meter', value: 1 }
+];
+
+let currentFromUnit = 'square_meter';
+let currentToUnit = 'square_foot';
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    populateUnits();
+    convert();
+    setupEventListeners();
+});
+
+function populateUnits() {
+    const fromSelect = document.getElementById('fromUnit');
+    const toSelect = document.getElementById('toUnit');
+
+    fromSelect.innerHTML = '';
+    toSelect.innerHTML = '';
+
+    Object.keys(areaUnits).forEach(unit => {
+        const option1 = new Option(areaUnits[unit].name + ' (' + areaUnits[unit].symbol + ')', unit);
+        const option2 = new Option(areaUnits[unit].name + ' (' + areaUnits[unit].symbol + ')', unit);
+        fromSelect.add(option1);
+        toSelect.add(option2);
+    });
+
+    // Set defaults
+    fromSelect.value = currentFromUnit;
+    toSelect.value = currentToUnit;
+
+    updateCommonConversions();
+}
+
+function setupEventListeners() {
+    // Input changes
+    document.getElementById('fromValue').addEventListener('input', convert);
+    document.getElementById('fromUnit').addEventListener('change', function() {
+        currentFromUnit = this.value;
+        convert();
+    });
+    document.getElementById('toUnit').addEventListener('change', function() {
+        currentToUnit = this.value;
+        convert();
+    });
+
+    // Swap button
+    document.getElementById('swapBtn').addEventListener('click', swapUnits);
+}
+
+function convert() {
+    const value = parseFloat(document.getElementById('fromValue').value) || 0;
+    const fromUnit = currentFromUnit;
+    const toUnit = currentToUnit;
+
+    const fromFactor = areaUnits[fromUnit].factor;
+    const toFactor = areaUnits[toUnit].factor;
+    const result = (value * fromFactor) / toFactor;
+
+    document.getElementById('toValue').value = result.toFixed(6);
+    document.getElementById('resultValue').textContent = result.toFixed(6);
+    document.getElementById('resultUnit').textContent = areaUnits[toUnit].symbol;
+
+    // Update formula
+    const conversionFactor = fromFactor / toFactor;
+    document.getElementById('formulaText').textContent =
+        `1 ${fromUnit} = ${conversionFactor.toExponential(4)} ${toUnit}`;
+}
+
+function swapUnits() {
+    const fromSelect = document.getElementById('fromUnit');
+    const toSelect = document.getElementById('toUnit');
+
+    const temp = fromSelect.value;
+    fromSelect.value = toSelect.value;
+    toSelect.value = temp;
+
+    currentFromUnit = fromSelect.value;
+    currentToUnit = toSelect.value;
+
+    convert();
+}
+
+function updateCommonConversions() {
+    const container = document.getElementById('commonConversions');
+    container.innerHTML = '';
+
+    commonConversions.forEach(conv => {
+        const fromFactor = areaUnits[conv.from].factor;
+        const toFactor = areaUnits[conv.to].factor;
+        const result = (conv.value * fromFactor) / toFactor;
+
+        const fromSymbol = areaUnits[conv.from].symbol;
+        const toSymbol = areaUnits[conv.to].symbol;
+
+        const item = document.createElement('div');
+        item.className = 'conversion-item';
+        item.innerHTML = `<strong>${conv.value} ${fromSymbol}</strong> = ${result.toFixed(4)} ${toSymbol}`;
+        container.appendChild(item);
+    });
+}
+</script>
+{% endblock %}
