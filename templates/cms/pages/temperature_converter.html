@@ -1,0 +1,405 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Temperature Converter - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block meta_description %}Free online temperature converter tool. Convert between Celsius, Fahrenheit, and Kelvin.{% endblock %}
+
+{% block extra_css %}
+<style>
+.converter-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+.converter-form {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1.5rem;
+    align-items: center;
+}
+@media (max-width: 768px) {
+    .converter-form {
+        grid-template-columns: 1fr;
+    }
+}
+.input-group label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 0.625rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.15s ease-in-out;
+}
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(218, 37, 28, 0.25);
+}
+.swap-button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s, background 0.3s;
+}
+.swap-button:hover {
+    background: #b92920;
+    transform: rotate(180deg);
+}
+.result-display {
+    background: #f0f9ff;
+    border: 2px solid #0ea5e9;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-top: 2rem;
+}
+.result-display .value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #0369a1;
+}
+.result-display .unit {
+    font-size: 1.25rem;
+    color: #0284c7;
+    margin-left: 0.5rem;
+}
+.formula-display {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #92400e;
+}
+.common-conversions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+}
+.conversion-item {
+    background: #f9fafb;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #4b5563;
+}
+.temp-info {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border-radius: 4px;
+}
+.temp-info h4 {
+    color: #1e40af;
+    margin-bottom: 0.5rem;
+}
+.temp-info p {
+    color: #1e3a8a;
+    margin: 0;
+}
+.quick-convert {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+}
+.quick-convert-btn {
+    padding: 0.75rem;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+.quick-convert-btn:hover {
+    background: #e5e7eb;
+    border-color: var(--primary);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="border-top pt-5 pb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-5 fw-bold text-primary mb-4">Temperature Converter</h1>
+                <p class="fs-5 text-dim-grey-dark">Convert between Celsius, Fahrenheit, and Kelvin quickly and accurately. Essential for weather, cooking, and scientific applications.</p>
+                <a href="{% url 'pages:tools' %}" class="btn btn-outline-primary mt-3">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Tools
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Converter Section -->
+<div class="pt-5 pb-5 mt-5 border-top">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="converter-card">
+                    <!-- Temperature Information -->
+                    <div class="temp-info">
+                        <h4><i class="fas fa-info-circle me-2"></i>Temperature Scales</h4>
+                        <p class="small mb-1">
+                            <strong>Celsius (°C)</strong>: Metric scale, water freezes at 0°, boils at 100°
+                        </p>
+                        <p class="small mb-1">
+                            <strong>Fahrenheit (°F)</strong>: Imperial scale, water freezes at 32°, boils at 212°
+                        </p>
+                        <p class="small mb-0">
+                            <strong>Kelvin (K)</strong>: Scientific scale, absolute zero is 0K (-273.15°C)
+                        </p>
+                    </div>
+
+                    <!-- Quick Convert Buttons -->
+                    <div class="quick-convert mb-4">
+                        <div class="quick-convert-btn" onclick="quickConvert('celsius', 'fahrenheit', 0)">
+                            <strong>0°C</strong> → <span class="text-primary">32°F</span>
+                        </div>
+                        <div class="quick-convert-btn" onclick="quickConvert('celsius', 'fahrenheit', 100)">
+                            <strong>100°C</strong> → <span class="text-primary">212°F</span>
+                        </div>
+                        <div class="quick-convert-btn" onclick="quickConvert('fahrenheit', 'celsius', 32)">
+                            <strong>32°F</strong> → <span class="text-primary">0°C</span>
+                        </div>
+                        <div class="quick-convert-btn" onclick="quickConvert('celsius', 'kelvin', 0)">
+                            <strong>0°C</strong> → <span class="text-primary">273.15K</span>
+                        </div>
+                    </div>
+
+                    <!-- Converter Form -->
+                    <div class="converter-form">
+                        <div class="input-group">
+                            <label for="fromValue">From</label>
+                            <input type="number" id="fromValue" value="0" step="any" placeholder="Enter value">
+                            <select id="fromUnit" style="margin-top: 0.5rem;"></select>
+                        </div>
+
+                        <button class="swap-button" id="swapBtn" title="Swap units">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+
+                        <div class="input-group">
+                            <label for="toUnit">To</label>
+                            <input type="number" id="toValue" readonly placeholder="Result">
+                            <select id="toUnit" style="margin-top: 0.5rem;"></select>
+                        </div>
+                    </div>
+
+                    <!-- Result Display -->
+                    <div class="result-display">
+                        <span class="value" id="resultValue">0</span>
+                        <span class="unit" id="resultUnit"></span>
+                    </div>
+
+                    <!-- Formula Display -->
+                    <div class="formula-display" id="formulaDisplay">
+                        <strong>Conversion Formula:</strong> <span id="formulaText"></span>
+                    </div>
+
+                    <!-- Common Conversions -->
+                    <div class="common-conversions" id="commonConversions"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="pt-5 pb-5 mt-5 border-top bg-off-white">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="display-6 fw-bold text-almost-black mb-4">Need Professional Services?</h2>
+                <p class="fs-5 text-dim-grey-dark mb-4">Contact us for expert Vastu consultation and engineering design services</p>
+                <a href="{% url 'pages:consultation' %}" class="btn btn-primary btn-lg text-decoration-none">
+                    <i class="fas fa-calendar-check me-2"></i>Get Consultation
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Temperature units
+const tempUnits = {
+    celsius: { symbol: '°C', name: 'Celsius' },
+    fahrenheit: { symbol: '°F', name: 'Fahrenheit' },
+    kelvin: { symbol: 'K', name: 'Kelvin' }
+};
+
+// Common temperature conversions
+const commonConversions = [
+    { from: 'celsius', to: 'fahrenheit', value: 0, label: 'Freezing point of water' },
+    { from: 'celsius', to: 'fahrenheit', value: 100, label: 'Boiling point of water' },
+    { from: 'celsius', to: 'fahrenheit', value: 37, label: 'Body temperature' },
+    { from: 'fahrenheit', to: 'celsius', value: -40, label: 'Equal point' },
+    { from: 'celsius', to: 'kelvin', value: 0, label: 'Freezing point' },
+    { from: 'celsius', to: 'kelvin', value: -273.15, label: 'Absolute zero' }
+];
+
+let currentFromUnit = 'celsius';
+let currentToUnit = 'fahrenheit';
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    populateUnits();
+    convert();
+    setupEventListeners();
+});
+
+function populateUnits() {
+    const fromSelect = document.getElementById('fromUnit');
+    const toSelect = document.getElementById('toUnit');
+
+    fromSelect.innerHTML = '';
+    toSelect.innerHTML = '';
+
+    Object.keys(tempUnits).forEach(unit => {
+        const option1 = new Option(tempUnits[unit].name + ' (' + tempUnits[unit].symbol + ')', unit);
+        const option2 = new Option(tempUnits[unit].name + ' (' + tempUnits[unit].symbol + ')', unit);
+        fromSelect.add(option1);
+        toSelect.add(option2);
+    });
+
+    // Set defaults
+    fromSelect.value = currentFromUnit;
+    toSelect.value = currentToUnit;
+
+    updateCommonConversions();
+}
+
+function setupEventListeners() {
+    // Input changes
+    document.getElementById('fromValue').addEventListener('input', convert);
+    document.getElementById('fromUnit').addEventListener('change', function() {
+        currentFromUnit = this.value;
+        convert();
+    });
+    document.getElementById('toUnit').addEventListener('change', function() {
+        currentToUnit = this.value;
+        convert();
+    });
+
+    // Swap button
+    document.getElementById('swapBtn').addEventListener('click', swapUnits);
+}
+
+function convert() {
+    const value = parseFloat(document.getElementById('fromValue').value) || 0;
+    const fromUnit = currentFromUnit;
+    const toUnit = currentToUnit;
+
+    const result = convertTemperature(value, fromUnit, toUnit);
+
+    document.getElementById('toValue').value = result.toFixed(2);
+    document.getElementById('resultValue').textContent = result.toFixed(2);
+    document.getElementById('resultUnit').textContent = tempUnits[toUnit].symbol;
+
+    // Update formula
+    document.getElementById('formulaText').textContent = getTemperatureFormula(fromUnit, toUnit);
+}
+
+function convertTemperature(value, from, to) {
+    let celsius;
+
+    // Convert to Celsius first
+    if (from === 'celsius') {
+        celsius = value;
+    } else if (from === 'fahrenheit') {
+        celsius = (value - 32) * 5/9;
+    } else if (from === 'kelvin') {
+        celsius = value - 273.15;
+    }
+
+    // Convert from Celsius to target
+    if (to === 'celsius') {
+        return celsius;
+    } else if (to === 'fahrenheit') {
+        return (celsius * 9/5) + 32;
+    } else if (to === 'kelvin') {
+        return celsius + 273.15;
+    }
+}
+
+function getTemperatureFormula(from, to) {
+    const formulas = {
+        'celsius-fahrenheit': '°F = (°C × 9/5) + 32',
+        'celsius-kelvin': 'K = °C + 273.15',
+        'fahrenheit-celsius': '°C = (°F - 32) × 5/9',
+        'fahrenheit-kelvin': 'K = (°F - 32) × 5/9 + 273.15',
+        'kelvin-celsius': '°C = K - 273.15',
+        'kelvin-fahrenheit': '°F = (K - 273.15) × 9/5 + 32'
+    };
+    return formulas[`${from}-${to}`] || 'Direct conversion';
+}
+
+function swapUnits() {
+    const fromSelect = document.getElementById('fromUnit');
+    const toSelect = document.getElementById('toUnit');
+
+    const temp = fromSelect.value;
+    fromSelect.value = toSelect.value;
+    toSelect.value = temp;
+
+    currentFromUnit = fromSelect.value;
+    currentToUnit = toSelect.value;
+
+    convert();
+}
+
+function quickConvert(from, to, value) {
+    document.getElementById('fromValue').value = value;
+    document.getElementById('fromUnit').value = from;
+    document.getElementById('toUnit').value = to;
+    currentFromUnit = from;
+    currentToUnit = to;
+    convert();
+}
+
+function updateCommonConversions() {
+    const container = document.getElementById('commonConversions');
+    container.innerHTML = '';
+
+    commonConversions.forEach(conv => {
+        const result = convertTemperature(conv.value, conv.from, conv.to);
+        const fromSymbol = tempUnits[conv.from].symbol;
+        const toSymbol = tempUnits[conv.to].symbol;
+
+        const item = document.createElement('div');
+        item.className = 'conversion-item';
+        item.innerHTML = `
+            <strong>${conv.value}${fromSymbol}</strong> = ${result.toFixed(2)}${toSymbol}
+            <div class="text-muted small mt-1">${conv.label}</div>
+        `;
+        container.appendChild(item);
+    });
+}
+</script>
+{% endblock %}

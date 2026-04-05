@@ -783,14 +783,35 @@ def tools_list(request):
             'description': 'Convert between different units of measurement including length, weight, area, volume, and temperature.',
             'icon': 'fa-ruler',
             'url': 'pages:measurement_converter',
-            'category': 'Conversion'
+            'category': 'Multi-Purpose'
         },
         {
             'title': 'Area Converter',
             'description': 'Convert between different area units including square meters, square feet, acres, hectares, and more.',
             'icon': 'fa-vector-square',
             'url': 'pages:area_converter',
-            'category': 'Conversion'
+            'category': 'Area'
+        },
+        {
+            'title': 'Weight Converter',
+            'description': 'Convert between different weight units including kilograms, grams, pounds, ounces, and more.',
+            'icon': 'fa-weight-hanging',
+            'url': 'pages:weight_converter',
+            'category': 'Weight'
+        },
+        {
+            'title': 'Volume Converter',
+            'description': 'Convert between different volume units including liters, gallons, cubic meters, and more.',
+            'icon': 'fa-cube',
+            'url': 'pages:volume_converter',
+            'category': 'Volume'
+        },
+        {
+            'title': 'Temperature Converter',
+            'description': 'Convert between Celsius, Fahrenheit, and Kelvin temperature scales.',
+            'icon': 'fa-temperature-half',
+            'url': 'pages:temperature_converter',
+            'category': 'Temperature'
         },
         {
             'title': 'Coming Soon',
@@ -811,3 +832,18 @@ def measurement_converter(request):
 def area_converter(request):
     """Area conversion tool page - static template-based"""
     return render(request, 'cms/pages/area_converter.html')
+
+
+def weight_converter(request):
+    """Weight conversion tool page - static template-based"""
+    return render(request, 'cms/pages/weight_converter.html')
+
+
+def volume_converter(request):
+    """Volume conversion tool page - static template-based"""
+    return render(request, 'cms/pages/volume_converter.html')
+
+
+def temperature_converter(request):
+    """Temperature conversion tool page - static template-based"""
+    return render(request, 'cms/pages/temperature_converter.html')

@@ -68,6 +68,9 @@ urlpatterns = [
     path('tools/', views.tools_list, name='tools'),
     path('tools/measurement-converter/', views.measurement_converter, name='measurement_converter'),
     path('tools/area-converter/', views.area_converter, name='area_converter'),
+    path('tools/weight-converter/', views.weight_converter, name='weight_converter'),
+    path('tools/volume-converter/', views.volume_converter, name='volume_converter'),
+    path('tools/temperature-converter/', views.temperature_converter, name='temperature_converter'),
 
     # Search
     path('search/', views.search, name='search'),

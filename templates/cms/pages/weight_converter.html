@@ -1,0 +1,343 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Weight Converter - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block meta_description %}Free online weight converter tool. Convert between kilograms, grams, pounds, ounces, and more.{% endblock %}
+
+{% block extra_css %}
+<style>
+.converter-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+.converter-form {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1.5rem;
+    align-items: center;
+}
+@media (max-width: 768px) {
+    .converter-form {
+        grid-template-columns: 1fr;
+    }
+}
+.input-group label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 0.625rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.15s ease-in-out;
+}
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(218, 37, 28, 0.25);
+}
+.swap-button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s, background 0.3s;
+}
+.swap-button:hover {
+    background: #b92920;
+    transform: rotate(180deg);
+}
+.result-display {
+    background: #f0f9ff;
+    border: 2px solid #0ea5e9;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-top: 2rem;
+}
+.result-display .value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #0369a1;
+}
+.result-display .unit {
+    font-size: 1.25rem;
+    color: #0284c7;
+    margin-left: 0.5rem;
+}
+.formula-display {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #92400e;
+}
+.common-conversions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+}
+.conversion-item {
+    background: #f9fafb;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #4b5563;
+}
+.weight-info {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border-radius: 4px;
+}
+.weight-info h4 {
+    color: #1e40af;
+    margin-bottom: 0.5rem;
+}
+.weight-info p {
+    color: #1e3a8a;
+    margin: 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="border-top pt-5 pb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-5 fw-bold text-primary mb-4">Weight Converter</h1>
+                <p class="fs-5 text-dim-grey-dark">Convert between different weight units quickly and accurately. Perfect for cooking, shipping, and scientific calculations.</p>
+                <a href="{% url 'pages:tools' %}" class="btn btn-outline-primary mt-3">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Tools
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Converter Section -->
+<div class="pt-5 pb-5 mt-5 border-top">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="converter-card">
+                    <!-- Weight Information -->
+                    <div class="weight-info">
+                        <h4><i class="fas fa-info-circle me-2"></i>Common Weight Units</h4>
+                        <p class="small mb-1">
+                            <strong>Kilogram (kg)</strong>: Metric base unit, used worldwide |
+                            <strong>Gram (g)</strong>: Smaller metric unit (1/1000 kg)
+                        </p>
+                        <p class="small mb-1">
+                            <strong>Pound (lb)</strong>: Imperial unit, used in US/UK |
+                            <strong>Ounce (oz)</strong>: 1/16 of a pound
+                        </p>
+                        <p class="small mb-0">
+                            <strong>Metric Ton (t)</strong>: 1,000 kg |
+                            <strong>Stone</strong>: 14 pounds (UK unit)
+                        </p>
+                    </div>
+
+                    <!-- Converter Form -->
+                    <div class="converter-form">
+                        <div class="input-group">
+                            <label for="fromValue">From</label>
+                            <input type="number" id="fromValue" value="1" min="0" step="any" placeholder="Enter value">
+                            <select id="fromUnit" style="margin-top: 0.5rem;"></select>
+                        </div>
+
+                        <button class="swap-button" id="swapBtn" title="Swap units">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+
+                        <div class="input-group">
+                            <label for="toUnit">To</label>
+                            <input type="number" id="toValue" readonly placeholder="Result">
+                            <select id="toUnit" style="margin-top: 0.5rem;"></select>
+                        </div>
+                    </div>
+
+                    <!-- Result Display -->
+                    <div class="result-display">
+                        <span class="value" id="resultValue">0</span>
+                        <span class="unit" id="resultUnit"></span>
+                    </div>
+
+                    <!-- Formula Display -->
+                    <div class="formula-display" id="formulaDisplay">
+                        <strong>Conversion Formula:</strong> <span id="formulaText"></span>
+                    </div>
+
+                    <!-- Common Conversions -->
+                    <div class="common-conversions" id="commonConversions"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="pt-5 pb-5 mt-5 border-top bg-off-white">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="display-6 fw-bold text-almost-black mb-4">Need Professional Services?</h2>
+                <p class="fs-5 text-dim-grey-dark mb-4">Contact us for expert Vastu consultation and engineering design services</p>
+                <a href="{% url 'pages:consultation' %}" class="btn btn-primary btn-lg text-decoration-none">
+                    <i class="fas fa-calendar-check me-2"></i>Get Consultation
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Weight conversion factors (all relative to kilogram)
+const weightUnits = {
+    milligram: { factor: 0.000001, symbol: 'mg', name: 'Milligram' },
+    gram: { factor: 0.001, symbol: 'g', name: 'Gram' },
+    kilogram: { factor: 1, symbol: 'kg', name: 'Kilogram' },
+    metric_ton: { factor: 1000, symbol: 't', name: 'Metric Ton' },
+    ounce: { factor: 0.0283495, symbol: 'oz', name: 'Ounce' },
+    pound: { factor: 0.453592, symbol: 'lb', name: 'Pound' },
+    stone: { factor: 6.35029, symbol: 'st', name: 'Stone' },
+    short_ton: { factor: 907.185, symbol: 'short ton', name: 'Short Ton (US)' },
+    long_ton: { factor: 1016.05, symbol: 'long ton', name: 'Long Ton (UK)' },
+    carat: { factor: 0.0002, symbol: 'ct', name: 'Carat' }
+};
+
+// Common weight conversions
+const commonConversions = [
+    { from: 'kilogram', to: 'pound', value: 1 },
+    { from: 'pound', to: 'kilogram', value: 1 },
+    { from: 'kilogram', to: 'gram', value: 1 },
+    { from: 'pound', to: 'ounce', value: 1 },
+    { from: 'metric_ton', to: 'kilogram', value: 1 },
+    { from: 'ounce', to: 'gram', value: 1 },
+    { from: 'stone', to: 'pound', value: 1 },
+    { from: 'carat', to: 'gram', value: 1 }
+];
+
+let currentFromUnit = 'kilogram';
+let currentToUnit = 'pound';
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    populateUnits();
+    convert();
+    setupEventListeners();
+});
+
+function populateUnits() {
+    const fromSelect = document.getElementById('fromUnit');
+    const toSelect = document.getElementById('toUnit');
+
+    fromSelect.innerHTML = '';
+    toSelect.innerHTML = '';
+
+    Object.keys(weightUnits).forEach(unit => {
+        const option1 = new Option(weightUnits[unit].name + ' (' + weightUnits[unit].symbol + ')', unit);
+        const option2 = new Option(weightUnits[unit].name + ' (' + weightUnits[unit].symbol + ')', unit);
+        fromSelect.add(option1);
+        toSelect.add(option2);
+    });
+
+    // Set defaults
+    fromSelect.value = currentFromUnit;
+    toSelect.value = currentToUnit;
+
+    updateCommonConversions();
+}
+
+function setupEventListeners() {
+    // Input changes
+    document.getElementById('fromValue').addEventListener('input', convert);
+    document.getElementById('fromUnit').addEventListener('change', function() {
+        currentFromUnit = this.value;
+        convert();
+    });
+    document.getElementById('toUnit').addEventListener('change', function() {
+        currentToUnit = this.value;
+        convert();
+    });
+
+    // Swap button
+    document.getElementById('swapBtn').addEventListener('click', swapUnits);
+}
+
+function convert() {
+    const value = parseFloat(document.getElementById('fromValue').value) || 0;
+    const fromUnit = currentFromUnit;
+    const toUnit = currentToUnit;
+
+    const fromFactor = weightUnits[fromUnit].factor;
+    const toFactor = weightUnits[toUnit].factor;
+    const result = (value * fromFactor) / toFactor;
+
+    document.getElementById('toValue').value = result.toFixed(6);
+    document.getElementById('resultValue').textContent = result.toFixed(6);
+    document.getElementById('resultUnit').textContent = weightUnits[toUnit].symbol;
+
+    // Update formula
+    const conversionFactor = fromFactor / toFactor;
+    document.getElementById('formulaText').textContent =
+        `1 ${fromUnit} = ${conversionFactor.toFixed(6)} ${toUnit}`;
+}
+
+function swapUnits() {
+    const fromSelect = document.getElementById('fromUnit');
+    const toSelect = document.getElementById('toUnit');
+
+    const temp = fromSelect.value;
+    fromSelect.value = toSelect.value;
+    toSelect.value = temp;
+
+    currentFromUnit = fromSelect.value;
+    currentToUnit = toSelect.value;
+
+    convert();
+}
+
+function updateCommonConversions() {
+    const container = document.getElementById('commonConversions');
+    container.innerHTML = '';
+
+    commonConversions.forEach(conv => {
+        const fromFactor = weightUnits[conv.from].factor;
+        const toFactor = weightUnits[conv.to].factor;
+        const result = (conv.value * fromFactor) / toFactor;
+
+        const fromSymbol = weightUnits[conv.from].symbol;
+        const toSymbol = weightUnits[conv.to].symbol;
+
+        const item = document.createElement('div');
+        item.className = 'conversion-item';
+        item.innerHTML = `<strong>${conv.value} ${fromSymbol}</strong> = ${result.toFixed(4)} ${toSymbol}`;
+        container.appendChild(item);
+    });
+}
+</script>
+{% endblock %}
