@@ -782,35 +782,35 @@ def tools_list(request):
             'title': 'Length Converter',
             'description': 'Convert between different length units including millimeters, centimeters, meters, kilometers, inches, feet, yards, and miles.',
             'icon': 'fa-ruler',
-            'url_name': 'measurement_converter',
+            'url': 'pages:measurement_converter',
             'category': 'Length'
         },
         {
             'title': 'Area Converter',
             'description': 'Convert between different area units including square meters, square feet, acres, hectares, and more.',
             'icon': 'fa-vector-square',
-            'url_name': 'area_converter',
+            'url': 'pages:area_converter',
             'category': 'Area'
         },
         {
             'title': 'Weight Converter',
             'description': 'Convert between different weight units including kilograms, grams, pounds, ounces, and more.',
             'icon': 'fa-weight-hanging',
-            'url_name': 'weight_converter',
+            'url': 'pages:weight_converter',
             'category': 'Weight'
         },
         {
             'title': 'Volume Converter',
             'description': 'Convert between different volume units including liters, gallons, cubic meters, and more.',
             'icon': 'fa-cube',
-            'url_name': 'volume_converter',
+            'url': 'pages:volume_converter',
             'category': 'Volume'
         },
         {
             'title': 'Temperature Converter',
             'description': 'Convert between Celsius, Fahrenheit, and Kelvin temperature scales.',
             'icon': 'fa-temperature-half',
-            'url_name': 'temperature_converter',
+            'url': 'pages:temperature_converter',
             'category': 'Temperature'
         }
     ]
