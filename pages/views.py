@@ -812,13 +812,6 @@ def tools_list(request):
             'icon': 'fa-temperature-half',
             'url_name': 'temperature_converter',
             'category': 'Temperature'
-        },
-        {
-            'title': 'Coming Soon',
-            'description': 'More engineering tools will be added soon.',
-            'icon': 'fa-tools',
-            'url_name': None,
-            'category': 'Coming Soon'
         }
     ]
     return render(request, 'cms/pages/tools.html', {'tools': tools})
