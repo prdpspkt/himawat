@@ -779,11 +779,11 @@ def tools_list(request):
     """Engineering tools list page - static template-based"""
     tools = [
         {
-            'title': 'Measurement Converter',
-            'description': 'Convert between different units of measurement including length, weight, area, volume, and temperature.',
+            'title': 'Length Converter',
+            'description': 'Convert between different length units including millimeters, centimeters, meters, kilometers, inches, feet, yards, and miles.',
             'icon': 'fa-ruler',
             'url_name': 'measurement_converter',
-            'category': 'Multi-Purpose'
+            'category': 'Length'
         },
         {
             'title': 'Area Converter',
