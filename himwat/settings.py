@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Determine which .env file to load based on DEBUG environment variable
 # If DEBUG is not set, default to True (development mode)
-debug_env_value = False
+debug_env_value = True
 
 # Load the appropriate .env file based on DEBUG setting
 if debug_env_value:
@@ -100,6 +100,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',  # For static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'dashboard.menu_views.CSRFJsonMiddleware',  # Extract CSRF from JSON body
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',

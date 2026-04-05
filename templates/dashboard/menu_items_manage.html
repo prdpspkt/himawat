@@ -714,7 +714,23 @@
         }
         return cookieValue;
     }
-    const csrftoken = getCookie('csrftoken');
+
+    // Get fresh CSRF token from server
+    function getFreshCSRFToken() {
+        return $.ajax({
+            url: '/dashboard/api/csrf-token/',
+            type: 'GET',
+            dataType: 'json'
+        }).then(function(response) {
+            return response.csrfToken;
+        }).fail(function() {
+            // Fallback to cookie if AJAX fails
+            return getCookie('csrftoken');
+        });
+    }
+
+    // Initialize with cookie value
+    let csrftoken = getCookie('csrftoken');
     
     // Global variables for drag tracking
     let dragStartX = 0;
@@ -1117,22 +1133,31 @@
 
         // Save to server if it's an existing item
         if (itemId && !itemId.toString().startsWith('new-')) {
-            $.ajax({
-                url: `/dashboard/api/menu-items/${itemId}/update/`,
-                type: 'POST',
-                contentType: 'application/json',
-                headers: { 'X-CSRFToken': csrftoken },
-                data: JSON.stringify(data),
-                success: function(response) {
-                    if (response.success) {
-                        showNotification('Item updated successfully', 'success');
-                    } else {
-                        showNotification(response.error || 'Error updating item', 'error');
+            // Fetch fresh CSRF token before saving
+            getFreshCSRFToken().then(function(freshToken) {
+                const formDataWithCsrf = {
+                    ...data,
+                    csrfmiddlewaretoken: freshToken
+                };
+
+                $.ajax({
+                    url: `/dashboard/api/menu-items/${itemId}/update/`,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formDataWithCsrf),
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification('Item updated successfully', 'success');
+                        } else {
+                            showNotification(response.error || 'Error updating item', 'error');
+                        }
+                    },
+                    error: function() {
+                        showNotification('Error updating item', 'error');
                     }
-                },
-                error: function() {
-                    showNotification('Error updating item', 'error');
-                }
+                });
+            }).fail(function() {
+                showNotification('Error getting CSRF token', 'error');
             });
         }
     }
@@ -1245,32 +1270,38 @@
         itemDiv.find('.item-url-input').val(data.url);
         itemDiv.find('.item-icon-input').val(data.icon || '');
 
-        // Create via AJAX
-        $.ajax({
-            url: '/dashboard/api/menu-items/create/',
-            type: 'POST',
-            contentType: 'application/json',
-            headers: { 'X-CSRFToken': csrftoken },
-            data: JSON.stringify({
+        // Create via AJAX - fetch fresh CSRF token
+        getFreshCSRFToken().then(function(freshToken) {
+            const createData = {
                 menu_id: {{ menu.id }},
                 title: data.title,
                 type: data.type,
                 url: data.url,
                 icon: data.icon || '',
                 page_id: data.page_id || null,
-                category_id: data.category_id || null
-            }),
-            success: function(response) {
-                if (response.success) {
-                    itemDiv.attr('data-id', response.item.id);
-                    showNotification('Item added successfully', 'success');
-                } else {
-                    showNotification(response.error || 'Error adding item', 'error');
+                category_id: data.category_id || null,
+                csrfmiddlewaretoken: freshToken
+            };
+
+            $.ajax({
+                url: '/dashboard/api/menu-items/create/',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(createData),
+                success: function(response) {
+                    if (response.success) {
+                        itemDiv.attr('data-id', response.item.id);
+                        showNotification('Item added successfully', 'success');
+                    } else {
+                        showNotification(response.error || 'Error adding item', 'error');
+                    }
+                },
+                error: function() {
+                    showNotification('Error adding item', 'error');
                 }
-            },
-            error: function() {
-                showNotification('Error adding item', 'error');
-            }
+            });
+        }).fail(function() {
+            showNotification('Error getting CSRF token', 'error');
         });
 
         $('#menu-items-list').append(itemDiv);
@@ -1292,20 +1323,26 @@
         
         // Delete from server if it's an existing item
         if (itemId && !itemId.toString().startsWith('new-')) {
-            $.ajax({
-                url: `/dashboard/api/menu-items/${itemId}/delete/`,
-                type: 'POST',
-                headers: { 'X-CSRFToken': csrftoken },
-                success: function(response) {
-                    if (response.success) {
-                        showNotification('Item removed', 'success');
-                    } else {
-                        showNotification(response.error || 'Error removing item', 'error');
+            // Fetch fresh CSRF token before deleting
+            getFreshCSRFToken().then(function(freshToken) {
+                $.ajax({
+                    url: `/dashboard/api/menu-items/${itemId}/delete/`,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ csrfmiddlewaretoken: freshToken }),
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification('Item removed', 'success');
+                        } else {
+                            showNotification(response.error || 'Error removing item', 'error');
+                        }
+                    },
+                    error: function() {
+                        showNotification('Error removing item', 'error');
                     }
-                },
-                error: function() {
-                    showNotification('Error removing item', 'error');
-                }
+                });
+            }).fail(function() {
+                showNotification('Error getting CSRF token', 'error');
             });
         }
         
@@ -1319,35 +1356,46 @@
         const btn = $('#save-menu-btn');
         btn.addClass('saving');
         btn.find('.btn-text').text('Saving...');
-        
+
         const items = [];
-        
+
         // Collect top-level items
         $('#menu-items-list > .menu-item').each(function(index) {
             collectItemData($(this), items, index, null);
         });
-        
-        $.ajax({
-            url: '/dashboard/api/menu-items/reorder/',
-            type: 'POST',
-            contentType: 'application/json',
-            headers: { 'X-CSRFToken': csrftoken },
-            data: JSON.stringify({ items: items }),
-            success: function(response) {
-                btn.removeClass('saving');
-                btn.find('.btn-text').text('Save Menu');
-                
-                if (response.success) {
-                    showNotification('Menu saved successfully', 'success');
-                } else {
-                    showNotification(response.error || 'Error saving menu', 'error');
+
+        // Fetch fresh CSRF token before saving
+        getFreshCSRFToken().then(function(freshToken) {
+            const reorderData = {
+                items: items,
+                csrfmiddlewaretoken: freshToken
+            };
+
+            $.ajax({
+                url: '/dashboard/api/menu-items/reorder/',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(reorderData),
+                success: function(response) {
+                    btn.removeClass('saving');
+                    btn.find('.btn-text').text('Save Menu');
+
+                    if (response.success) {
+                        showNotification('Menu saved successfully', 'success');
+                    } else {
+                        showNotification(response.error || 'Error saving menu', 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    btn.removeClass('saving');
+                    btn.find('.btn-text').text('Save Menu');
+                    showNotification('Error saving menu: ' + (xhr.responseJSON?.error || error), 'error');
                 }
-            },
-            error: function() {
-                btn.removeClass('saving');
-                btn.find('.btn-text').text('Save Menu');
-                showNotification('Error saving menu', 'error');
-            }
+            });
+        }).fail(function() {
+            btn.removeClass('saving');
+            btn.find('.btn-text').text('Save Menu');
+            showNotification('Error getting CSRF token', 'error');
         });
     }
     

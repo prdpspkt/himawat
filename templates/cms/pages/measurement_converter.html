@@ -1,0 +1,463 @@
+{% extends 'base.html' %}
+
+{% block title %}Measurement Converter - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block meta_description %}Free online measurement converter tool. Convert between length, weight, area, volume, temperature, and more.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .converter-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .converter-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 1rem;
+    }
+    .converter-tab {
+        padding: 0.75rem 1.5rem;
+        background: #f3f4f6;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #4b5563;
+        transition: all 0.3s;
+    }
+    .converter-tab:hover {
+        background: #e5e7eb;
+    }
+    .converter-tab.active {
+        background: #2563eb;
+        color: white;
+    }
+    .converter-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: center;
+    }
+    @media (max-width: 768px) {
+        .converter-form {
+            grid-template-columns: 1fr;
+        }
+    }
+    .input-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .input-group label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    .input-group input, .input-group select {
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+    .input-group input:focus, .input-group select:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+    .swap-button {
+        background: #2563eb;
+        color: white;
+        border: none;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s, background 0.3s;
+        align-self: center;
+    }
+    .swap-button:hover {
+        background: #1d4ed8;
+        transform: rotate(180deg);
+    }
+    .result-display {
+        background: #f0f9ff;
+        border: 2px solid #0ea5e9;
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        margin-top: 2rem;
+    }
+    .result-display .value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #0369a1;
+    }
+    .result-display .unit {
+        font-size: 1.25rem;
+        color: #0284c7;
+        margin-left: 0.5rem;
+    }
+    .formula-display {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 1rem;
+        margin-top: 1rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        color: #92400e;
+    }
+    .common-conversions {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .conversion-item {
+        background: #f9fafb;
+        padding: 0.75rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        color: #4b5563;
+    }
+    .conversion-item strong {
+        color: #1f2937;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="relative bg-gradient-to-r from-blue-600 to-blue-800 overflow-hidden">
+    <div class="relative max-w-7xl mx-auto px-4 py-12 md:py-16 text-center">
+        <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">Measurement Converter</h1>
+        <p class="text-lg text-blue-100 max-w-3xl mx-auto">
+            Convert between different units of measurement quickly and accurately.
+        </p>
+        <a href="{% url 'pages:tools' %}" class="inline-flex items-center text-white hover:text-blue-200 mt-4">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Tools
+        </a>
+    </div>
+</div>
+
+<!-- Converter Section -->
+<div class="max-w-4xl mx-auto px-4 py-12">
+    <div class="converter-card">
+        <!-- Category Tabs -->
+        <div class="converter-tabs" id="categoryTabs">
+            <button class="converter-tab active" data-category="length">
+                <i class="fas fa-ruler mr-2"></i>Length
+            </button>
+            <button class="converter-tab" data-category="weight">
+                <i class="fas fa-weight mr-2"></i>Weight
+            </button>
+            <button class="converter-tab" data-category="area">
+                <i class="fas fa-square mr-2"></i>Area
+            </button>
+            <button class="converter-tab" data-category="volume">
+                <i class="fas fa-cube mr-2"></i>Volume
+            </button>
+            <button class="converter-tab" data-category="temperature">
+                <i class="fas fa-thermometer-half mr-2"></i>Temperature
+            </button>
+        </div>
+
+        <!-- Converter Form -->
+        <div class="converter-form">
+            <div class="input-group">
+                <label for="fromValue">From</label>
+                <input type="number" id="fromValue" value="1" min="0" step="any" placeholder="Enter value">
+                <select id="fromUnit" style="margin-top: 0.5rem;"></select>
+            </div>
+
+            <button class="swap-button" id="swapBtn" title="Swap units">
+                <i class="fas fa-exchange-alt"></i>
+            </button>
+
+            <div class="input-group">
+                <label for="toUnit">To</label>
+                <input type="number" id="toValue" readonly placeholder="Result">
+                <select id="toUnit" style="margin-top: 0.5rem;"></select>
+            </div>
+        </div>
+
+        <!-- Result Display -->
+        <div class="result-display">
+            <span class="value" id="resultValue">0</span>
+            <span class="unit" id="resultUnit"></span>
+        </div>
+
+        <!-- Formula Display -->
+        <div class="formula-display" id="formulaDisplay">
+            <strong>Formula:</strong> <span id="formulaText"></span>
+        </div>
+
+        <!-- Common Conversions -->
+        <div class="common-conversions" id="commonConversions"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Conversion factors (all relative to base unit)
+const conversionFactors = {
+    length: {
+        units: {
+            millimeter: { factor: 0.001, symbol: 'mm' },
+            centimeter: { factor: 0.01, symbol: 'cm' },
+            meter: { factor: 1, symbol: 'm' },
+            kilometer: { factor: 1000, symbol: 'km' },
+            inch: { factor: 0.0254, symbol: 'in' },
+            foot: { factor: 0.3048, symbol: 'ft' },
+            yard: { factor: 0.9144, symbol: 'yd' },
+            mile: { factor: 1609.344, symbol: 'mi' }
+        },
+        common: [
+            { from: 'inch', to: 'cm', value: 1 },
+            { from: 'foot', to: 'm', value: 1 },
+            { from: 'yard', to: 'm', value: 1 },
+            { from: 'mile', to: 'km', value: 1 }
+        ]
+    },
+    weight: {
+        units: {
+            milligram: { factor: 0.000001, symbol: 'mg' },
+            gram: { factor: 0.001, symbol: 'g' },
+            kilogram: { factor: 1, symbol: 'kg' },
+            metric_ton: { factor: 1000, symbol: 't' },
+            ounce: { factor: 0.0283495, symbol: 'oz' },
+            pound: { factor: 0.453592, symbol: 'lb' }
+        },
+        common: [
+            { from: 'ounce', to: 'g', value: 1 },
+            { from: 'pound', to: 'kg', value: 1 },
+            { from: 'kg', to: 'lb', value: 1 }
+        ]
+    },
+    area: {
+        units: {
+            square_millimeter: { factor: 0.000001, symbol: 'mm²' },
+            square_centimeter: { factor: 0.0001, symbol: 'cm²' },
+            square_meter: { factor: 1, symbol: 'm²' },
+            square_kilometer: { factor: 1000000, symbol: 'km²' },
+            square_inch: { factor: 0.00064516, symbol: 'in²' },
+            square_foot: { factor: 0.092903, symbol: 'ft²' },
+            square_yard: { factor: 0.836127, symbol: 'yd²' },
+            acre: { factor: 4046.86, symbol: 'ac' },
+            hectare: { factor: 10000, symbol: 'ha' }
+        },
+        common: [
+            { from: 'square_foot', to: 'square_meter', value: 1 },
+            { from: 'acre', to: 'square_meter', value: 1 },
+            { from: 'hectare', to: 'square_meter', value: 1 }
+        ]
+    },
+    volume: {
+        units: {
+            milliliter: { factor: 0.001, symbol: 'mL' },
+            liter: { factor: 1, symbol: 'L' },
+            cubic_meter: { factor: 1000, symbol: 'm³' },
+            cubic_centimeter: { factor: 0.000001, symbol: 'cm³' },
+            cubic_inch: { factor: 0.0163871, symbol: 'in³' },
+            cubic_foot: { factor: 28.3168, symbol: 'ft³' },
+            gallon_us: { factor: 3.78541, symbol: 'gal (US)' },
+            gallon_uk: { factor: 4.54609, symbol: 'gal (UK)' }
+        },
+        common: [
+            { from: 'liter', to: 'gallon_us', value: 1 },
+            { from: 'cubic_foot', to: 'liter', value: 1 },
+            { from: 'gallon_us', to: 'liter', value: 1 }
+        ]
+    },
+    temperature: {
+        units: {
+            celsius: { symbol: '°C' },
+            fahrenheit: { symbol: '°F' },
+            kelvin: { symbol: 'K' }
+        },
+        common: [
+            { from: 'celsius', to: 'fahrenheit', value: 0 },
+            { from: 'celsius', to: 'fahrenheit', value: 100 },
+            { from: 'fahrenheit', to: 'celsius', value: 32 },
+            { from: 'celsius', to: 'kelvin', value: 0 }
+        ]
+    }
+};
+
+let currentCategory = 'length';
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    initializeConverter();
+    setupEventListeners();
+});
+
+function initializeConverter() {
+    populateUnits(currentCategory);
+    convert();
+}
+
+function setupEventListeners() {
+    // Category tabs
+    document.querySelectorAll('.converter-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.converter-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            currentCategory = this.dataset.category;
+            populateUnits(currentCategory);
+            convert();
+        });
+    });
+
+    // Input changes
+    document.getElementById('fromValue').addEventListener('input', convert);
+    document.getElementById('fromUnit').addEventListener('change', convert);
+    document.getElementById('toUnit').addEventListener('change', convert);
+
+    // Swap button
+    document.getElementById('swapBtn').addEventListener('click', swapUnits);
+}
+
+function populateUnits(category) {
+    const fromSelect = document.getElementById('fromUnit');
+    const toSelect = document.getElementById('toUnit');
+
+    fromSelect.innerHTML = '';
+    toSelect.innerHTML = '';
+
+    const units = Object.keys(conversionFactors[category].units);
+    units.forEach(unit => {
+        const option1 = new Option(formatUnitName(unit), unit);
+        const option2 = new Option(formatUnitName(unit), unit);
+        fromSelect.add(option1);
+        toSelect.add(option2);
+    });
+
+    // Set defaults
+    if (category === 'length') {
+        fromSelect.value = 'meter';
+        toSelect.value = 'foot';
+    } else if (category === 'weight') {
+        fromSelect.value = 'kilogram';
+        toSelect.value = 'pound';
+    } else if (category === 'area') {
+        fromSelect.value = 'square_meter';
+        toSelect.value = 'square_foot';
+    } else if (category === 'volume') {
+        fromSelect.value = 'liter';
+        toSelect.value = 'gallon_us';
+    } else if (category === 'temperature') {
+        fromSelect.value = 'celsius';
+        toSelect.value = 'fahrenheit';
+    }
+
+    updateCommonConversions();
+}
+
+function formatUnitName(unit) {
+    return unit.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
+function convert() {
+    const value = parseFloat(document.getElementById('fromValue').value) || 0;
+    const fromUnit = document.getElementById('fromUnit').value;
+    const toUnit = document.getElementById('toUnit').value;
+
+    let result;
+    let formula;
+
+    if (currentCategory === 'temperature') {
+        result = convertTemperature(value, fromUnit, toUnit);
+        formula = getTemperatureFormula(fromUnit, toUnit);
+    } else {
+        const fromFactor = conversionFactors[currentCategory].units[fromUnit].factor;
+        const toFactor = conversionFactors[currentCategory].units[toUnit].factor;
+        result = (value * fromFactor) / toFactor;
+        formula = `1 ${fromUnit} = ${(fromFactor / toFactor).toFixed(6)} ${toUnit}`;
+    }
+
+    document.getElementById('toValue').value = result.toFixed(6);
+    document.getElementById('resultValue').textContent = result.toFixed(6);
+    document.getElementById('resultUnit').textContent = conversionFactors[currentCategory].units[toUnit].symbol;
+    document.getElementById('formulaText').textContent = formula;
+}
+
+function convertTemperature(value, from, to) {
+    let celsius;
+
+    // Convert to Celsius first
+    if (from === 'celsius') {
+        celsius = value;
+    } else if (from === 'fahrenheit') {
+        celsius = (value - 32) * 5/9;
+    } else if (from === 'kelvin') {
+        celsius = value - 273.15;
+    }
+
+    // Convert from Celsius to target
+    if (to === 'celsius') {
+        return celsius;
+    } else if (to === 'fahrenheit') {
+        return (celsius * 9/5) + 32;
+    } else if (to === 'kelvin') {
+        return celsius + 273.15;
+    }
+}
+
+function getTemperatureFormula(from, to) {
+    const formulas = {
+        'celsius-fahrenheit': '(°C × 9/5) + 32 = °F',
+        'celsius-kelvin': '°C + 273.15 = K',
+        'fahrenheit-celsius': '(°F - 32) × 5/9 = °C',
+        'fahrenheit-kelvin': '(°F - 32) × 5/9 + 273.15 = K',
+        'kelvin-celsius': 'K - 273.15 = °C',
+        'kelvin-fahrenheit': '(K - 273.15) × 9/5 + 32 = °F'
+    };
+    return formulas[`${from}-${to}`] || 'Direct conversion';
+}
+
+function swapUnits() {
+    const fromSelect = document.getElementById('fromUnit');
+    const toSelect = document.getElementById('toUnit');
+
+    const temp = fromSelect.value;
+    fromSelect.value = toSelect.value;
+    toSelect.value = temp;
+
+    convert();
+}
+
+function updateCommonConversions() {
+    const container = document.getElementById('commonConversions');
+    container.innerHTML = '';
+
+    const common = conversionFactors[currentCategory].common;
+    common.forEach(conv => {
+        let result;
+        if (currentCategory === 'temperature') {
+            result = convertTemperature(conv.value, conv.from, conv.to);
+        } else {
+            const fromFactor = conversionFactors[currentCategory].units[conv.from].factor;
+            const toFactor = conversionFactors[currentCategory].units[conv.to].factor;
+            result = (conv.value * fromFactor) / toFactor;
+        }
+
+        const fromSymbol = conversionFactors[currentCategory].units[conv.from].symbol;
+        const toSymbol = conversionFactors[currentCategory].units[conv.to].symbol;
+
+        const item = document.createElement('div');
+        item.className = 'conversion-item';
+        item.innerHTML = `<strong>${conv.value}${fromSymbol}</strong> = ${result.toFixed(4)}${toSymbol}`;
+        container.appendChild(item);
+    });
+}
+</script>
+{% endblock %}

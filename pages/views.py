@@ -771,3 +771,36 @@ def search(request):
         'products': products,
         'total_results': len(posts) + len(pages) + len(products)
     })
+
+
+# ===== TOOLS VIEWS =====
+
+class ToolsListView(TemplateView):
+    """Engineering tools list view"""
+    template_name = 'cms/pages/tools.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Define available tools
+        context['tools'] = [
+            {
+                'title': 'Measurement Converter',
+                'description': 'Convert between different units of measurement including length, weight, area, and more.',
+                'icon': 'fa-ruler',
+                'url': 'tools:measurement_converter',
+                'category': 'Conversion'
+            },
+            {
+                'title': 'Coming Soon',
+                'description': 'More engineering tools will be added soon.',
+                'icon': 'fa-tools',
+                'url': None,
+                'category': 'Coming Soon'
+            }
+        ]
+        return context
+
+
+class MeasurementConverterView(TemplateView):
+    """Measurement conversion tool view"""
+    template_name = 'cms/pages/measurement_converter.html'

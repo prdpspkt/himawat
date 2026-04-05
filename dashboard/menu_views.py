@@ -1,15 +1,37 @@
 import json
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
+from django.middleware.csrf import get_token
+from django.utils.deprecation import MiddlewareMixin
 
 from dashboard.models import Menu, MenuItem, Page, Category
 from dashboard.decorators import staff_member_required
 
 
+class CSRFJsonMiddleware(MiddlewareMixin):
+    """
+    Middleware to extract CSRF token from JSON request body and make it
+    available to Django's CSRF validation middleware.
+    """
+    def process_request(self, request):
+        if request.method == 'POST':
+            content_type = request.content_type
+            if content_type and 'application/json' in content_type:
+                try:
+                    data = json.loads(request.body)
+                    csrf_token = data.get('csrfmiddlewaretoken')
+                    if csrf_token:
+                        # Add to META so Django's CSRF middleware can find it
+                        request.META['HTTP_X_CSRFTOKEN'] = csrf_token
+                except (json.JSONDecodeError, AttributeError):
+                    pass
+
+
 @staff_member_required
+@ensure_csrf_cookie
 def menu_items_manage(request, pk):
     """Dynamic menu item management with drag-and-drop functionality"""
     menu = get_object_or_404(Menu, pk=pk)
@@ -170,3 +192,11 @@ def menu_item_get_ajax(request, pk):
         })
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+
+
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    """Get a fresh CSRF token for AJAX requests"""
+    from django.middleware.csrf import get_token
+    token = get_token(request)
+    return JsonResponse({'csrfToken': token})

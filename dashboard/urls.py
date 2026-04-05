@@ -82,6 +82,7 @@ urlpatterns = [
     path('api/menu-items/<int:pk>/delete/', menu_views.menu_item_delete_ajax, name='menu_item_delete_ajax'),
     path('api/menu-items/<int:pk>/get/', menu_views.menu_item_get_ajax, name='menu_item_get_ajax'),
     path('api/menu-items/reorder/', menu_views.menu_item_reorder_ajax, name='menu_item_reorder_ajax'),
+    path('api/csrf-token/', menu_views.get_csrf_token, name='get_csrf_token'),
     
     # Gallery Image API
     path('api/gallery/images/upload/', views.gallery_image_upload, name='gallery_image_upload'),
