@@ -782,42 +782,42 @@ def tools_list(request):
             'title': 'Measurement Converter',
             'description': 'Convert between different units of measurement including length, weight, area, volume, and temperature.',
             'icon': 'fa-ruler',
-            'url': 'pages:measurement_converter',
+            'url_name': 'measurement_converter',
             'category': 'Multi-Purpose'
         },
         {
             'title': 'Area Converter',
             'description': 'Convert between different area units including square meters, square feet, acres, hectares, and more.',
             'icon': 'fa-vector-square',
-            'url': 'pages:area_converter',
+            'url_name': 'area_converter',
             'category': 'Area'
         },
         {
             'title': 'Weight Converter',
             'description': 'Convert between different weight units including kilograms, grams, pounds, ounces, and more.',
             'icon': 'fa-weight-hanging',
-            'url': 'pages:weight_converter',
+            'url_name': 'weight_converter',
             'category': 'Weight'
         },
         {
             'title': 'Volume Converter',
             'description': 'Convert between different volume units including liters, gallons, cubic meters, and more.',
             'icon': 'fa-cube',
-            'url': 'pages:volume_converter',
+            'url_name': 'volume_converter',
             'category': 'Volume'
         },
         {
             'title': 'Temperature Converter',
             'description': 'Convert between Celsius, Fahrenheit, and Kelvin temperature scales.',
             'icon': 'fa-temperature-half',
-            'url': 'pages:temperature_converter',
+            'url_name': 'temperature_converter',
             'category': 'Temperature'
         },
         {
             'title': 'Coming Soon',
             'description': 'More engineering tools will be added soon.',
             'icon': 'fa-tools',
-            'url': None,
+            'url_name': None,
             'category': 'Coming Soon'
         }
     ]

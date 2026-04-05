@@ -36,8 +36,8 @@
                         </div>
                         <h5 class="fw-bold text-almost-black mb-3">{{ tool.title }}</h5>
                         <p class="text-dim-grey-dark small mb-4">{{ tool.description }}</p>
-                        {% if tool.url %}
-                        <a href="{% url tool.url %}" class="btn btn-primary btn-sm w-100 text-decoration-none">
+                        {% if tool.url_name %}
+                        <a href="{% url 'pages:' tool.url_name %}" class="btn btn-primary btn-sm w-100 text-decoration-none">
                             <i class="fas fa-tools me-2"></i>Use Tool
                         </a>
                         {% else %}
