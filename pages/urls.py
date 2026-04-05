@@ -65,8 +65,8 @@ urlpatterns = [
     path('contact/submit/', views.contact_submit, name='contact_submit'),
 
     # Tools
-    path('tools/', views.ToolsListView.as_view(), name='tools'),
-    path('tools/measurement-converter/', views.MeasurementConverterView.as_view(), name='measurement_converter'),
+    path('tools/', views.tools_list, name='tools'),
+    path('tools/measurement-converter/', views.measurement_converter, name='measurement_converter'),
 
     # Search
     path('search/', views.search, name='search'),
