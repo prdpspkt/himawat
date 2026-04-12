@@ -162,6 +162,19 @@ class GalleryAdmin(BaseAdmin):
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ['status', 'sort_order']
     inlines = [GalleryImageInline]
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'slug', 'description', 'cover_image')
+        }),
+        ('Settings', {
+            'fields': ('status', 'sort_order')
+        }),
+        ('SEO', {
+            'fields': ('meta_title', 'meta_description', 'meta_keywords'),
+            'classes': ('collapse',)
+        }),
+    )
     
     def cover_preview(self, obj):
         if obj.cover_image:
@@ -172,6 +185,34 @@ class GalleryAdmin(BaseAdmin):
     def image_count(self, obj):
         return obj.images.count()
     image_count.short_description = 'Images'
+
+
+@admin.register(Video)
+class VideoAdmin(BaseAdmin):
+    list_display = ['title', 'status', 'sort_order', 'thumbnail_preview']
+    list_filter = ['status', 'created_at']
+    search_fields = ['title', 'description']
+    prepopulated_fields = {'slug': ('title',)}
+    list_editable = ['status', 'sort_order']
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('title', 'slug', 'description', 'embed_code', 'thumbnail')
+        }),
+        ('Settings', {
+            'fields': ('status', 'sort_order', 'published_at')
+        }),
+        ('SEO', {
+            'fields': ('meta_title', 'meta_description', 'meta_keywords'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def thumbnail_preview(self, obj):
+        if obj.thumbnail:
+            return format_html('<img src="{}" style="max-height: 50px; max-width: 100px;" />', obj.thumbnail.url)
+        return '-'
+    thumbnail_preview.short_description = 'Thumbnail'
 
 
 @admin.register(Download)
@@ -250,6 +291,19 @@ class ProductAdmin(BaseAdmin):
     list_editable = ['category', 'featured', 'status', 'sort_order']
     inlines = [ProductImageInline]
 
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'slug', 'description', 'image', 'category')
+        }),
+        ('Settings', {
+            'fields': ('featured', 'status', 'sort_order')
+        }),
+        ('SEO', {
+            'fields': ('meta_title', 'meta_description', 'meta_keywords'),
+            'classes': ('collapse',)
+        }),
+    )
+
     def image_preview(self, obj):
         if obj.image:
             return format_html('<img src="{}" style="max-height: 50px; max-width: 100px;" />', obj.image.url)
@@ -299,6 +353,19 @@ class ServiceAdmin(BaseAdmin):
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ['category', 'featured', 'status', 'sort_order']
 
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'slug', 'description', 'excerpt', 'image', 'icon', 'category')
+        }),
+        ('Settings', {
+            'fields': ('price', 'featured', 'status', 'sort_order')
+        }),
+        ('SEO', {
+            'fields': ('meta_title', 'meta_description', 'meta_keywords'),
+            'classes': ('collapse',)
+        }),
+    )
+
     def image_preview(self, obj):
         if obj.image:
             return format_html('<img src="{}" style="max-height: 50px; max-width: 100px;" />', obj.image.url)
@@ -333,6 +400,19 @@ class TrainingAdmin(BaseAdmin):
     search_fields = ['name', 'description']
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ['category', 'featured', 'status', 'sort_order']
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'slug', 'description', 'short_description', 'excerpt', 'image', 'icon', 'category')
+        }),
+        ('Settings', {
+            'fields': ('duration', 'price', 'featured', 'status', 'sort_order')
+        }),
+        ('SEO', {
+            'fields': ('meta_title', 'meta_description', 'meta_keywords'),
+            'classes': ('collapse',)
+        }),
+    )
 
     def image_preview(self, obj):
         if obj.image:
@@ -497,7 +577,7 @@ class CEOInfoAdmin(admin.ModelAdmin):
 class CompanyInfoAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Company Details', {
-            'fields': ('company_name', 'description', 'logo', 'favicon')
+            'fields': ('company_name', 'description', 'meta_keywords', 'logo', 'favicon')
         }),
         ('Contact Information', {
             'fields': ('email', 'phone', 'address', 'city', 'state', 'postal_code', 'country')
@@ -507,6 +587,9 @@ class CompanyInfoAdmin(admin.ModelAdmin):
         }),
         ('Social Media', {
             'fields': ('facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'whatsapp')
+        }),
+        ('Analytics', {
+            'fields': ('google_analytics_id',)
         }),
         ('Company Anthem', {
             'fields': ('anthem',)

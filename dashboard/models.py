@@ -331,6 +331,9 @@ class Gallery(TimestampModel):
     sort_order = models.IntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    meta_title = models.CharField(max_length=255, blank=True)
+    meta_description = models.TextField(blank=True)
+    meta_keywords = models.CharField(max_length=255, blank=True)
 
     class Meta:
         verbose_name_plural = 'Galleries'
@@ -466,6 +469,9 @@ class Product(TimestampModel):
     sort_order = models.IntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    meta_title = models.CharField(max_length=255, blank=True)
+    meta_description = models.TextField(blank=True)
+    meta_keywords = models.CharField(max_length=255, blank=True)
 
     class Meta:
         ordering = ['-featured', 'sort_order', 'name']
@@ -742,6 +748,9 @@ class Video(TimestampModel):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     published_at = models.DateTimeField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    meta_title = models.CharField(max_length=255, blank=True)
+    meta_description = models.TextField(blank=True)
+    meta_keywords = models.CharField(max_length=255, blank=True)
 
     class Meta:
         verbose_name = 'Video'
@@ -782,6 +791,8 @@ class CompanyInfo(models.Model):
     youtube = models.URLField(blank=True)
     whatsapp = models.CharField(max_length=50, blank=True)
     anthem = models.FileField(upload_to='company/anthem/', null=True, blank=True, help_text="Company anthem MP3 file")
+    google_analytics_id = models.CharField(max_length=50, blank=True, help_text="Google Analytics Tracking ID (e.g., G-XXXXXXXXXX)")
+    meta_keywords = models.CharField(max_length=255, blank=True, help_text="Default meta keywords for all pages (can be overridden per page)")
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -987,6 +998,9 @@ class Service(TimestampModel):
     sort_order = models.IntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    meta_title = models.CharField(max_length=255, blank=True)
+    meta_description = models.TextField(blank=True)
+    meta_keywords = models.CharField(max_length=255, blank=True)
 
     class Meta:
         ordering = ['-featured', 'sort_order', 'name']
@@ -1050,6 +1064,9 @@ class Training(TimestampModel):
     sort_order = models.IntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    meta_title = models.CharField(max_length=255, blank=True)
+    meta_description = models.TextField(blank=True)
+    meta_keywords = models.CharField(max_length=255, blank=True)
 
     class Meta:
         ordering = ['-featured', 'sort_order', 'name']

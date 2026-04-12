@@ -6,7 +6,25 @@
     <meta name="description" content="{% block meta_description %}{% if company_info %}{{ company_info.description }}{% else %}Your Blueprint for Harmony, Structure, and Expertise{% endif %}{% endblock %}">
     <meta name="theme-color" content="#DA251C">
     <title>{% block title %}{% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}</title>
-    
+
+    {% block meta_keywords %}
+    {% if company_info and company_info.meta_keywords %}
+    <meta name="keywords" content="{{ company_info.meta_keywords }}">
+    {% endif %}
+    {% endblock %}
+
+    <!-- Google Analytics -->
+    {% if company_info and company_info.google_analytics_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ company_info.google_analytics_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '{{ company_info.google_analytics_id }}');
+    </script>
+    {% endif %}
+
     {% load static %}
     
     <!-- Favicon -->
