@@ -167,6 +167,11 @@
 {% endblock %}
 
 {% block dashboard_content %}
+{% if form.errors %}
+<div class="alert alert-danger mb-4">
+    {{ form.errors }}
+</div>
+{% endif %}
 <form method="post" enctype="multipart/form-data" id="post-form">
     {% csrf_token %}
     
@@ -199,16 +204,6 @@
                 </div>
             </div>
             
-            <!-- Slug -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <label class="form-label fw-medium">Permalink</label>
-                    <div class="input-group">
-                        <span class="input-group-text text-muted">{{ request.scheme }}://{{ request.get_host }}/blog/</span>
-                        <input type="text" name="slug" value="{{ form.slug.value|default:'' }}" class="form-control">
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Sidebar - Right Side -->

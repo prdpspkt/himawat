@@ -118,8 +118,17 @@ class PostCreateView(BaseCreateView):
     
     def form_valid(self, form):
         form.instance.author = self.request.user
+        # Auto-generate unique slug from title
+        from django.utils.text import slugify
+        base_slug = slugify(form.instance.title)
+        slug = base_slug
+        counter = 1
+        while Post.objects.filter(slug=slug).exists():
+            slug = f'{base_slug}-{counter}'
+            counter += 1
+        form.instance.slug = slug
         response = super().form_valid(form)
-        
+
         # Handle tags from the hidden input
         tags_input = self.request.POST.get('tags', '')
         if tags_input:
@@ -127,7 +136,7 @@ class PostCreateView(BaseCreateView):
             self.object.tags.set(tag_ids)
         else:
             self.object.tags.clear()
-        
+
         return response
 
 
@@ -842,6 +851,37 @@ class TrainingRequestDetailView(AdminRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         messages.success(self.request, 'Request updated successfully!')
+        return super().form_valid(form)
+
+
+# Contact Views
+class ContactListView(BaseListView):
+    model = Contact
+    template_name = 'dashboard/contact_list.html'
+    context_object_name = 'contacts'
+    paginate_by = 20
+
+    def get_queryset(self):
+        return Contact.objects.order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['new_count'] = Contact.objects.filter(status='new').count()
+        context['read_count'] = Contact.objects.filter(status='read').count()
+        context['replied_count'] = Contact.objects.filter(status='replied').count()
+        return context
+
+
+class ContactDetailView(AdminRequiredMixin, UpdateView):
+    model = Contact
+    template_name = 'dashboard/contact_detail.html'
+    fields = ['status', 'notes']
+
+    def get_success_url(self):
+        return reverse_lazy('dashboard:contact_detail', kwargs={'pk': self.object.pk})
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Contact updated successfully!')
         return super().form_valid(form)
 
 
