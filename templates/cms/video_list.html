@@ -95,7 +95,7 @@
     <div class="container text-center">
         <i class="fas fa-video text-dim-grey mb-4" style="font-size: 4rem;"></i>
         <p class="text-dim-grey fs-5">No videos available at the moment.</p>
-        <a href="https://youtube.com/@himwatkhanda" target="_blank" class="btn btn-primary mt-3">
+        <a href="{{ company_info.youtube|default:'https://youtube.com' }}" target="_blank" class="btn btn-primary mt-3">
             <i class="fab fa-youtube me-2"></i>Visit Our YouTube Channel
         </a>
     </div>
@@ -111,7 +111,7 @@
             <a href="{% url 'pages:consultation' %}" class="btn btn-primary btn-lg">
                 <i class="fas fa-calendar-check me-2"></i>Book Consultation
             </a>
-            <a href="https://youtube.com/@himwatkhanda" target="_blank" class="btn btn-outline-danger btn-lg">
+            <a href="{{ company_info.youtube|default:'https://youtube.com' }}" target="_blank" class="btn btn-outline-danger btn-lg">
                 <i class="fab fa-youtube me-2"></i>Subscribe on YouTube
             </a>
         </div>

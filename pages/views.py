@@ -639,8 +639,9 @@ class VideoListView(ListView):
     
     def get_queryset(self):
         return Video.objects.filter(
-            status='published',
-            published_at__lte=timezone.now()
+            status='published'
+        ).filter(
+            Q(published_at__isnull=True) | Q(published_at__lte=timezone.now())
         ).order_by('sort_order', '-published_at')
 
 
