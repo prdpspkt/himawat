@@ -153,21 +153,21 @@
         <!-- Testimonials Carousel -->
         {% if featured_testimonials|length > 1 %}
         <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="hover">
-            <!-- Indicators (calculated for groups of 6) -->
+            <!-- Indicators (one dot per group of 3) -->
             <div class="carousel-indicators mb-0">
                 <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Testimonial slide 1"></button>
-                {% if featured_testimonials|length > 6 %}
+                {% if featured_testimonials|length > 3 %}
                 <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="1" aria-label="Testimonial slide 2"></button>
                 {% endif %}
-                {% if featured_testimonials|length > 12 %}
+                {% if featured_testimonials|length > 6 %}
                 <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="2" aria-label="Testimonial slide 3"></button>
                 {% endif %}
             </div>
 
-            <!-- Slides -->
+            <!-- Slides (3 cards per slide) -->
             <div class="carousel-inner">
                 {% for testimonial in featured_testimonials %}
-                {% if forloop.counter0|divisibleby:6 or forloop.first %}
+                {% if forloop.counter0|divisibleby:3 %}
                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
                     <div class="row g-4 justify-content-center">
                 {% endif %}
@@ -224,15 +224,15 @@
                                 </div>
                             </div>
                         </div>
-                {% if forloop.counter0|add:1|divisibleby:6 or forloop.last %}
+                {% if forloop.counter0|add:1|divisibleby:3 or forloop.last %}
                     </div>
                 </div>
                 {% endif %}
                 {% endfor %}
             </div>
 
-            <!-- Controls -->
-            {% if featured_testimonials|length > 6 %}
+            <!-- Controls (shown whenever there are multiple slides) -->
+            {% if featured_testimonials|length > 3 %}
             <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true" style="width: 50px; height: 50px;"></span>
                 <span class="visually-hidden">Previous</span>
