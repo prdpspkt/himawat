@@ -29,8 +29,7 @@ class HomeView(TemplateView):
         
         # Featured testimonials
         context['featured_testimonials'] = Testimonial.objects.filter(
-            status='published',
-            featured=True
+            status='published'
         ).order_by('order')[:6]
         
         # FAQs grouped by category (limited to 5 per category)
