@@ -171,6 +171,35 @@
                 </div>
             </div>
             
+            <!-- SEO Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">SEO Settings</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-medium small">Meta Title</label>
+                        <input type="text" name="meta_title" form="download-form" value="{{ form.meta_title.value|default:'' }}"
+                               class="form-control form-control-sm"
+                               placeholder="SEO title (optional)">
+                        <div class="form-text">Recommended: 50-60 characters</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium small">Meta Description</label>
+                        <textarea name="meta_description" form="download-form" rows="2"
+                                  class="form-control form-control-sm"
+                                  placeholder="SEO description (optional)">{{ form.meta_description.value|default:'' }}</textarea>
+                        <div class="form-text">Recommended: 150-160 characters</div>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-medium small">Meta Keywords</label>
+                        <input type="text" name="meta_keywords" form="download-form" value="{{ form.meta_keywords.value|default:'' }}"
+                               class="form-control form-control-sm"
+                               placeholder="keyword1, keyword2, keyword3">
+                    </div>
+                </div>
+            </div>
+
             <!-- Stats Card (for existing) -->
             {% if object %}
             <div class="card shadow">
