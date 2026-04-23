@@ -71,7 +71,7 @@ class PostAdmin(BaseAdmin):
     form = PostForm
     list_display = ['title', 'author', 'category', 'status', 'view_count', 'published_at', 'featured_image_preview', 'template_display']
     list_filter = ['status', 'category', 'created_at', 'published_at']
-    search_fields = ['title', 'content', 'excerpt', 'keywords']
+    search_fields = ['title', 'content', 'excerpt', 'meta_title', 'meta_description', 'meta_keywords']
     prepopulated_fields = {'slug': ('title',)}
     list_editable = ['status']
     date_hierarchy = 'published_at'
@@ -89,7 +89,11 @@ class PostAdmin(BaseAdmin):
             'classes': ('collapse',),
         }),
         ('SEO', {
-            'fields': ('keywords', 'custom_fields'),
+            'fields': ('meta_title', 'meta_description', 'meta_keywords'),
+            'classes': ('collapse',)
+        }),
+        ('Advanced', {
+            'fields': ('custom_fields',),
             'classes': ('collapse',)
         }),
     )
@@ -219,10 +223,23 @@ class VideoAdmin(BaseAdmin):
 class DownloadAdmin(BaseAdmin):
     list_display = ['title', 'file_type', 'download_count', 'file_size_display', 'status', 'published_at']
     list_filter = ['status', 'file_type', 'created_at']
-    search_fields = ['title', 'description']
+    search_fields = ['title', 'description', 'meta_title', 'meta_description', 'meta_keywords']
     prepopulated_fields = {'slug': ('title',)}
     list_editable = ['status']
-    
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('title', 'slug', 'description', 'file', 'featured_image')
+        }),
+        ('Settings', {
+            'fields': ('version', 'status', 'published_at')
+        }),
+        ('SEO', {
+            'fields': ('meta_title', 'meta_description', 'meta_keywords'),
+            'classes': ('collapse',)
+        }),
+    )
+
     def file_size_display(self, obj):
         if obj.file_size < 1024:
             return f"{obj.file_size} B"
