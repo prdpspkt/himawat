@@ -252,9 +252,9 @@ class DownloadListView(BaseListView):
 class DownloadCreateView(BaseCreateView):
     model = Download
     template_name = 'dashboard/download_form.html'
-    fields = ['title', 'slug', 'description', 'file', 'version', 'featured_image', 'status', 'published_at']
+    fields = ['title', 'slug', 'description', 'file', 'version', 'featured_image', 'meta_title', 'meta_description', 'meta_keywords', 'status', 'published_at']
     success_url = reverse_lazy('dashboard:download_list')
-    
+
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
@@ -263,7 +263,7 @@ class DownloadCreateView(BaseCreateView):
 class DownloadUpdateView(BaseUpdateView):
     model = Download
     template_name = 'dashboard/download_form.html'
-    fields = ['title', 'slug', 'description', 'file', 'version', 'featured_image', 'status', 'published_at']
+    fields = ['title', 'slug', 'description', 'file', 'version', 'featured_image', 'meta_title', 'meta_description', 'meta_keywords', 'status', 'published_at']
     success_url = reverse_lazy('dashboard:download_list')
 
 
@@ -286,9 +286,9 @@ class GalleryListView(BaseListView):
 class GalleryCreateView(BaseCreateView):
     model = Gallery
     template_name = 'dashboard/gallery_form.html'
-    fields = ['name', 'slug', 'description', 'cover_image', 'sort_order', 'status']
+    fields = ['name', 'slug', 'description', 'cover_image', 'sort_order', 'status', 'meta_title', 'meta_description', 'meta_keywords']
     success_url = reverse_lazy('dashboard:gallery_list')
-    
+
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
@@ -297,7 +297,7 @@ class GalleryCreateView(BaseCreateView):
 class GalleryUpdateView(BaseUpdateView):
     model = Gallery
     template_name = 'dashboard/gallery_form.html'
-    fields = ['name', 'slug', 'description', 'cover_image', 'sort_order', 'status']
+    fields = ['name', 'slug', 'description', 'cover_image', 'sort_order', 'status', 'meta_title', 'meta_description', 'meta_keywords']
     success_url = reverse_lazy('dashboard:gallery_list')
 
 
@@ -1071,9 +1071,9 @@ class VideoListView(BaseListView):
 class VideoCreateView(BaseCreateView):
     model = Video
     template_name = 'dashboard/video_form.html'
-    fields = ['title', 'slug', 'description', 'embed_code', 'thumbnail', 'sort_order', 'status', 'published_at']
+    fields = ['title', 'slug', 'description', 'embed_code', 'thumbnail', 'sort_order', 'status', 'published_at', 'meta_title', 'meta_description', 'meta_keywords']
     success_url = reverse_lazy('dashboard:video_list')
-    
+
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
@@ -1082,7 +1082,7 @@ class VideoCreateView(BaseCreateView):
 class VideoUpdateView(BaseUpdateView):
     model = Video
     template_name = 'dashboard/video_form.html'
-    fields = ['title', 'slug', 'description', 'embed_code', 'thumbnail', 'sort_order', 'status', 'published_at']
+    fields = ['title', 'slug', 'description', 'embed_code', 'thumbnail', 'sort_order', 'status', 'published_at', 'meta_title', 'meta_description', 'meta_keywords']
     success_url = reverse_lazy('dashboard:video_list')
 
 

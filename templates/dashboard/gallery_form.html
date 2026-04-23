@@ -120,6 +120,33 @@
                     </div>
                 </div>
                 
+                <!-- SEO Section -->
+                <div class="mt-4 pt-4 border-top">
+                    <h6 class="fw-semibold mb-3">SEO Settings</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium small">Meta Title</label>
+                            <input type="text" name="meta_title" value="{{ form.meta_title.value|default:'' }}"
+                                   class="form-control form-control-sm"
+                                   placeholder="SEO title (optional)">
+                            <div class="form-text">Recommended: 50-60 characters</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium small">Meta Keywords</label>
+                            <input type="text" name="meta_keywords" value="{{ form.meta_keywords.value|default:'' }}"
+                                   class="form-control form-control-sm"
+                                   placeholder="keyword1, keyword2, keyword3">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-medium small">Meta Description</label>
+                            <textarea name="meta_description" rows="2"
+                                      class="form-control form-control-sm"
+                                      placeholder="SEO description (optional)">{{ form.meta_description.value|default:'' }}</textarea>
+                            <div class="form-text">Recommended: 150-160 characters</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="mt-4 d-flex gap-3">
                     <button type="submit" class="btn btn-primary">
                         Save Gallery
