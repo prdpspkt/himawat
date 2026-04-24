@@ -2,7 +2,21 @@
 {% load static %}
 
 {% block title %}{{ post.meta_title|default:post.title }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
-{% block meta_description %}{{ post.meta_description|default:post.excerpt|truncatewords:30 }}{% endblock %}
+{% block seo %}
+<meta name="description" content="{{ post.meta_description|default:post.excerpt|truncatewords:30 }}">
+{% if post.meta_keywords %}<meta name="keywords" content="{{ post.meta_keywords }}">{% elif company_info and company_info.meta_keywords %}<meta name="keywords" content="{{ company_info.meta_keywords }}">{% endif %}
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="{% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:title" content="{{ post.meta_title|default:post.title }}">
+<meta property="og:description" content="{{ post.meta_description|default:post.excerpt|truncatewords:30 }}">
+{% if post.featured_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.featured_image.url }}">{% elif company_info and company_info.logo %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
+{% if post.published_at %}<meta property="article:published_time" content="{{ post.published_at|date:'c' }}">{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ post.meta_title|default:post.title }}">
+<meta name="twitter:description" content="{{ post.meta_description|default:post.excerpt|truncatewords:30 }}">
+{% if post.featured_image %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.featured_image.url }}">{% elif company_info and company_info.logo %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
+{% endblock %}
 
 {% block content %}
 <!-- Featured Image -->

@@ -3,22 +3,22 @@
 
 {% block title %}{{ product.name }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
 
-{% block extra_head %}
-<meta name="description" content="{{ product.description|striptags|truncatewords:30 }}">
-<meta property="og:title" content="{{ product.name }}">
-<meta property="og:description" content="{{ product.description|striptags|truncatewords:30 }}">
+{% block seo %}
+<meta name="description" content="{{ product.meta_description|default:product.description|striptags|truncatewords:30 }}">
+{% if product.meta_keywords %}<meta name="keywords" content="{{ product.meta_keywords }}">{% elif company_info and company_info.meta_keywords %}<meta name="keywords" content="{{ company_info.meta_keywords }}">{% endif %}
 <meta property="og:type" content="product">
+<meta property="og:site_name" content="{% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
-{% if product.image %}
-<meta property="og:image" content="{{ request.build_absolute_uri }}{{ product.image.url }}">
-{% endif %}
+<meta property="og:title" content="{{ product.meta_title|default:product.name }}">
+<meta property="og:description" content="{{ product.meta_description|default:product.description|striptags|truncatewords:30 }}">
+{% if product.image %}<meta property="og:image" content="{{ request.build_absolute_uri }}{{ product.image.url }}">{% elif company_info and company_info.logo %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ product.name }}">
-<meta name="twitter:description" content="{{ product.description|striptags|truncatewords:30 }}">
-{% if product.image %}
-<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ product.image.url }}">
-{% endif %}
+<meta name="twitter:title" content="{{ product.meta_title|default:product.name }}">
+<meta name="twitter:description" content="{{ product.meta_description|default:product.description|striptags|truncatewords:30 }}">
+{% if product.image %}<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ product.image.url }}">{% elif company_info and company_info.logo %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
+{% endblock %}
 
+{% block extra_head %}
 <!-- Schema.org Product Markup -->
 <script type="application/ld+json">
 {

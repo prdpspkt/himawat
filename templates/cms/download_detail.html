@@ -1,7 +1,20 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ download.title }}{% endblock %}
-{% block meta_description %}{{ download.description|truncatewords:30 }}{% endblock %}
+{% block title %}{{ download.meta_title|default:download.title }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block seo %}
+<meta name="description" content="{{ download.meta_description|default:download.description|truncatewords:30 }}">
+{% if download.meta_keywords %}<meta name="keywords" content="{{ download.meta_keywords }}">{% elif company_info and company_info.meta_keywords %}<meta name="keywords" content="{{ company_info.meta_keywords }}">{% endif %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:title" content="{{ download.meta_title|default:download.title }}">
+<meta property="og:description" content="{{ download.meta_description|default:download.description|truncatewords:30 }}">
+{% if download.featured_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ download.featured_image.url }}">{% elif company_info and company_info.logo %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ download.meta_title|default:download.title }}">
+<meta name="twitter:description" content="{{ download.meta_description|default:download.description|truncatewords:30 }}">
+{% if download.featured_image %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ download.featured_image.url }}">{% elif company_info and company_info.logo %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 py-12">

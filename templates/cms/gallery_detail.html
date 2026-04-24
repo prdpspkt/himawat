@@ -1,7 +1,21 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ gallery.name }} - Gallery{% endblock %}
+{% block title %}{{ gallery.meta_title|default:gallery.name }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block seo %}
+<meta name="description" content="{{ gallery.meta_description|default:gallery.description|truncatewords:30 }}">
+{% if gallery.meta_keywords %}<meta name="keywords" content="{{ gallery.meta_keywords }}">{% elif company_info and company_info.meta_keywords %}<meta name="keywords" content="{{ company_info.meta_keywords }}">{% endif %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:title" content="{{ gallery.meta_title|default:gallery.name }}">
+<meta property="og:description" content="{{ gallery.meta_description|default:gallery.description|truncatewords:30 }}">
+{% if gallery.cover_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ gallery.cover_image.url }}">{% elif gallery.images.first %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ gallery.images.first.image.url }}">{% elif company_info and company_info.logo %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ gallery.meta_title|default:gallery.name }}">
+<meta name="twitter:description" content="{{ gallery.meta_description|default:gallery.description|truncatewords:30 }}">
+{% if gallery.cover_image %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ gallery.cover_image.url }}">{% elif gallery.images.first %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ gallery.images.first.image.url }}">{% elif company_info and company_info.logo %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
+{% endblock %}
 
 {% block extra_css %}
 <style>
