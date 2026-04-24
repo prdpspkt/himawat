@@ -3,22 +3,22 @@
 
 {% block title %}{{ training.name }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
 
-{% block extra_head %}
-<meta name="description" content="{% if training.short_description %}{{ training.short_description }}{% else %}{{ training.description|striptags|truncatewords:30 }}{% endif %}">
-<meta property="og:title" content="{{ training.name }}">
-<meta property="og:description" content="{% if training.short_description %}{{ training.short_description }}{% else %}{{ training.description|striptags|truncatewords:30 }}{% endif %}">
-<meta property="og:type" content="course">
+{% block seo %}
+<meta name="description" content="{{ training.meta_description|default:training.short_description|default:training.description|striptags|truncatewords:30 }}">
+{% if training.meta_keywords %}<meta name="keywords" content="{{ training.meta_keywords }}">{% elif company_info and company_info.meta_keywords %}<meta name="keywords" content="{{ company_info.meta_keywords }}">{% endif %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
-{% if training.image %}
-<meta property="og:image" content="{{ request.build_absolute_uri }}{{ training.image.url }}">
-{% endif %}
+<meta property="og:title" content="{{ training.meta_title|default:training.name }}">
+<meta property="og:description" content="{{ training.meta_description|default:training.short_description|default:training.description|striptags|truncatewords:30 }}">
+{% if training.image %}<meta property="og:image" content="{{ request.build_absolute_uri }}{{ training.image.url }}">{% elif company_info and company_info.logo %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ training.name }}">
-<meta name="twitter:description" content="{% if training.short_description %}{{ training.short_description }}{% else %}{{ training.description|striptags|truncatewords:30 }}{% endif %}">
-{% if training.image %}
-<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ training.image.url }}">
-{% endif %}
+<meta name="twitter:title" content="{{ training.meta_title|default:training.name }}">
+<meta name="twitter:description" content="{{ training.meta_description|default:training.short_description|default:training.description|striptags|truncatewords:30 }}">
+{% if training.image %}<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ training.image.url }}">{% elif company_info and company_info.logo %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
+{% endblock %}
 
+{% block extra_head %}
 <!-- Schema.org Course Markup -->
 <script type="application/ld+json">
 {

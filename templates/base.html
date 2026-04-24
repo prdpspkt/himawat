@@ -3,15 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="{% block meta_description %}{% if company_info %}{{ company_info.description }}{% else %}Your Blueprint for Harmony, Structure, and Expertise{% endif %}{% endblock %}">
     <meta name="theme-color" content="#DA251C">
     <title>{% block title %}{% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}</title>
 
-    {% block meta_keywords %}
-    {% if company_info and company_info.meta_keywords %}
-    <meta name="keywords" content="{{ company_info.meta_keywords }}">
-    {% endif %}
+    {% block seo %}
+    <meta name="description" content="{% block meta_description %}{% if company_info %}{{ company_info.description }}{% else %}Your Blueprint for Harmony, Structure, and Expertise{% endif %}{% endblock %}">
+    {% block meta_keywords %}{% if company_info and company_info.meta_keywords %}<meta name="keywords" content="{{ company_info.meta_keywords }}">{% endif %}{% endblock %}
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:title" content="{% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}">
+    <meta property="og:description" content="{% if company_info %}{{ company_info.description }}{% else %}Your Blueprint for Harmony, Structure, and Expertise{% endif %}">
+    {% if company_info and company_info.logo %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}">
+    <meta name="twitter:description" content="{% if company_info %}{{ company_info.description }}{% else %}Your Blueprint for Harmony, Structure, and Expertise{% endif %}">
+    {% if company_info and company_info.logo %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
     {% endblock %}
+
+    <!-- Google Search Console -->
+    {% if company_info and company_info.google_search_console_id %}
+    <meta name="google-site-verification" content="{{ company_info.google_search_console_id }}">
+    {% endif %}
 
     <!-- Google Analytics -->
     {% if company_info and company_info.google_analytics_id %}

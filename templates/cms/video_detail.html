@@ -1,7 +1,21 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ video.title }} - Videos{% endblock %}
+{% block title %}{{ video.meta_title|default:video.title }} - {% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}{% endblock %}
+{% block seo %}
+<meta name="description" content="{{ video.meta_description|default:video.description|truncatewords:30 }}">
+{% if video.meta_keywords %}<meta name="keywords" content="{{ video.meta_keywords }}">{% elif company_info and company_info.meta_keywords %}<meta name="keywords" content="{{ company_info.meta_keywords }}">{% endif %}
+<meta property="og:type" content="video.other">
+<meta property="og:site_name" content="{% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu{% endif %}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:title" content="{{ video.meta_title|default:video.title }}">
+<meta property="og:description" content="{{ video.meta_description|default:video.description|truncatewords:30 }}">
+{% if video.thumbnail %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ video.thumbnail.url }}">{% elif company_info and company_info.logo %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ video.meta_title|default:video.title }}">
+<meta name="twitter:description" content="{{ video.meta_description|default:video.description|truncatewords:30 }}">
+{% if video.thumbnail %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ video.thumbnail.url }}">{% elif company_info and company_info.logo %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
+{% endblock %}
 
 {% block content %}
 <!-- Video Header -->
