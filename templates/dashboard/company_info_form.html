@@ -11,6 +11,15 @@
     
     <form method="post" enctype="multipart/form-data" class="card-body p-4">
         {% csrf_token %}
+        {% if form.errors %}
+        <div class="alert alert-danger mb-4">
+            <strong>Please fix the following errors:</strong>
+            <ul class="mb-0 mt-1">
+                {% for field in form %}{% for error in field.errors %}<li><strong>{{ field.label }}:</strong> {{ error }}</li>{% endfor %}{% endfor %}
+                {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+            </ul>
+        </div>
+        {% endif %}
         
         <div class="row g-4">
             <!-- Company Details -->

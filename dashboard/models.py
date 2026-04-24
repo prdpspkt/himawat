@@ -138,7 +138,7 @@ class Post(TimestampModel):
     featured_image = models.ImageField(upload_to='posts/', null=True, blank=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
-    meta_keywords = models.CharField(max_length=255, blank=True)
+    meta_keywords = models.TextField(blank=True)
     custom_fields = models.JSONField(null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
@@ -221,7 +221,7 @@ class Page(TimestampModel):
     template_name = models.CharField(max_length=255, blank=True, help_text="Custom template path (e.g., 'cms/pages/services-page.html'). Overrides preset template if specified.")
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
-    meta_keywords = models.CharField(max_length=255, blank=True)
+    meta_keywords = models.TextField(blank=True)
     blocks = models.JSONField(null=True, blank=True, help_text="Page builder blocks")
 
     class Meta:
@@ -299,7 +299,7 @@ class Download(TimestampModel):
     featured_image = models.ImageField(upload_to='downloads/images/', null=True, blank=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
-    meta_keywords = models.CharField(max_length=255, blank=True)
+    meta_keywords = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     published_at = models.DateTimeField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -338,7 +338,7 @@ class Gallery(TimestampModel):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
-    meta_keywords = models.CharField(max_length=255, blank=True)
+    meta_keywords = models.TextField(blank=True)
 
     class Meta:
         verbose_name_plural = 'Galleries'
@@ -476,7 +476,7 @@ class Product(TimestampModel):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
-    meta_keywords = models.CharField(max_length=255, blank=True)
+    meta_keywords = models.TextField(blank=True)
 
     class Meta:
         ordering = ['-featured', 'sort_order', 'name']
@@ -755,7 +755,7 @@ class Video(TimestampModel):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
-    meta_keywords = models.CharField(max_length=255, blank=True)
+    meta_keywords = models.TextField(blank=True)
 
     class Meta:
         verbose_name = 'Video'
@@ -798,7 +798,7 @@ class CompanyInfo(models.Model):
     anthem = models.FileField(upload_to='company/anthem/', null=True, blank=True, help_text="Company anthem MP3 file")
     google_analytics_id = models.CharField(max_length=50, blank=True, help_text="Google Analytics Tracking ID (e.g., G-XXXXXXXXXX)")
     google_search_console_id = models.CharField(max_length=255, blank=True, help_text="Google Search Console verification meta tag content value (e.g., abc123XYZ)")
-    meta_keywords = models.CharField(max_length=255, blank=True, help_text="Default meta keywords for all pages (can be overridden per page)")
+    meta_keywords = models.TextField(blank=True, help_text="Default meta keywords for all pages (can be overridden per page)")
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -832,7 +832,7 @@ class PageRevision(TimestampModel):
     excerpt = models.TextField(blank=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
-    meta_keywords = models.CharField(max_length=255, blank=True)
+    meta_keywords = models.TextField(blank=True)
     template = models.CharField(max_length=50, blank=True)
     blocks = models.JSONField(null=True, blank=True)
     revision_reason = models.TextField(blank=True, help_text="Why was this revision created?")
@@ -1006,7 +1006,7 @@ class Service(TimestampModel):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
-    meta_keywords = models.CharField(max_length=255, blank=True)
+    meta_keywords = models.TextField(blank=True)
 
     class Meta:
         ordering = ['-featured', 'sort_order', 'name']
@@ -1072,7 +1072,7 @@ class Training(TimestampModel):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     meta_title = models.CharField(max_length=255, blank=True)
     meta_description = models.TextField(blank=True)
-    meta_keywords = models.CharField(max_length=255, blank=True)
+    meta_keywords = models.TextField(blank=True)
 
     class Meta:
         ordering = ['-featured', 'sort_order', 'name']
