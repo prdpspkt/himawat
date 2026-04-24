@@ -955,7 +955,8 @@ class CompanyInfoUpdateView(AdminRequiredMixin, UpdateView):
         'address', 'city', 'state', 'postal_code', 'country',
         'latitude', 'longitude',
         'facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'whatsapp',
-        'anthem'
+        'anthem',
+        'google_analytics_id', 'google_search_console_id', 'meta_keywords',
     ]
     success_url = reverse_lazy('dashboard:company_info')
     

@@ -797,6 +797,7 @@ class CompanyInfo(models.Model):
     whatsapp = models.CharField(max_length=50, blank=True)
     anthem = models.FileField(upload_to='company/anthem/', null=True, blank=True, help_text="Company anthem MP3 file")
     google_analytics_id = models.CharField(max_length=50, blank=True, help_text="Google Analytics Tracking ID (e.g., G-XXXXXXXXXX)")
+    google_search_console_id = models.CharField(max_length=255, blank=True, help_text="Google Search Console verification meta tag content value (e.g., abc123XYZ)")
     meta_keywords = models.CharField(max_length=255, blank=True, help_text="Default meta keywords for all pages (can be overridden per page)")
     updated_at = models.DateTimeField(auto_now=True)
 

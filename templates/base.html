@@ -21,6 +21,11 @@
     {% if company_info and company_info.logo %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
     {% endblock %}
 
+    <!-- Google Search Console -->
+    {% if company_info and company_info.google_search_console_id %}
+    <meta name="google-site-verification" content="{{ company_info.google_search_console_id }}">
+    {% endif %}
+
     <!-- Google Analytics -->
     {% if company_info and company_info.google_analytics_id %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ company_info.google_analytics_id }}"></script>
