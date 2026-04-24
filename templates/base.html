@@ -21,6 +21,8 @@
     {% if company_info and company_info.logo %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_info.logo.url }}">{% endif %}
     {% endblock %}
 
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+
     <!-- Google Search Console -->
     {% if company_info and company_info.google_search_console_id %}
     <meta name="google-site-verification" content="{{ company_info.google_search_console_id }}">
