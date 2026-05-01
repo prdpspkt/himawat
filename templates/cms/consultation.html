@@ -310,6 +310,21 @@
                                 <input type="file" name="files" multiple accept="image/*,.pdf,.doc,.docx,.txt,.xls,.xlsx,.dwg,.dxf,.dwf,.step,.stp,.iges,.igs" class="form-control">
                             </div>
 
+                            <!-- Verification -->
+                            <div class="mb-4 p-4 border rounded" style="background: #f8f9fa;">
+                                <label class="form-label fw-semibold text-almost-black mb-2">Verification *</label>
+                                <p class="small text-dim-grey mb-3">Answer the question below to confirm you are not a bot.</p>
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <span class="fs-5 fw-bold text-primary" id="captcha-question">{{ captcha_question }}</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="captcha-refresh" title="Get a new question">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                </div>
+                                <input type="number" name="captcha_answer" id="captcha-answer" required
+                                       class="form-control" placeholder="Your answer"
+                                       style="max-width: 160px;" autocomplete="off">
+                            </div>
+
                             <button type="submit" class="btn btn-primary btn-lg px-5 w-100">
                                 <i class="fas fa-paper-plane me-2"></i>Submit Consultation Request
                             </button>
@@ -320,4 +335,18 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('captcha-refresh').addEventListener('click', function () {
+    fetch('{% url "pages:captcha_refresh" %}')
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('captcha-question').textContent = data.question;
+            document.getElementById('captcha-answer').value = '';
+            document.getElementById('captcha-answer').focus();
+        });
+});
+</script>
 {% endblock %}

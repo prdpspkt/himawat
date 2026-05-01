@@ -8,6 +8,8 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
+from . import captcha as captcha_utils
+
 from dashboard.models import (
     Post, Page, Category, Tag, Download, Gallery,
     Testimonial, Carousel, FAQ, Product, ProductRequest, Consultation, Video,
@@ -435,10 +437,22 @@ def product_request(request, slug):
     return redirect('cms:product_detail', slug=slug)
 
 
+def captcha_refresh(request):
+    """Return a fresh captcha question as JSON."""
+    question = captcha_utils.generate(request)
+    return JsonResponse({'question': question})
+
+
 @require_POST
 def consultation_request(request):
     """Handle consultation form"""
     from dashboard.models import ConsultationFile
+
+    # Verify captcha before processing anything else
+    user_answer = request.POST.get('captcha_answer', '')
+    if not captcha_utils.verify(request, user_answer):
+        messages.error(request, 'Incorrect answer to the verification question. Please try again.')
+        return redirect('pages:consultation')
 
     name = request.POST.get('name')
     email = request.POST.get('email')
@@ -489,6 +503,7 @@ class ConsultationView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['captcha_question'] = captcha_utils.generate(self.request)
         from django.contrib.contenttypes.models import ContentType
         from dashboard.models import Category, Service, Gallery, Video
         from django.db.models import Q, Count

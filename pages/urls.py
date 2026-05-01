@@ -56,6 +56,7 @@ urlpatterns = [
     # Consultation
     path('consultation/', views.ConsultationView.as_view(), name='consultation'),
     path('consultation/submit/', views.consultation_request, name='consultation_submit'),
+    path('consultation/captcha/', views.captcha_refresh, name='captcha_refresh'),
 
     # CEO Profile
     path('ceo/', views.CEOProfileView.as_view(), name='ceo_profile'),
