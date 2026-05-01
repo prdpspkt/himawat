@@ -110,7 +110,7 @@ a {
 
 a:hover {
     color: var(--primary-scarlet-dark);
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 /* ============================================================
