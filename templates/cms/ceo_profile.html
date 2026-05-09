@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{% if ceo_info %}{{ ceo_info.name }} - {% endif %}CEO Profile{% endblock %}
+{% block title %}{% if ceo_info %}{{ ceo_info.name }}{% else %}Laxmi Prasad Soti{% endif %} — Vastu Consultant &amp; Civil Engineer, Kathmandu | Himawatkhanda Vastu{% endblock %}
+{% block meta_description %}Laxmi Prasad Soti — Best Vastu Consultant in Asia awardee, PhD Vedic Vastu Sthapati &amp; civil structural engineer in Kathmandu with 17 years &amp; 4,000+ cases.{% endblock %}
 
 {% block extra_css %}
 <style>
