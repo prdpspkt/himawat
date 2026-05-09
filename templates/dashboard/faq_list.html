@@ -9,9 +9,25 @@
 <div class="card dashboard-card shadow-sm">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title mb-0">All FAQs</h3>
-        <a href="{% url 'dashboard:faq_create' %}" class="btn btn-primary">
-            Add New
-        </a>
+        <a href="{% url 'dashboard:faq_create' %}" class="btn btn-primary">Add New</a>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="border-bottom px-3 pt-2">
+        <ul class="nav nav-tabs border-0">
+            <li class="nav-item">
+                <a class="nav-link {% if active_tab != 'engineering' %}active{% endif %}"
+                   href="?tab=vastu">
+                    <i class="fas fa-om me-1"></i> Vastu
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if active_tab == 'engineering' %}active{% endif %}"
+                   href="?tab=engineering">
+                    <i class="fas fa-hard-hat me-1"></i> Engineering
+                </a>
+            </li>
+        </ul>
     </div>
 
     <div class="table-responsive">
@@ -22,7 +38,6 @@
                         <input type="checkbox" class="form-check-input" aria-label="Select all">
                     </th>
                     <th class="p-3">Question</th>
-                    <th class="p-3">Category</th>
                     <th class="p-3">Order</th>
                     <th class="p-3">Status</th>
                     <th class="p-3">Actions</th>
@@ -37,11 +52,6 @@
                     <td class="p-3">
                         <div class="text-dark fw-medium">{{ faq.question|truncatewords:10 }}</div>
                     </td>
-                    <td class="p-3 text-nowrap">
-                        <span class="badge {% if faq.category == 'vastu' %}bg-success{% else %}bg-info{% endif %}">
-                            {{ faq.get_category_display }}
-                        </span>
-                    </td>
                     <td class="p-3 text-nowrap text-muted">{{ faq.sort_order }}</td>
                     <td class="p-3 text-nowrap">
                         <span class="badge {% if faq.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
@@ -55,11 +65,50 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="p-4 text-center text-muted">No FAQs found.</td>
+                    <td colspan="5" class="p-4 text-center text-muted">No FAQs found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
+    {% if is_paginated %}
+    <div class="card-footer bg-white">
+        <div class="row align-items-center">
+            <div class="col-sm-6">
+                <small class="text-muted">
+                    Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ paginator.count }} results
+                </small>
+            </div>
+            <div class="col-sm-6">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm justify-content-sm-end mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?tab={{ active_tab }}&page={{ page_obj.previous_page_number }}">Previous</a>
+                        </li>
+                        {% endif %}
+                        {% for num in paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?tab={{ active_tab }}&page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?tab={{ active_tab }}&page={{ page_obj.next_page_number }}">Next</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

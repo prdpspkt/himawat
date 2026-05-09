@@ -71,7 +71,7 @@
                 <h1 class="display-4 fw-bold mb-2" style="color: var(--primary-purple);">{% firstof ceo_info.name 'Laxmi Prasad Soti' %}</h1>
                 <p class="fs-3 mb-3" style="color: var(--primary-purple);">{% firstof ceo_info.title 'Founder & CEO' %}</p>
                 {% if ceo_info and ceo_info.bio %}
-                <p class="lead mb-4 text-dark">{{ ceo_info.bio }}</p>
+                <div class="lead mb-4 text-dark">{{ ceo_info.bio|safe }}</div>
                 {% endif %}
                 <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
                     {% if ceo_info and ceo_info.email %}
@@ -108,7 +108,7 @@
                             Message from {% firstof ceo_info.name 'the CEO' %}
                         </h2>
                         <div class="prose prose-lg fs-5 text-dim-grey-dark">
-                            {{ ceo_info.message|linebreaks }}
+                            {{ ceo_info.message|safe }}
                         </div>
                     </div>
                 </div>

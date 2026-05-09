@@ -641,9 +641,16 @@ class FAQListView(BaseListView):
     model = FAQ
     template_name = 'dashboard/faq_list.html'
     context_object_name = 'faqs'
-    
+
     def get_queryset(self):
-        return FAQ.objects.order_by('category', 'sort_order')
+        tab = self.request.GET.get('tab', 'vastu')
+        category = 'engineering' if tab == 'engineering' else 'vastu'
+        return FAQ.objects.filter(category=category).order_by('sort_order')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_tab'] = self.request.GET.get('tab', 'vastu')
+        return context
 
 
 class FAQCreateView(BaseCreateView):
