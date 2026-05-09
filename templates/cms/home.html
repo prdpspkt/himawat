@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{% if company_info %}{{ company_info.company_name }}{% else %}Himwatkhanda Vastu Pvt. Ltd.{% endif %}{% endblock %}
+{% block title %}{% if company_info %}{{ company_info.company_name }} | Vastu Shastra Consultants, Kathmandu{% else %}Himawatkhanda Vastu | Vastu Shastra Consultants, Kathmandu{% endif %}{% endblock %}
+{% block meta_description %}Kathmandu's trusted Vastu Shastra &amp; engineering consultants. Expert Vedic architecture, sustainable design, and construction services across Nepal.{% endblock %}
 
 {% block content %}
 <!-- Hero Section: Carousel & CEO Info Side by Side -->
@@ -81,7 +82,7 @@
                              loading="lazy">
                         {% else %}
                         <img src="{% static 'images/ceo.png' %}"
-                             alt="CEO of Himwatkhanda Vastu"
+                             alt="CEO of Himawatkhanda Vastu"
                              class="card-img-top object-fit-cover"
                              style="height: clamp(200px, 30vw, 250px);"
                              onerror="this.src='https://via.placeholder.com/400x250?text=CEO'"
@@ -118,11 +119,11 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
-                <h2 class="display-5 fw-bold text-primary mb-4">
-                    Welcome to Himwatkhanda Vastu
-                </h2>
+                <h1 class="display-5 fw-bold text-primary mb-4">
+                    Vastu Shastra &amp; Engineering Consultants in Kathmandu, Nepal
+                </h1>
                 <p class="fs-5 text-dim-grey-dark mb-4">
-                    Your trusted partner for Vedic Architecture, Vastu Shastra consultation, Engineering Design, and Sustainable Construction. We combine ancient wisdom with modern engineering to create harmonious living and working spaces.
+                    Himawatkhanda Vastu Pvt. Ltd. provides certified Vastu Shastra consultation, Vedic architectural design, structural engineering, and earthquake-resistant construction services throughout Nepal — rooted in ancient Himawat tradition, applied with modern precision.
                 </p>
 
                 <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">

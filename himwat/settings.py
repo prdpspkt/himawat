@@ -227,7 +227,7 @@ LOGOUT_REDIRECT_URL = '/'
 # SITE SETTINGS
 # =============================================================================
 
-SITE_NAME = os.environ.get('SITE_NAME', 'Himwatkhanda Vastu Pvt. Ltd.')
+SITE_NAME = os.environ.get('SITE_NAME', 'Himawatkhanda Vastu Pvt. Ltd.')
 SITE_DESCRIPTION = os.environ.get('SITE_DESCRIPTION', 'Your Blueprint for Harmony, Structure, and Expertise')
 SITE_URL = os.environ.get('SITE_URL', 'https://himawatkhandavastu.com')
 
@@ -240,7 +240,7 @@ SITE_URL = os.environ.get('SITE_URL', 'https://himawatkhandavastu.com')
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@localhost')
 SERVER_EMAIL = os.environ.get('SERVER_EMAIL', 'server@localhost')
-EMAIL_SUBJECT_PREFIX = '[Himwatkhanda Vastu] '
+EMAIL_SUBJECT_PREFIX = '[Himawatkhanda Vastu] '
 ADMINS = [('Admin', os.environ.get('ADMIN_EMAIL', 'admin@localhost'))]
 
 # Load email configuration from database if available
