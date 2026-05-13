@@ -1,0 +1,33 @@
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/negeobag/himawat"
+PassengerBaseURI "/"
+PassengerPython "/home/negeobag/virtualenv/himawat/3.11/bin/python"
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+
+Options -Indexes
+
+# Bypass ModSecurity for social media crawlers
+<IfModule mod_security2.c>
+    SecRule REQUEST_HEADERS:User-Agent "facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Slackbot" \
+        "id:1000,phase:1,pass,nolog,ctl:ruleEngine=Off"
+</IfModule>
+
+# Allow social media crawlers (environment flag)
+SetEnvIfNoCase User-Agent "facebookexternalhit" good_bot
+SetEnvIfNoCase User-Agent "Twitterbot" good_bot
+SetEnvIfNoCase User-Agent "LinkedInBot" good_bot
+SetEnvIfNoCase User-Agent "WhatsApp" good_bot
+SetEnvIfNoCase User-Agent "Slackbot" good_bot
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Serve static and media files directly without going through Passenger
+    RewriteCond %{REQUEST_URI} ^/(static|media)/ [NC]
+    RewriteRule ^.*$ - [L]
+
+    # Pass all other requests to Passenger/Django
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ passenger_wsgi.py [QSA,L]
+</IfModule>
