@@ -19,7 +19,7 @@ class PostForm(forms.ModelForm):
     """Form for Post model"""
     class Meta:
         model = Post
-        exclude = ['slug']
+        exclude = ['slug', 'author', 'tags', 'view_count']
         widgets = {
             'content': TinyMCEWidget(),
         }
