@@ -100,7 +100,7 @@
                         <h3 class="h4 fw-bold text-almost-black mb-1">{% firstof ceo_info.name 'Laxmi Prasad Soti' %}</h3>
                         <p class="text-primary fw-semibold mb-3">{% firstof ceo_info.title 'Founder & CEO' %}</p>
                         {% if ceo_info and ceo_info.bio %}
-                        <p class="text-dim-grey-dark small mb-3">{{ ceo_info.bio|truncatewords:20 }}</p>
+                        <p class="text-dim-grey-dark small mb-3">{{ ceo_info.bio|truncatewords:20|safe }}</p>
                         {% else %}
                         <p class="text-dim-grey-dark small mb-3">Vedic Architecture, Vastu Shastra, Sustainable Design, Environmental Planning</p>
                         {% endif %}
