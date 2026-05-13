@@ -104,6 +104,7 @@ MIDDLEWARE = [
     'dashboard.menu_views.CSRFJsonMiddleware',  # Extract CSRF from JSON body
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'himwat.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Cache control middleware (only active in DEBUG mode)

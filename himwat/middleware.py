@@ -1,5 +1,24 @@
 from django.conf import settings
+from django.contrib.auth.views import redirect_to_login
 from django.utils.deprecation import MiddlewareMixin
+
+
+PROTECTED_PREFIXES = (
+    '/dashboard/',
+    '/accounts/profile',
+)
+
+
+class LoginRequiredMiddleware(MiddlewareMixin):
+    """
+    Require login for /dashboard/* and /accounts/profile*.
+    All other paths are fully public (including blog, pages, etc.)
+    so external crawlers like facebookexternalhit can access them.
+    """
+    def process_request(self, request):
+        if any(request.path.startswith(prefix) for prefix in PROTECTED_PREFIXES):
+            if not request.user.is_authenticated:
+                return redirect_to_login(request.get_full_path(), settings.LOGIN_URL)
 
 
 class DisableBrowserCachingMiddleware(MiddlewareMixin):
