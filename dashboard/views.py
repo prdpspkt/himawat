@@ -153,8 +153,17 @@ class PostUpdateView(BaseUpdateView):
         return context
     
     def form_valid(self, form):
+        if not form.instance.slug:
+            from django.utils.text import slugify
+            base_slug = slugify(form.instance.title)
+            slug = base_slug
+            counter = 1
+            while Post.objects.filter(slug=slug).exclude(pk=form.instance.pk).exists():
+                slug = f'{base_slug}-{counter}'
+                counter += 1
+            form.instance.slug = slug
         response = super().form_valid(form)
-        
+
         # Handle tags from the hidden input
         tags_input = self.request.POST.get('tags', '')
         if tags_input:
@@ -162,7 +171,7 @@ class PostUpdateView(BaseUpdateView):
             self.object.tags.set(tag_ids)
         else:
             self.object.tags.clear()
-        
+
         return response
 
 

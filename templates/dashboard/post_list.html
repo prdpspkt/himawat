@@ -77,7 +77,7 @@
                             <a href="{% url 'dashboard:post_revisions' post.pk %}" class="btn btn-sm btn-outline-info" title="Revisions">
                                 <i class="fas fa-history"></i>
                             </a>
-                            <a href="{% url 'pages:post_detail' post.slug %}" target="_blank" class="btn btn-sm btn-outline-success" title="View">
+                            <a href="{% if post.slug %}{% url 'pages:post_detail' post.slug %}{% else %}#{% endif %}" target="_blank" class="btn btn-sm btn-outline-success" title="View">
                                 <i class="fas fa-eye"></i>
                             </a>
                             <a href="{% url 'dashboard:post_delete' post.pk %}" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure?')">
