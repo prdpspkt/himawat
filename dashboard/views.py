@@ -118,9 +118,8 @@ class PostCreateView(BaseCreateView):
     
     def form_valid(self, form):
         form.instance.author = self.request.user
-        # Auto-generate unique slug from title
         from django.utils.text import slugify
-        base_slug = slugify(form.instance.title)
+        base_slug = slugify(form.instance.title) or 'post'
         slug = base_slug
         counter = 1
         while Post.objects.filter(slug=slug).exists():
@@ -155,7 +154,7 @@ class PostUpdateView(BaseUpdateView):
     def form_valid(self, form):
         if not form.instance.slug:
             from django.utils.text import slugify
-            base_slug = slugify(form.instance.title)
+            base_slug = slugify(form.instance.title) or 'post'
             slug = base_slug
             counter = 1
             while Post.objects.filter(slug=slug).exclude(pk=form.instance.pk).exists():
