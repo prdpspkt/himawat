@@ -196,6 +196,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Whitenoise for static file serving in production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Serve root-level files (robots.txt, favicon, etc.) directly via WhiteNoise
+WHITENOISE_ROOT = BASE_DIR / 'static'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

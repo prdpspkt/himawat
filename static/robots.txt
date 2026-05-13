@@ -16,4 +16,4 @@ Allow: /
 User-agent: Slackbot
 Allow: /
 
-Sitemap: {{ request.scheme }}://{{ request.get_host }}/sitemap.xml
+Sitemap: https://himawatkhandavastu.com/sitemap.xml
